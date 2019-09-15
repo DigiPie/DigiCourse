@@ -3,12 +3,9 @@ var router = express.Router();
 
 const { Pool } = require('pg')
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'postgres',
-  password: 'Post2102',
-  port: 5432,
-})
+	connectionString: process.env.DATABASE_URL
+});
+
 
 /* SQL Query */
 var sql_query = 'SELECT * FROM student_info';
