@@ -6,13 +6,11 @@ To deploy this project locally for testing and development purposes, follow the 
 
 1. [Install PostgreSQL](https://www.postgresql.org/download/)
 2. [Install NodeJS](https://nodejs.org/en/)
-3. Install **express-generator** by entering `npm install express-generator -g` into your terminal
-4. Install **ejs** by using `npm install ejs`
-5. Open the newly created folder by using `cd src`
-6. Install the required packages by using `npm install`
-7. Run this project on your local server by using `node bin\www` for Linux or `node bin/www` for Windows
-8. Open `localhost:3000` in your web browser and you should see the project's landing web page
-9. Stop the server by using `CTRL + C`
+3. Open the newly created folder by using `cd src`
+4. Install the required packages by using `npm install`
+5. Run this project on your local server by using `node bin\www` for Linux or `node bin/www` for Windows
+6. Open `localhost:3000` in your web browser and you should see the project's landing web page
+7. Stop the server by using `CTRL + C`
 
 # Acknowledgements
 * DigiCourse was developed under National University of Singapore's [CS2102: Database Systems module](https://nusmods.com/modules/CS2102/database-systems) which was taught by [Dr. Prabawa Adi Yoga Sidi](https://www.comp.nus.edu.sg/cs/bio/adi-yoga/).
