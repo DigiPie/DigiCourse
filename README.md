@@ -14,5 +14,5 @@ To deploy this project locally for testing and development purposes, follow the 
 8. Stop the server by using `CTRL + C`.
 
 # Acknowledgements
-* DigiCourse was developed under National University of Singapore's [CS2102: Database Systems module](https://nusmods.com/modules/CS2102/database-systems) which was taught by [Dr. Prabawa Adi Yoga Sidi](https://www.comp.nus.edu.sg/cs/bio/adi-yoga/).
+* DigiCourse was developed for National University of Singapore's [CS2102: Database Systems](https://nusmods.com/modules/CS2102/database-systems) Autumn 2019. It was conducted by [Dr. Prabawa Adi Yoga Sidi](https://www.comp.nus.edu.sg/cs/bio/adi-yoga/).
 * DigiCourse was developed by [Evan Tay](https://github.com/DigiPie/), [Lee Tze Ting](https://github.com/halcyoneee), [Bryan Koh](https://github.com/awarenessxz) and [Jacqueline Cheong](https://github.com/Aquarinte/) over 2 months from September to November 2019.
