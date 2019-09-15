@@ -12,7 +12,7 @@ To deploy this project locally for development purposes, follow the steps below.
 
 ### Database setup
 
-1. Log into **psql** by entering `psql -U username -d database`. Replace the fields accordingly (e.g. `sudo -U postgres -d postgres`).
+1. Log into **psql** by entering `psql -U username -d database`. Replace the fields accordingly (e.g. `psql -U postgres -d postgres`).
 2. Execute _postgresql_script.sql_ by running the command `\i postgresql_script.sql`.
 7. Exit **psql** by entering `\q`.
 
@@ -25,7 +25,7 @@ To deploy this project locally for development purposes, follow the steps below.
 
 ### Local server setup
 1. Run this project on your local server by using `node bin\www` for Linux or `node bin/www` for Windows.
-2. Open `localhost:3000` in your web browser and you should see the project's landing web page.
+2. Open `localhost:3000/insert` in your web browser and you should see a form submission web page.
 3. Stop the server by using `CTRL + C`.
 
 # Acknowledgements
