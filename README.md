@@ -13,7 +13,7 @@ To deploy this project locally for development purposes, follow the steps below.
 ### Database setup
 
 1. Log into **psql** by entering `psql -U username -d database`. Replace the fields accordingly (e.g. `psql -U postgres -d postgres`).
-2. Execute _postgresql_script.sql_ by running the command `\i postgresql_script.sql`.
+2. Execute _setup.sql_ by running the command `\i setup.sql`.
 7. Exit **psql** by entering `\q`.
 
 ### NodeJS setup
