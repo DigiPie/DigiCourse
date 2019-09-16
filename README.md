@@ -1,7 +1,13 @@
 # DigiCourse
 A course management platform where student-teacher interactions can take place seamlessly online.
 
-# Local deployment
+## Tech stack
+This project was built using the following technologies:
+- Back-end: NodeJS, ExpressJS, PostgreSQL
+- Front-end: JQuery, Bootstrap
+- Continuous Deployment: Herokuapp
+
+## Local deployment
 To deploy this project locally for development purposes, follow the steps below.
 
 ### Downloads
@@ -28,6 +34,6 @@ To deploy this project locally for development purposes, follow the steps below.
 2. Open `localhost:3000/insert` in your web browser and you should see a form submission web page.
 3. Stop the server by using `CTRL + C`.
 
-# Acknowledgements
+## Acknowledgements
 * DigiCourse was developed for National University of Singapore's [CS2102: Database Systems](https://nusmods.com/modules/CS2102/database-systems) (Autumn 2019, taught by [Dr. Prabawa Adi Yoga Sidi](https://www.comp.nus.edu.sg/cs/bio/adi-yoga/)).
 * DigiCourse was developed by [Evan Tay](https://github.com/DigiPie/), [Lee Tze Ting](https://github.com/halcyoneee), [Bryan Koh](https://github.com/awarenessxz) and [Jacqueline Cheong](https://github.com/Aquarinte/) from September to November 2019.
