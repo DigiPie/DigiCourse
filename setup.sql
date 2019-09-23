@@ -1,3 +1,4 @@
+-- This file will be executed each time the project is deployed to Heroku
 DROP TABLE IF EXISTS student_info;
 
 CREATE TABLE student_info (
