@@ -20,13 +20,15 @@ To contribute to this project:
 The `dev` branch will be merged to the `master` branch at appropriate development stages.
 
 ## Continuous deployment
-Each time a commit is made to the `master` branch, the project is automatically deployed to Heroku. The following occurs:
+Each time a commit is made to the `master` branch, the project is automatically deployed to Heroku. The following occurs next:
 
-1. A commit is made to the `master` branch, the project build begins on Heroku.
-2. Heroku runs the first buildpack in the chain [subdir-psql-heroku](https://github.com/DigiPie/subdir-psql-heroku), with `PROJECT_PATH` set to 'src' and `SETUP_SQL` set to 'setup.sql'. This buildpack executes _setup.sql_ to perform the initial set up for the PostgreSQL database on Heroku. It then sets 'src' as the project root.
-3. Heroku then runs the second buildpack [heroku/nodejs](https://github.com/heroku/heroku-buildpack-nodejs) to build the NodeJS application.
+1. Heroku detects the commit and starts building the project.
+2. Heroku runs the first buildpack in the chain [psql-heroku-buildpack](https://github.com/DigiPie/psql-heroku-buildpack) which executes `setup.sql` to reset and repopulate the PostgreSQL database attached to this project's Herokuapp.
+3. The second buildpack [subdir-heroku-buildpack](https://github.com/DigiPie/subdir-heroku-buildpack) is then executed. It sets 'src' as the project root.
+4. Heroku then runs the third and final buildpack [heroku/nodejs](https://github.com/heroku/heroku-buildpack-nodejs) to build the NodeJS application.
+5. The project is deployed to [digicourse.herokuapp.com](https://digicourse.herokuapp.com).
 
 ## Acknowledgements
 * DigiCourse was developed for National University of Singapore's [CS2102: Database Systems](https://nusmods.com/modules/CS2102/database-systems) (Autumn 2019, taught by [Dr. Prabawa Adi Yoga Sidi](https://www.comp.nus.edu.sg/cs/bio/adi-yoga/)).
 * This project was developed by [Evan Tay](https://github.com/DigiPie/), [Lee Tze Ting](https://github.com/halcyoneee), [Bryan Koh](https://github.com/awarenessxz) and [Jacqueline Cheong](https://github.com/Aquarinte/) from September to November 2019.
-* This project is deployed to Heroku with the help of the Heroku buildpack [subdir-psql-heroku](https://github.com/DigiPie/subdir-psql-heroku) which was written by [Alexey Timanovsky](https://github.com/timanovsky) and Evan Tay.
+* This project is deployed to Heroku with the help of the Heroku buildpack [subdir-heroku-buildpack](https://github.com/DigiPie/subdir-heroku-buildpack) developed by [Alexey Timanovsky](https://github.com/timanovsky).

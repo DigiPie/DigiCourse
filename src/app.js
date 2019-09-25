@@ -32,6 +32,10 @@ var formsRouter = require('./routes/forms');
 var insertRouter = require('./routes/insert');
 /* ---------------------------- */
 
+/* --- course template --- */
+var dashboardRouter = require('./routes/dashboard');
+var courseRouter = require('./routes/course');
+
 var app = express();
 
 // view engine setup
@@ -70,6 +74,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/insert', insertRouter);
 /* ---------------------------- */
+
+/* course template */
+app.use('/dashboard', dashboardRouter);
+app.use('/course', courseRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
