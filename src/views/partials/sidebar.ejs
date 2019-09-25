@@ -1,0 +1,46 @@
+<div class="sidebar">
+  <!-- user profile -->
+  <div class="user-profile">
+    <div class="display-avatar animated-avatar">
+      <img class="profile-img img-lg rounded-circle" width="100" height="100" src="images/test.png" alt="profile image">
+    </div>
+    <div class="info-wrapper">
+      <p class="user-name"><%= username %></p>
+      <h6 class="display-income"><%= accountType %></h6>
+    </div>
+  </div>
+  <!-- End of user profile -->
+
+  <!-- side bar menu -->
+  <% if (isCourse) { %>
+  <ul class="navigation-menu">
+    <li class="nav-title"><%= data[0].name %></li>
+    <li class="nav-category-divider">Course Main Menu</li>
+    <li>
+      <a href="#">
+        <span class="link-title">Announcement</span>
+        <i class="mdi mdi-clipboard-alert link-icon"></i>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <span class="link-title">Content</span>
+        <i class="mdi mdi-book-open link-icon"></i>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <span class="link-title">Class / Group</span>
+        <i class="mdi mdi-google-classroom link-icon"></i>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <span class="link-title">Forum</span>
+        <i class="mdi mdi-forum link-icon"></i>
+      </a>
+    </li>
+  </ul>
+  <% } %>
+  <!-- End of side bar menu -->
+</div>

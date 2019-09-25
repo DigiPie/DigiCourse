@@ -1,6 +1,8 @@
 -- This file will be executed each time the project is deployed to Heroku
 DROP TABLE IF EXISTS student_info;
+DROP TABLE IF EXISTS courses;
 
+-- Student Table
 CREATE TABLE student_info (
 	matric  varchar(9) PRIMARY KEY,
 	name    varchar(255) NOT NULL,
@@ -36,3 +38,14 @@ VALUES ('A0000009I', 'Frances Wright', 'SCI');
 
 INSERT INTO student_info (matric, name, faculty)
 VALUES ('A0000010J', 'Alyssa Sims', 'SCI');
+
+-- Course Table
+CREATE TABLE courses (
+	code varchar(10) PRIMARY KEY,
+	name varchar(20) NOT NULL,
+	capacity integer NOT NULL
+);
+
+INSERT INTO courses 
+VALUES ('CS2102', 'Database', 40), ('CS3103', 'Networking', 40);
+
