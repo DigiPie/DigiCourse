@@ -8,32 +8,27 @@ This project was built using the following technologies:
 - Continuous Deployment: Herokuapp
 
 ## Local deployment
-To deploy this project locally for development purposes, follow the steps below.
+To deploy this project locally for development purposes, follow the steps in the [local development guide](DEVELOP.md).
 
-### Downloads
-1. [Install PostgreSQL](https://www.postgresql.org/download/).
-2. [Install NodeJS](https://nodejs.org/en/).
-3. Clone this repository (e.g. enter `git clone https://github.com/DigiPie/DigiCourse.git` in your command-line terminal).
-4. Change directory to the newly created _DigiCourse_ directory by entering `cd DigiCourse`.
+## Contribution
+To contribute to this project:
 
-### Database setup
+1. Fork this repo.
+2. Create a new branch (e.g. `feature-1`) and do your development on this branch.
+3. After completing a feature, make a pull request to merge your branch to the `dev` branch on this repo.
 
-1. Log into **psql** by entering `psql -U username -d database`. Replace the fields accordingly (e.g. `psql -U postgres -d postgres`).
-2. Execute _setup.sql_ by running the command `\i setup.sql`.
-7. Exit **psql** by entering `\q`.
+The `dev` branch will be merged to the `master` branch at appropriate development stages.
 
-### NodeJS setup
+## Continuous deployment
+Each time a commit is made to the `master` branch, the project is automatically deployed to Heroku. The following occurs next:
 
-1. Change directory to the _src_ folder by entering the command `cd src`.
-2. Install the required packages by entering `npm install`.
-3. Create a file named _.env_ in the current directory (_src_).
-4. Open _.env_ and type in the following: `DATABASE_URL=postgres://username:password@localhost:5432/database_name` (e.g. `DATABASE_URL=postgres://postgres:password@localhost:5432/postgres`). Replace the fields accordingly (5432 is the default port for Postgres).
-
-### Local server setup
-1. Run this project on your local server by using `node bin\www` for Linux or `node bin/www` for Windows.
-2. Open `localhost:3000/insert` in your web browser and you should see a form submission web page.
-3. Stop the server by using `CTRL + C`.
+1. Heroku detects the commit and starts building the project.
+2. Heroku runs the first buildpack in the chain [psql-heroku-buildpack](https://github.com/DigiPie/psql-heroku-buildpack) which executes `setup.sql` to reset and repopulate the PostgreSQL database attached to this project's Herokuapp.
+3. The second buildpack [subdir-heroku-buildpack](https://github.com/DigiPie/subdir-heroku-buildpack) is then executed. It sets 'src' as the project root.
+4. Heroku then runs the third and final buildpack [heroku/nodejs](https://github.com/heroku/heroku-buildpack-nodejs) to build the NodeJS application.
+5. The project is deployed to [digicourse.herokuapp.com](https://digicourse.herokuapp.com).
 
 ## Acknowledgements
 * DigiCourse was developed for National University of Singapore's [CS2102: Database Systems](https://nusmods.com/modules/CS2102/database-systems) (Autumn 2019, taught by [Dr. Prabawa Adi Yoga Sidi](https://www.comp.nus.edu.sg/cs/bio/adi-yoga/)).
-* DigiCourse was developed by [Evan Tay](https://github.com/DigiPie/), [Lee Tze Ting](https://github.com/halcyoneee), [Bryan Koh](https://github.com/awarenessxz) and [Jacqueline Cheong](https://github.com/Aquarinte/) from September to November 2019.
+* This project was developed by [Evan Tay](https://github.com/DigiPie/), [Lee Tze Ting](https://github.com/halcyoneee), [Bryan Koh](https://github.com/awarenessxz) and [Jacqueline Cheong](https://github.com/Aquarinte/) from September to November 2019.
+* This project is deployed to Heroku with the help of the Heroku buildpack [subdir-heroku-buildpack](https://github.com/DigiPie/subdir-heroku-buildpack) developed by [Alexey Timanovsky](https://github.com/timanovsky).
