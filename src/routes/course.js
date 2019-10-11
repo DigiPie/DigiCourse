@@ -10,9 +10,11 @@ const pool = new Pool({
 var courseName;
 
 /**** Routing ****/
-router.get('/:ccode', function(req, res, next) {
-	var sql_query = 'SELECT * FROM courses WHERE code=\'' + req.params.ccode + '\'';
+router.get('/:cid', function(req, res, next) {
+	var sql_query = `SELECT * FROM courses WHERE c_id =\'${req.params.cid}\'`;
+	console.log("ccode "+ req.params.cid)
 	pool.query(sql_query, (err, data) => {
+		console.log (data.rows);
 		res.render('course', {
 			isCourse: true, 
 			username: "Name",
