@@ -12,14 +12,13 @@ router.get('/', function(req, res, next) {
         isCourse: req.isCourse, 
 		username: req.username,
 		accountType: req.accountType, 
-        ccode: req.ccode,
+        cid: req.cid,
         data: req.data
     });
 });
 
 router.get('/:forumId', function(req, res, next) {
-    let ccode = req.ccode;
-    let forumId = req.params.forumId;
+    let ccode = req.cid;
   });
 
 module.exports = router;

@@ -19,18 +19,18 @@ router.get('/:cid', function(req, res, next) {
 			isCourse: true, 
 			username: "Name",
 			accountType: "Student",
-			ccode: req.params.ccode,
+			cid: req.params.cid,
 			data: data.rows 
 		});
 		courseName = data.rows;
 	});
 });
 
-router.use('/:ccode/forum', function(req, res, next) {
+router.use('/:cid/forum', function(req, res, next) {
 	req.isCourse = true, 
 	req.username = "Name",
 	req.accountType = "Student",
-	req.ccode = req.params.ccode;
+	req.cid = req.params.cid;
 	req.data = courseName;
 	next()
 }, forum);
