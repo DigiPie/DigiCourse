@@ -3,6 +3,44 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+a, a:visited {
+  color: #007bff;
+  border: none;
+  outline: 0;
+  text-decoration: none;
+  transition: color .3s ease-in-out;
 }
+
+a:hover {
+  color: #02264B;
+  text-decoration: none;
+}
+
+#error-block {
+  margin: 2rem 1rem;
+}
+
+#error-block h1 {
+  margin-top: 0.6rem;
+}
+
+#error-block h5 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#error-block a {
+  font-size: 1.2rem;
+}
+
+#error-block i {
+  font-size: 1.4rem;
+}
+
+.bg-gray {
+  background-color: #FBFCFD;
+}
+
+.logo-mid {
+  width: 120px;
+}
+

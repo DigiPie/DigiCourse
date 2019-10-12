@@ -86,17 +86,13 @@ app.use(function(req, res, next) {
 
 // Error handler
 app.use(function(err, req, res, next) {
-  // Set locals, only provide error message in development
+  // Set locals
+  res.locals.status = err.status;
   res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // Render the error page
   res.status(err.status || 500);
-  res.render('error', { 
-    isCourse: false, 
-    username: "",
-    accountType: ""
-  });
+  res.render('error');
 });
 
 module.exports = app;
