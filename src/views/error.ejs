@@ -3,7 +3,7 @@
 
 <head>
     <!-- Page Title -->
-    <title>Error: <%= status %></title>
+    <title><%= err_status %></title>
 
     <!-- CSS for Styling -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
@@ -21,8 +21,8 @@
     <!-- Main Content -->
     <div id="error-block">
         <img class="logo-mid" src="images/logo.png" />
-        <h1>Error: <%= status %></h1>
-        <h5><%= message %></h5>
+        <h1><%= err_status %></h1>
+        <h5><%= err_msg %></h5>
         <br>
         <a href="/">Return to home page <i class="mdi mdi-logout"></i></a>
     </div>

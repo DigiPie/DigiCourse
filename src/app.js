@@ -79,7 +79,8 @@ app.use('/insert', insertRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/course', courseRouter);
 
-// catch 404 and forward to error handler
+/* Error handling */
+// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
@@ -87,8 +88,13 @@ app.use(function(req, res, next) {
 // Error handler
 app.use(function(err, req, res, next) {
   // Set locals
-  res.locals.status = err.status;
-  res.locals.message = err.message;
+  if (err.status == 404) {
+    res.locals.err_status = "Error: 404";
+    res.locals.err_msg = "Page not found.";
+  } else {
+    res.locals.err_status = "Error";
+    res.locals.err_msg = "Unexpected error occured.";
+  }
 
   // Render the error page
   res.status(err.status || 500);
