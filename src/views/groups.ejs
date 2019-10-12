@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title>Course Dashboard</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/label_template.css' />
+    <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  
+  </head>
+  <body class="header-fixed">
+
+  	<!-- nav bar -->
+    <% include partials/nav.ejs %>
+    <!-- End of Navbar -->
+
+    <!-- Main Content -->
+  	<div class="page-body">
+
+      <!-- side bar -->
+      <%- include('./partials/sidebar', { cid: cid }); %>
+      <!-- End of Sidebar -->
+
+      <!-- Right Box -->
+      <div class="page-content-wrapper">
+        <!-- Content -->
+        <div class="page-content-wrapper-inner">
+          <div class="content-viewport">
+            <div class="row">
+              <div class="col-12 py-5">
+                <div class="topnav">
+                  <a class="active" href="#">Create group</a>
+                  <a href="/course/<%= cid %>/groups/assign">Assign group</a>
+                </div>
+              </br>
+                <% if (messages.error) {%>
+                  <div class="alert alert-danger">
+                    <%= messages.error %>
+                  </div>
+                <% } %>
+                <form id="html_form" action="/course/<%= cid %>/groups/create" role="form" method="post">
+                  <div class="form-group">
+                    <label for="g_num">Group number</label>
+                    <input type="number" class="form-control" id="g_num" name="g_num" placeholder="Enter group number">
+                  </div>
+                  <div class="form-group">
+                    <label for="g_capacity">Group capacity</label>
+                    <input type="number" class="form-control" id="g_capacity" name="g_capacity" value="4">
+                  </div>
+                  <input type="hidden" name='c_id' value="<%= cid %>">
+                  <button type="submit" class="btn btn-primary">Create group</button>
+                </form>
+                <br>
+                </br>
+                <% if (datarows.length == 0) { %>
+                <h4>There are no students enrolled to any groups in this module.</h4>
+                <% } else { %>
+                <form id="html_form" role="form" method="post">
+                  <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Group number</th>
+                          <th scope="col">Group capacity</th>
+                          <th scope="col">Number of enrolled</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% for (var i = 0; i < datarows.length; i++) { %>
+                        <tr>
+                          <td><%= datarows[i].g_num %></td>
+                          <td><%= datarows[i].g_capacity %></td>
+                          <td><%= datarows[i].enrolled %></td>
+                        </tr>
+                        <% } %>
+                      </tbody>
+                    </table>
+                </form>
+                <% } %>
+              </div>
+            </div>
+            <!-- put your stuff here -->
+          </div>
+        </div>
+        <!-- End of Content -->
+
+        <!-- Footer -->
+        <% include partials/footer.ejs %>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Right Box -->
+
+    </div>
+    <!-- End of Main Content -->
+
+    <!-- Additional Javascript -->
+    <script src="javascripts/label_template.js"></script>
+  </body>
+</html>

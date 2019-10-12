@@ -6,3 +6,53 @@ body {
 a {
   color: #00B7FF;
 }
+
+td.min {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.topnav {
+  overflow: hidden;
+  color: #333;
+}
+
+.topnav a {
+  float: left;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+  border-bottom: solid 6px #efb200;
+}
+
+.topnav a {
+  color: black;
+}
