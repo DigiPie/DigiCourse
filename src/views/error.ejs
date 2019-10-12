@@ -17,14 +17,18 @@
         crossorigin="anonymous"></script>
 </head>
 
-<body class="text-center bg-gray">
+<body class="text-center bg-dark">
     <!-- Main Content -->
-    <div id="error-block">
-        <img class="logo-mid" src="images/logo.png" />
-        <h1><%= err_status %></h1>
-        <h5><%= err_msg %></h5>
-        <br>
-        <a href="/">Return to home page <i class="mdi mdi-logout"></i></a>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-md-6 col-lg-6 mx-auto mt-5 p-5 bg-light border-error rounded">
+                    <img class="logo-mid mx-auto my-4" src="images/logo.png" />
+                <h1><%= err_status %></h1>
+                <h5><%= err_msg %></h5>
+                <br>
+                <a href="/"><i class="mdi mdi-logout"> </i>Return to home page</i></a>
+            </div>
+        </div>
     </div>
     <!-- End of Main Content -->
 </body>
