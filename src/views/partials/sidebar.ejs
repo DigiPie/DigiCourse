@@ -34,6 +34,14 @@
         <i class="mdi mdi-google-classroom link-icon"></i>
       </a>
     </li>
+    <% if (accountType == 'Professor') {%>
+    <li>
+        <a href="/course/<%= cid %>/enrollments">
+          <span class="link-title">Enrollments</span>
+          <i class="mdi mdi-google-classroom link-icon"></i>
+        </a>
+      </li>
+    <% } %> 
     <li>
       <a href="/course/<%= cid %>/forum">
         <span class="link-title">Forum</span>
