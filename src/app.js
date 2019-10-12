@@ -36,6 +36,9 @@ var insertRouter = require('./routes/insert');
 var dashboardRouter = require('./routes/dashboard');
 var courseRouter = require('./routes/course');
 
+/* --- Login router  --- */
+var loginRouter = require('./routes/login');
+
 var app = express();
 
 // view engine setup
@@ -78,6 +81,9 @@ app.use('/insert', insertRouter);
 /* course template */
 app.use('/dashboard', dashboardRouter);
 app.use('/course', courseRouter);
+
+/* Login */
+app.use('/login', loginRouter);
 
 /* Error handling */
 // Catch 404 and forward to error handler

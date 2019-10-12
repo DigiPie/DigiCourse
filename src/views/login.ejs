@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Page Title -->
+    <title>Login</title>
+
+    <!-- CSS for Styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
+
+    <!-- JavaScript for Interactivity -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+</head>
+
+<body class="text-center bg-dark">
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-md-6 col-lg-6 mx-auto mt-5 p-5 bg-light border-prompt rounded">
+                <img class="logo-mid mx-auto my-4" src="images/logo.png" />
+                <form method="post" action="login">
+                    <div class="form-group">
+                        <div class="form-label-group">
+                            <input type="text" id="username" class="form-control" placeholder="User ID"
+                                required="required" autofocus="autofocus" name="username"
+                                pattern="[A-Za-z][A-Za-z0-9_]{2,14}">
+                            <label for="username" class="mt-2">User ID</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-label-group">
+                            <input type="password" id="password" class="form-control" placeholder="Password"
+                                required="required" name="password">
+                            <label for="password" class="mt-2">Password</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mx-auto px-5">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End of Main Content -->
+</body>
+
+</html>
