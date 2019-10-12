@@ -36,34 +36,50 @@
           <div class="content-viewport">
             <div class="row">
               <div class="col-12 py-5">
+                <div class="topnav">
+                  <a class="active" href="#">Create group</a>
+                  <a href="/course/<%= cid %>/groups/assign">Assign group</a>
+                </div>
+              </br>
+                <% if (messages.error) {%>
+                  <div class="alert alert-danger">
+                    <%= messages.error %>
+                  </div>
+                <% } %>
+                <form id="html_form" action="/course/<%= cid %>/groups/create" role="form" method="post">
+                  <div class="form-group">
+                    <label for="g_num">Group number</label>
+                    <input type="number" class="form-control" id="g_num" name="g_num" placeholder="Enter group number">
+                  </div>
+                  <div class="form-group">
+                    <label for="g_capacity">Group capacity</label>
+                    <input type="number" class="form-control" id="g_capacity" name="g_capacity" value="4">
+                  </div>
+                  <input type="hidden" name='c_id' value="<%= cid %>">
+                  <button type="submit" class="btn btn-primary">Create group</button>
+                </form>
+                <br>
+                </br>
                 <% if (datarows.length == 0) { %>
-                <h4>No pending request</h4>
+                <h4>There are no students enrolled to any groups in this module.</h4>
                 <% } else { %>
                 <form id="html_form" role="form" method="post">
                   <table class="table">
                       <thead>
                         <tr>
-                          <th scope="col"></th>
-                          <th scope="col">Student ID</th>
-                          <th scope="col">Course ID</th>
-                          <th scope="col">Request type</th>
-                          <th scope="col">Request date time</th>
+                          <th scope="col">Group number</th>
+                          <th scope="col">Group capacity</th>
+                          <th scope="col">Number of enrolled</th>
                         </tr>
                       </thead>
                       <tbody>
                         <% for (var i = 0; i < datarows.length; i++) { %>
                         <tr>
-                          <td class="min"><input type="checkbox" name="row[<%= i %>][accepted]" ></td>
-                          <td><input type="hidden" name='row[<%= i %>][s_id]' value="<%= datarows[i].s_id %>"><%= datarows[i].s_id %></td>
-                          <td><input type="hidden" name='row[<%= i %>][c_id]' value="<%= datarows[i].c_id %>"><%= datarows[i].c_id %></td>
-                          <td><input type="hidden" name='row[<%= i %>][req_type]' value="<%= datarows[i].req_type %>"><%= datarows[i].req_type == 1 ? 'Student' : 'Teaching Assistant' %></td>
-                          <td><input type="hidden" name='row[<%= i %>][req_datetime]' value="<%= datarows[i].req_datetime %>"><%= datarows[i].req_datetime %></td>
+                          <td><%= datarows[i].g_num %></td>
+                          <td><%= datarows[i].g_capacity %></td>
+                          <td><%= datarows[i].enrolled %></td>
                         </tr>
                         <% } %>
-                        <tr>
-                          <td><button type="submit" formaction="/course/<%= cid %>/enrollments/accept" class="btn btn-primary" >Accept</button></td>
-                          <td><button type="submit" formaction="/course/<%= cid %>/enrollments/reject" class="btn btn-primary" >Reject</button></td>
-                        </tr>
                       </tbody>
                     </table>
                 </form>

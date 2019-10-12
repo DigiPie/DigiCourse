@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var forum = require('./forum');
 const enrollments = require('./enrollments');
-
+const groups = require('./groups');
 const { Pool } = require('pg')
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
@@ -42,5 +42,14 @@ router.use('/:cid/enrollments', function(req, res, next) {
 	req.data = courseName;
 	next()
 }, enrollments);
+
+router.use('/:cid/groups', function(req, res, next) {		
+	req.isCourse = true, 
+	req.username = "Name",
+	req.accountType = "Professor",
+	req.cid = req.params.cid;
+	req.data = courseName;
+	next()
+}, groups);
 
 module.exports = router;

@@ -12,6 +12,8 @@
     "dotenv": "^8.1.0",
     "ejs": "^2.6.2",
     "express": "~4.16.1",
+    "express-flash": "0.0.2",
+    "express-session": "^1.17.0",
     "http-errors": "~1.6.3",
     "lodash": "^4.17.15",
     "morgan": "~1.9.1",
