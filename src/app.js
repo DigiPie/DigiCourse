@@ -120,9 +120,12 @@ app.use(function(err, req, res, next) {
   if (err.status == 404) {
     res.locals.err_status = "Error: 404";
     res.locals.err_msg = "Page not found.";
+  } else if (app.get('env') === 'development') {
+    res.locals.err_status = "Error";
+    res.locals.err_msg = err.message;
   } else {
     res.locals.err_status = "Error";
-    res.locals.err_msg = "Unexpected error occured.";
+    res.locals.err_msg = "Unexpected error occurred.";
   }
 
   // Render the error page
