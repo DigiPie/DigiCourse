@@ -16,23 +16,22 @@ const pool = new Pool({
 function findUser (u_id, callback) {
 	pool.query(sql_query.query.select_user, [u_id], (err, data) => {
 		if(err) {
-			console.error("Cannot find user");
+			console.error("Unable to connect to database");
 			return callback(null);
 		}
 		
 		if(data.rows.length == 0) {
-			console.error("User does not exists?");
-			return callback(null)
+			console.error("User does not exist");
+			return callback(null);
 		} else if(data.rows.length == 1) {
 			return callback(null, {
-        u_id      : data.rows[0].u_id,
-        u_type    : data.rows[0].u_type,
+        u_id: data.rows[0].u_id,
+        u_type: data.rows[0].u_type,
         passwd_hash: data.rows[0].passwd,
 			});
-		} else {
-			console.error("More than one user?");
-			return callback(null);
-		}
+    }
+    
+    return callback(null);
 	});
 }
 
