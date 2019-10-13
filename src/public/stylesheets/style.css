@@ -6,3 +6,34 @@ body {
 a {
   color: #00B7FF;
 }
+
+td.min {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.topnav {
+  overflow: hidden;
+  color: #333;
+}
+
+.topnav a {
+  float: left;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+  border-bottom: solid 6px #efb200;
+}
+
+.topnav a {
+  color: black;
+}
