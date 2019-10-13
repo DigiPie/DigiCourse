@@ -34,13 +34,14 @@
         <!-- Content -->
         <div class="page-content-wrapper-inner">
           <div class="content-viewport">
-            <div class="row">
-              <div class="col-12 py-5">
-                <h4><%= data[0].c_id %></h4>
-                <p class="text-gray">all</p>
+
+            <main role="main" class="container">
+              <div class="jumbotron">
+                <h1><%= data[0].c_id %> <%= data[0].c_name %></h1>
+                <p class="lead"><%= data[0].c_desc %></p>
               </div>
-            </div>
-            <!-- put your stuff here -->
+            </main>
+
           </div>
         </div>
         <!-- End of Content -->
