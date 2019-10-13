@@ -10,7 +10,8 @@ const pool = new Pool({
 
 /**** Routing ****/
 router.get('/', function(req, res, next) {
-    var sql_query = `SELECT * FROM Enrollments WHERE c_id =\'${req.params.cid}\' AND NOT req_status`;
+    var sql_query = `SELECT s_id, c_id, req_type, p_id, req_status, TO_CHAR(req_datetime, 'Dy Mon DD YYYY HH24:MI:SS') req_datetime 
+    FROM Enrollments WHERE c_id =\'${req.params.cid}\' AND NOT req_status`;
 
 	pool.query(sql_query, (err, data) => {
         res.render('enrollments', {
@@ -36,8 +37,6 @@ router.post('/accept', function(req, res, next) {
         delete selected_rows[i].accepted;
         selected_rows[i].req_status = true;
         selected_rows[i].p_id = account_uid;
-        var removedTimezone = selected_rows[i].req_datetime;
-        selected_rows[i].req_datetime = removedTimezone.replace(" GMT+0800 (Singapore Standard Time)", "");
         sids.push(selected_rows[i].s_id);
     }
     
