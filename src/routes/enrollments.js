@@ -32,6 +32,7 @@ router.post('/increase', function(req, res, next) {
     if (req.body.c_capacity.length == 0) {
         req.flash('error', `Please enter a capacity`);
         res.status(400).redirect('back');
+        return;
     }
 
     const column_set = new pgp.helpers.ColumnSet(['?c_id', 'c_capacity'], {table: 'courses'});
@@ -54,8 +55,13 @@ router.post('/increase', function(req, res, next) {
 // POST
 router.post('/accept', function(req, res, next) {
     const selected_rows = filter(req.body.row, { 'accepted': 'on' });
-    var sids = [];
+    if (selected_rows.length == 0) {
+        req.flash('error', `Please select a student`);
+        res.status(400).redirect('back');
+        return;
+    }
 
+    var sids = [];
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].accepted;
         selected_rows[i].req_status = true;
@@ -91,6 +97,12 @@ router.post('/accept', function(req, res, next) {
 // POST
 router.post('/reject', function(req, res, next) {
     const selected_rows = filter(req.body.row, { 'accepted': 'on' });
+    if (selected_rows.length == 0) {
+        req.flash('error', `Please select a student`);
+        res.status(400).redirect('back');
+        return;
+    }
+    
     var sids = [];
 
     for(var i=0; i<selected_rows.length; i++) {
@@ -101,11 +113,6 @@ router.post('/reject', function(req, res, next) {
     }
 
     sids = sids.join(', ');
-
-    if (selected_rows.length == 0) {
-        req.flash('error', `Please select a student`);
-        res.status(400).redirect('back');
-    }
 
     const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_id', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
     const update_sql = pgp.helpers.update(selected_rows, column_set) 
