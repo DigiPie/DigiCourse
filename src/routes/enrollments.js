@@ -30,6 +30,7 @@ const account_uid = 'P0000001A';
 // POST
 router.post('/accept', function(req, res, next) {
     const selected_rows = filter(req.body.row, { 'accepted': 'on' });
+    var sids = [];
 
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].accepted;
@@ -37,10 +38,14 @@ router.post('/accept', function(req, res, next) {
         selected_rows[i].p_id = account_uid;
         var removedTimezone = selected_rows[i].req_datetime;
         selected_rows[i].req_datetime = removedTimezone.replace(" GMT+0800 (Singapore Standard Time)", "");
+        sids.push(selected_rows[i].s_id);
     }
+    
+    sids = sids.join(', ');
 
     if (selected_rows.length == 0) {
-        res.status(200).redirect('back');
+        req.flash('error', `Please select a student`);
+        res.status(400).redirect('back');
     }
 
     const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_id', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
@@ -55,6 +60,7 @@ router.post('/accept', function(req, res, next) {
                 error: err
             });
         } else {
+            req.flash('success', `Successfully enrolled ${sids}.`);
             res.status(200).redirect('back');
         }
 	});
@@ -63,15 +69,20 @@ router.post('/accept', function(req, res, next) {
 // POST
 router.post('/reject', function(req, res, next) {
     const selected_rows = filter(req.body.row, { 'accepted': 'on' });
+    var sids = [];
 
     for(var i=0; i<selected_rows.length; i++) {
         delete selected_rows[i].accepted;
         selected_rows[i].req_status = false;
         selected_rows[i].p_id = account_uid;
+        sids.push(selected_rows[i].s_id);
     }
 
+    sids = sids.join(', ');
+
     if (selected_rows.length == 0) {
-        res.status(200).redirect('back');
+        req.flash('error', `Please select a student`);
+        res.status(400).redirect('back');
     }
 
     const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_id', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
@@ -86,6 +97,7 @@ router.post('/reject', function(req, res, next) {
                 error: err
             });
         } else {
+            req.flash('success', `Successfully rejected ${sids}.`);
             res.status(200).redirect('back');
         }
 	});

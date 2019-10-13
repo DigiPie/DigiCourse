@@ -42,6 +42,11 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/create', function(req, res, next) {
+    if (req.body.g_num == '' || isNaN(req.body.g_num)) {
+        req.flash('error', `Please enter a valid group number`);
+        res.redirect(`/course/${req.body.c_id}/groups`);
+    }
+
     var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.body.c_id}', '${req.body.g_num}', '${req.body.g_capacity}')`;
 
 	pool.query(sql_query, (err, data) => {
