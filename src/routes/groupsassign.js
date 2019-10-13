@@ -9,6 +9,7 @@ const pool = new Pool({
 
 router.get('/', function(req, res, next) {
     var sql_query = `SELECT * FROM CourseEnrollments WHERE c_id =\'${req.params.cid}\' 
+        AND req_type = 1
         AND s_id NOT IN (
             SELECT s_id
             FROM StudentGroups
@@ -33,7 +34,6 @@ router.get('/', function(req, res, next) {
 
 	pool.query(sql_query, (err, data) => {
         pool.query(group_list_query, (gerr, gdata) => {
-            console.log('groups %j', gdata);
             res.render('groupsassign', {
                 isCourse: req.isCourse, 
                 username: req.username,
@@ -50,14 +50,15 @@ router.get('/', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
     const selected_rows = filter(req.body.row, { 'selected': 'on' });
-
+    if (selected_rows.length == 0) {
+        req.flash('error', `Please select a student`);
+        res.status(400).redirect('back');
+        return;
+    }
+    
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].selected;
         selected_rows[i].g_num = req.body.g_num;
-    }
-
-    if (selected_rows.length == 0) {
-        res.status(200).redirect('back');
     }
 
     const column_set = new pgp.helpers.ColumnSet(['c_id', 's_id', 'g_num'], {table: 'studentgroups'});

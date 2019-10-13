@@ -36,6 +36,23 @@
           <div class="content-viewport">
             <div class="row">
               <div class="col-12 py-5">
+                <% if (messages.error) {%>
+                  <div class="alert alert-danger">
+                    <%= messages.error %>
+                  </div>
+                <% } if (messages.success) { %>
+                  <div class="alert alert-success">
+                    <%= messages.success %>
+                  </div>
+                <% } %>
+                <form id="html_form" role="form" method="post">
+                  <div class="form-group">
+                    <label for="c_capacity">Course current capacity: <%= capacity %><br>Enter new course capacity</label>
+                    <input type="number" class="form-control" id="c_capacity" name="c_capacity" value="<%= new_capacity %>">
+                  </div>
+                  <button type="submit" formaction="/course/<%= cid %>/enrollments/increase" class="btn btn-primary" >Submit</button>
+                </form>
+                <br>
                 <% if (datarows.length == 0) { %>
                 <h4>No pending request</h4>
                 <% } else { %>
@@ -48,6 +65,7 @@
                           <th scope="col">Course ID</th>
                           <th scope="col">Request type</th>
                           <th scope="col">Request date time</th>
+                          <th scope="col">Request status</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -58,6 +76,7 @@
                           <td><input type="hidden" name='row[<%= i %>][c_id]' value="<%= datarows[i].c_id %>"><%= datarows[i].c_id %></td>
                           <td><input type="hidden" name='row[<%= i %>][req_type]' value="<%= datarows[i].req_type %>"><%= datarows[i].req_type == 1 ? 'Student' : 'Teaching Assistant' %></td>
                           <td><input type="hidden" name='row[<%= i %>][req_datetime]' value="<%= datarows[i].req_datetime %>"><%= datarows[i].req_datetime %></td>
+                          <td><%= datarows[i].p_id ? 'Rejected' : 'nil' %></td>
                         </tr>
                         <% } %>
                         <tr>

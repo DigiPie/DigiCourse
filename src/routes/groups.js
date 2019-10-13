@@ -6,6 +6,8 @@ const pool = new Pool({
 });
 
 const groupsassign = require('./groupsassign');
+const groupsstudent = require('./groupsstudent');
+
 var courseName;
 
 router.get('/', function(req, res, next) {
@@ -40,6 +42,12 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/create', function(req, res, next) {
+    if (req.body.g_num == '' || isNaN(req.body.g_num)) {
+        req.flash('error', `Please enter a valid group number`);
+        res.redirect(`/course/${req.body.c_id}/groups`);
+        return;
+    }
+
     var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.body.c_id}', '${req.body.g_num}', '${req.body.g_capacity}')`;
 
 	pool.query(sql_query, (err, data) => {
@@ -55,6 +63,7 @@ router.post('/create', function(req, res, next) {
                 });
             }
         } else {
+            req.flash('success', `Successfully created group ${req.body.g_num} with capacity of ${req.body.g_capacity}.`);
             res.status(200).redirect('back');
         }
     });
@@ -69,5 +78,14 @@ router.use('/assign', function(req, res, next) {
 	req.data = courseName;
 	next()
 }, groupsassign);
+
+router.use('/student', function(req, res, next) {
+	req.isCourse = true, 
+	req.username = "Name",
+	req.accountType = "Professor",
+	req.cid = req.cid,
+	req.data = courseName
+	next()
+}, groupsstudent);
 
 module.exports = router;
