@@ -45,8 +45,17 @@ router.get('/login', function (req, res, next) {
     return res.redirect('/dashboard');
   }
 
-  req.flash('info', 'User: A0000001A\nPassword: DatabaseSystem');
   res.render('login');
+});
+
+router.get('/logout', function (req, res, next) {
+  // If user is already logged out, redirect to login page
+  if (req.user) {
+	  req.logout();
+  }
+
+  req.flash('info', 'Logged out');
+  return res.redirect('/login');
 });
 
 

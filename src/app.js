@@ -106,6 +106,7 @@ app.use('/course', courseRouter);
 /* Login/logout handling */
 app.use('/', authRouter);
 app.use('/login', authRouter);
+app.use('/logout', authRouter);
 
 /* Error handling */
 // Catch 404 and forward to error handler
