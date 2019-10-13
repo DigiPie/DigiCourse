@@ -68,7 +68,7 @@ CREATE TABLE Enrollments (
 );
 
 CREATE OR REPLACE VIEW CourseEnrollments AS (
-	SELECT c_id, s_id, s_name
+	SELECT c_id, s_id, s_name, req_type
 	FROM Courses
 	NATURAL JOIN Enrollments
 	NATURAL JOIN Students
@@ -118,6 +118,7 @@ INSERT INTO StudentGroups VAlUES ('CS2102', 4, 'A0000001A');
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000003C', 'CS2102', 1, NOW());
+INSERT INTO Enrollments VALUES ('A0000004D', 'CS2102', 0, NOW());
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2100', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2100', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000003C', 'CS2030', 1, NOW());
