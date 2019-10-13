@@ -41,8 +41,8 @@ var insertRouter = require('./routes/insert');
 var dashboardRouter = require('./routes/dashboard');
 var courseRouter = require('./routes/course');
 
-/* --- Login router  --- */
-var loginRouter = require('./routes/login');
+/* --- Authentication router  --- */
+var authRouter = require('./routes/authenticate');
 
 var app = express();
 
@@ -103,8 +103,8 @@ app.use('/insert', insertRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/course', courseRouter);
 
-/* Login */
-app.use('/login', loginRouter);
+/* Login/logout handling */
+app.use('/login', authRouter);
 
 /* Error handling */
 // Catch 404 and forward to error handler
@@ -115,8 +115,6 @@ app.use(function(req, res, next) {
 // Error handler
 app.use(function(err, req, res, next) {
   // Set locals
-  console.log(err);
-  
   if (err.status == 404) {
     res.locals.err_status = "Error: 404";
     res.locals.err_msg = "Page not found.";
