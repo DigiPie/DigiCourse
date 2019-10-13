@@ -12,8 +12,8 @@
 		
 		<!-- JavaScript for Interactivity -->
 		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
   
   </head>
   <body class="header-fixed">
@@ -36,8 +36,54 @@
           <div class="content-viewport">
             <div class="row">
               <div class="col-12 py-5">
-                <h4>nothing here yet</h4>
-                  <!-- <p class="text-gray">all</p> -->
+                <% if (accountType == 'Student') { %>
+                <div class="topnav">
+                  <a class="active" href="#">Create forum</a>
+                  <a href="#">Assign forum</a>
+                </div>
+                <br>
+                <% if (messages.error) {%>
+                  <div class="alert alert-danger">
+                    <%= messages.error %>
+                  </div>
+                <% } else if (messages.success) { %>
+                    <div class="alert alert-success">
+                      <%= messages.success %>
+                    </div>
+                  <% } %>
+                <form id="html_form" action="/course/<%= cid %>/forum/create" role="form" method="post">
+                  <div class="form-group">
+                    <label for="f_topic">Topic:</label>
+                    <input type="text" maxlength="100" class="form-control" id="f_topic" name="f_topic" placeholder="Enter topic name">
+                  </div>
+                  <input type="hidden" name='c_id' value="<%= cid %>">
+                  <button type="submit" class="btn btn-primary">Create forum</button>
+                </form>
+                <% } %>
+                <br>
+                </br>
+                <% if (forums.length == 0) { %>
+                <h4>There are no forums in this module.</h4>
+                <% } else { %>
+                <form id="html_form" role="form" method="post">
+                  <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Forum Topic:</th>
+                          <th scope="col">Created On:</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% for (var i = 0; i < forums.length; i++) { %>
+                        <list-view>
+                          <td><%= forums[i].f_topic %></td>
+                          <td><%= forums[i].f_datetime %></td>
+                        </tr>
+                        <% } %>
+                      </tbody>
+                    </table>
+                </form>
+                <% } %>
               </div>
             </div>
             <!-- put your stuff here -->
