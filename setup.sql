@@ -54,7 +54,6 @@ CREATE TABLE Manages (
 	PRIMARY KEY (p_id, c_id)
 );
 
-
 CREATE TABLE Enrollments (
 	s_id		varchar(9) REFERENCES Students (s_id),
 	c_id		varchar(9) REFERENCES Courses (c_id),
@@ -67,11 +66,18 @@ CREATE TABLE Enrollments (
 );
 
 CREATE OR REPLACE VIEW CourseEnrollments AS (
-	SELECT c_id, s_id, s_name, req_type
+	SELECT c_id, c_name, s_id, s_name, req_type
 	FROM Courses
 	NATURAL JOIN Enrollments
 	NATURAL JOIN Students
 	WHERE req_status
+); 
+
+CREATE OR REPLACE VIEW CourseManages AS (
+	SELECT c_id, c_name, p_id, p_name
+	FROM Courses
+	NATURAL JOIN Manages
+	NATURAL JOIN Professors
 ); 
 
 CREATE TABLE student_info (
@@ -80,6 +86,7 @@ CREATE TABLE student_info (
 	faculty varchar(3) NOT NULL
 );
 
+-- Accounts(u_id, passwd) -> u_id
 INSERT INTO Accounts VALUES ('A0000001A', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('A0000002B', 'B');
 INSERT INTO Accounts VALUES ('A0000003C', 'C');
@@ -88,6 +95,7 @@ INSERT INTO Accounts VALUES ('A0000005E', 'E');
 INSERT INTO Accounts VALUES ('P0000001A', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('P0000002B', 'B');
 
+-- Professors(p_id, p_name) -> p_id
 INSERT INTO Professors VALUES ('P0000001A', 'Adi');
 INSERT INTO Professors VALUES ('P0000002B', 'John');
 
@@ -106,25 +114,33 @@ INSERT INTO Courses VALUES ('CS2030', 'Programming Methodology II', 200, 'This m
 INSERT INTO Courses VALUES ('CS4215', 'Programming Language implementation', 200, 'This module provides the students with theoretical knowledge and practical skill in the implementation of programming languages. It discusses implementation aspects of fundamental programming paradigms (imperative, functional and object-oriented), and of basic programming language concepts such as binding, scope, parameter-passing mechanisms and types. It introduces the language processing techniques of interpretation and compilation and virtual machines. The lectures are accompanied by lab sessions which will focus on language processing tools, and take the student through a sequence of programming language implementations. This modules also covers automatic memory management, dynamic linking and just-in-time compilation, as features of modern execution systems.');
 INSERT INTO Courses VALUES ('CS2100', 'Computer Organizations', 200, 'The objective of this module is to familiarise students with the fundamentals of computing devices. Through this module students will understand the basics of data representation, and how the various parts of a computer work, separately and with each other. This allows students to understand the issues in computing devices, and how these issues affect the implementation of solutions. Topics covered include data representation systems, combinational and sequential circuit design techniques, assembly language, processor execution cycles, pipelining, memory hierarchy and input/output systems.');
 
+-- Manages(p_id, c_id) -> p_id, c_id
 INSERT INTO Manages VALUES ('P0000001A','CS2102');
 INSERT INTO Manages VALUES ('P0000001A','CS2100');
 INSERT INTO Manages VALUES ('P0000001A','CS2030');
+INSERT INTO Manages VALUES ('P0000001A','CS4102');
+INSERT INTO Manages VALUES ('P0000001A','CS4215');
 INSERT INTO Manages VALUES ('P0000002B','CS2100');
 
+-- Students(s_id, s_name, yr_study, major) -> s_id
 INSERT INTO Students VALUES ('A0000001A', 'Leslie Cole', 1, 'SOC');
 INSERT INTO Students VALUES ('A0000002B', 'Myra Morgan', 2, 'SOC');
 INSERT INTO Students VALUES ('A0000003C', 'Raymond Benson', 2, 'SOC');
 INSERT INTO Students VALUES ('A0000004D', 'Wendy Kelley', 3,'SOC');
 INSERT INTO Students VALUES ('A0000005E', 'Patrick Bowers', 3,'FOE');
 
+-- CourseGroups (c_id, g_num, g_capacity) --> c_id, g_num
 INSERT INTO CourseGroups VAlUES ('CS2102', 1, 5);
 INSERT INTO CourseGroups VAlUES ('CS2102', 2, 5);
 INSERT INTO CourseGroups VAlUES ('CS2102', 3, 5);
 INSERT INTO CourseGroups VAlUES ('CS2102', 4, 5);
 INSERT INTO CourseGroups VAlUES ('CS2100', 1, 5);
 
+-- StudentGroups (c_id, g_num, s_id) --> c_id, g_num, s_id
 INSERT INTO StudentGroups VAlUES ('CS2102', 4, 'A0000001A');
+INSERT INTO StudentGroups VAlUES ('CS2100', 2, 'A0000001A');
 
+-- Enrollments (s_id, c_id, req_type, req_datetime, p_id, req_status) --> s_id, c_id, req_datetime
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000003C', 'CS2102', 1, NOW());
@@ -132,6 +148,8 @@ INSERT INTO Enrollments VALUES ('A0000004D', 'CS2102', 0, NOW());
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2100', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2100', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000003C', 'CS2030', 1, NOW());
+INSERT INTO Enrollments VALUES ('A0000001A', 'CS1010', 1, NOW(), NULL, TRUE);
+INSERT INTO Enrollments VALUES ('A0000001A', 'CS4215', 1, NOW(), NULL, TRUE);
 
 INSERT INTO student_info (matric, name, faculty) VALUES ('A0000001A', 'Leslie Cole', 'SOC');
 INSERT INTO student_info (matric, name, faculty) VALUES ('A0000002B', 'Myra Morgan', 'SOC');

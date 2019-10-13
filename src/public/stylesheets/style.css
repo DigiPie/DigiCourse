@@ -58,3 +58,25 @@ td.min {
 .topnav a {
   color: black;
 }
+
+/************************************************
+ * Dashboard
+ ***********************************************/
+
+.card {
+  cursor: pointer;
+}
+
+.card:hover {
+  background-color: #eee;
+}
+
+.card-a, .card-a:visited, .card-a:hover {
+  color: black;
+  border: none;
+  outline: 0;
+  text-decoration: none;
+}
+
+
+
