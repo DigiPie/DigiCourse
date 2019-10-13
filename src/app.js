@@ -1,15 +1,18 @@
 var session = require('express-session');
 var createError = require('http-errors');
 var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
 var flash = require('express-flash');
+var passport = require('passport');
+var request = require('request');
+var session = require('express-session');
+var path = require('path');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 /* --- V7: Using dotenv     --- */
 require('dotenv').config();
 
-var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 /* --- V2: Adding Web Pages --- */
@@ -37,6 +40,9 @@ var insertRouter = require('./routes/insert');
 var dashboardRouter = require('./routes/dashboard');
 var courseRouter = require('./routes/course');
 
+/* --- Authentication router  --- */
+var authRouter = require('./routes/authenticate');
+
 var app = express();
 
 // view engine setup
@@ -48,18 +54,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Express Session Middleware
-app.use(session({
-  secret: 'keyboard cat',
-  resave: true,
-  saveUninitialized: true
-}));
-
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Body parser init
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 
-app.use('/', indexRouter);
+// Authentication
+require('./auth').init(app);
+app.use(session({
+  secret: process.env.SECRET,
+  resave: true,
+  saveUninitialized: true
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.use('/users', usersRouter);
 
 /* --- V2: Adding Web Pages --- */
@@ -90,18 +102,32 @@ app.use('/insert', insertRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/course', courseRouter);
 
-// catch 404 and forward to error handler
+/* Login/logout handling */
+app.use('/', authRouter);
+app.use('/login', authRouter);
+app.use('/logout', authRouter);
+
+/* Error handling */
+// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
+// Error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  // Set locals
+  if (err.status == 404) {
+    res.locals.err_status = "Error: 404";
+    res.locals.err_msg = "Page not found.";
+  } else if (app.get('env') === 'development') {
+    res.locals.err_status = "Error";
+    res.locals.err_msg = err.message;
+  } else {
+    res.locals.err_status = "Error";
+    res.locals.err_msg = "Unexpected error occurred.";
+  }
 
-  // render the error page
+  // Render the error page
   res.status(err.status || 500);
   res.render('error');
 });
