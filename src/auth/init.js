@@ -25,8 +25,9 @@ function findUser (u_id, callback) {
 			return callback(null)
 		} else if(data.rows.length == 1) {
 			return callback(null, {
-				u_id    : data.rows[0].u_id,
-				passwdHash: data.rows[0].passwd
+        u_id      : data.rows[0].u_id,
+        u_type    : data.rows[0].u_type,
+        passwd_hash: data.rows[0].passwd,
 			});
 		} else {
 			console.error("More than one user?");
@@ -58,7 +59,7 @@ function initPassport () {
         }
 
         // Always use hashed passwords and fixed time comparison
-        bcrypt.compare(passwd, user.passwdHash, (err, isValid) => {
+        bcrypt.compare(passwd, user.passwd_hash, (err, isValid) => {
           if (err) {
             return done(err);
           }
@@ -67,6 +68,7 @@ function initPassport () {
             return done(null, false);
           }
 
+          delete user.passwd_hash;
           return done(null, user);
         })
       })

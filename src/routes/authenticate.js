@@ -20,7 +20,7 @@ router.post('/', function (req, res, next) {
       return res.redirect('/login'); 
     }
 
-    req.logIn(user, function (err) {
+    req.login(user, function (err) {
       if (err) { 
         return next(err); 
       }
@@ -51,12 +51,11 @@ router.get('/login', function (req, res, next) {
 router.get('/logout', function (req, res, next) {
   // If user is already logged out, redirect to login page
   if (req.user) {
+    req.flash('info', 'Logged out of ' + req.user.u_id);
 	  req.logout();
   }
 
-  req.flash('info', 'Logged out');
   return res.redirect('/login');
 });
-
 
 module.exports = router;
