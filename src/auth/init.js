@@ -26,6 +26,7 @@ function findUser (u_id, callback) {
 		} else if(data.rows.length == 1) {
 			return callback(null, {
         u_id      : data.rows[0].u_id,
+        u_name: 'Placeholder Name',
         u_type    : data.rows[0].u_type,
         passwd_hash: data.rows[0].passwd,
 			});
@@ -77,7 +78,7 @@ function initPassport () {
 
   passport.authMiddleware = authMiddleware;
   passport.antiMiddleware = antiMiddleware;
-	passport.findUser = findUser;
+  passport.findUser = findUser;
 }
 
 module.exports = initPassport;
