@@ -28,6 +28,29 @@ router.get('/', function(req, res, next) {
 
 const account_uid = 'P0000001A';
 
+router.post('/increase', function(req, res, next) {
+    if (req.body.c_capacity.length == 0) {
+        req.flash('error', `Please enter a capacity`);
+        res.status(400).redirect('back');
+    }
+
+    const column_set = new pgp.helpers.ColumnSet(['?c_id', 'c_capacity'], {table: 'courses'});
+    const update_sql = pgp.helpers.update({c_id: req.params.cid, c_capacity: req.body.c_capacity}, column_set) + ` WHERE c_id = '${req.params.cid}'`;
+
+	pool.query(update_sql, (err, data) => {
+        if (err) {
+            res.status(err.status || 500);
+            res.render('error', {
+                message: "Something went wrong during the update, try again later.",
+                error: err
+            });
+        } else {
+            req.flash('success', `Successfully increased the capacity to ${req.body.c_capacity}.`);
+            res.status(200).redirect('back');
+        }
+	});
+});
+
 // POST
 router.post('/accept', function(req, res, next) {
     const selected_rows = filter(req.body.row, { 'accepted': 'on' });

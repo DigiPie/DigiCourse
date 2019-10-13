@@ -45,6 +45,14 @@
                     <%= messages.success %>
                   </div>
                 <% }%>
+                <form id="html_form" role="form" method="post">
+                  <div class="form-group">
+                    <label for="c_capacity">Course capacity</label>
+                    <input type="number" class="form-control" id="c_capacity" name="c_capacity" placeholder="Enter course capacity">
+                  </div>
+                  <button type="submit" formaction="/course/<%= cid %>/enrollments/increase" class="btn btn-primary" >Submit</button>
+                </form>
+                <br>
                 <% if (datarows.length == 0) { %>
                 <h4>No pending request</h4>
                 <% } else { %>
