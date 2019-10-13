@@ -9,6 +9,7 @@ const pool = new Pool({
 
 router.get('/', function(req, res, next) {
     var sql_query = `SELECT * FROM CourseEnrollments WHERE c_id =\'${req.params.cid}\' 
+        AND req_type = 1
         AND s_id NOT IN (
             SELECT s_id
             FROM StudentGroups
