@@ -4,7 +4,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var flash = require('express-flash');
-var port = process.env.PORT || 3000;
 var logger = require('morgan');
 
 /* --- V7: Using dotenv     --- */
