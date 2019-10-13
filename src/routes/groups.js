@@ -6,6 +6,8 @@ const pool = new Pool({
 });
 
 const groupsassign = require('./groupsassign');
+const groupsstudent = require('./groupsstudent');
+
 var courseName;
 
 router.get('/', function(req, res, next) {
@@ -69,5 +71,14 @@ router.use('/assign', function(req, res, next) {
 	req.data = courseName;
 	next()
 }, groupsassign);
+
+router.use('/student', function(req, res, next) {
+	req.isCourse = true, 
+	req.username = "Name",
+	req.accountType = "Professor",
+	req.cid = req.cid,
+	req.data = courseName
+	next()
+}, groupsstudent);
 
 module.exports = router;
