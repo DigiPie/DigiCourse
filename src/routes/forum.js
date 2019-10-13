@@ -8,10 +8,17 @@ const pool = new Pool({
 
 /**** Routing ****/
 router.get('/', function(req, res, next) {
+     // Authentication
+	if (!req.user) {
+		req.flash('error','Login is required to access dashboard');
+		return res.redirect('/login');
+    }
+    
     res.render('forum', {
         isCourse: req.isCourse, 
-		username: req.username,
-		accountType: req.accountType, 
+        username: req.user.u_name,
+        accountType: req.user.u_type,
+        uid: req.user.u_id, 
         cid: req.cid,
         data: req.data
     });

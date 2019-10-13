@@ -22,8 +22,9 @@ router.get('/:cid', function(req, res, next) {
 	pool.query(sql_query, (err, data) => {
 		res.render('course', {
 			isCourse: true, 
-			username: req.user.u_id,
-			accountType: req.user.u_type,
+			username: req.user.u_name,
+			accountType: req.user.u_type, 
+			uid: req.user.u_id,
 			cid: req.params.cid,
 			data: data.rows 
 		});
@@ -33,17 +34,13 @@ router.get('/:cid', function(req, res, next) {
 
 router.use('/:cid/forum', function(req, res, next) {
 	req.isCourse = true, 
-	req.username = "Name",
-	req.accountType = "Student",
 	req.cid = req.params.cid;
 	req.data = courseName;
 	next()
 }, forum);
 
-router.use('/:cid/enrollments', function(req, res, next) {		
+router.use('/:cid/enrollments', function(req, res, next) {
 	req.isCourse = true, 
-	req.username = "Name",
-	req.accountType = "Professor",
 	req.cid = req.params.cid;
 	req.data = courseName;
 	next()
@@ -51,8 +48,6 @@ router.use('/:cid/enrollments', function(req, res, next) {
 
 router.use('/:cid/groups', function(req, res, next) {		
 	req.isCourse = true, 
-	req.username = "Name",
-	req.accountType = "Professor",
 	req.cid = req.params.cid;
 	req.data = courseName;
 	next()
