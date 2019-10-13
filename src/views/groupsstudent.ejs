@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title>Course Dashboard</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/label_template.css' />
+    <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+  </head>
+  <body class="header-fixed">
+
+  	<!-- nav bar -->
+    <% include partials/nav.ejs %>
+    <!-- End of Navbar -->
+
+    <!-- Main Content -->
+  	<div class="page-body">
+
+      <!-- side bar -->
+      <%- include('./partials/sidebar', { cid: cid }); %>
+      <!-- End of Sidebar -->
+
+      <!-- Right Box -->
+      <div class="page-content-wrapper">
+        <!-- Content -->
+        <div class="page-content-wrapper-inner">
+          <div class="content-viewport">
+            <div class="row">
+              <div class="col-12 py-5">
+                <div class="topnav">
+                  <a href="/course/<%= cid %>/groups">Create group</a>
+                  <a href="/course/<%= cid %>/groups/assign"">Assign group</a>
+                  <a class="active" href="#">Student roaster</a>
+                </div>
+                </br>
+                <% if (datarows.length == 0) { %>
+                <h4>There are no students enrolled in this module.</h4>
+                <% } else { %>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Student ID</th>
+                        <th scope="col">Student name</th>
+                        <th scope="col">Group number</th>
+                        <th scope="col">Type</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% for (var i = 0; i < datarows.length; i++) { %>
+                      <tr>
+                        <td><%= datarows[i].s_id %></td>
+                        <td><%= datarows[i].s_name %></td>
+                        <td><%= datarows[i].g_num ? datarows[i].g_num : (datarows[i].req_type == 0 ? 'All groups' : 'No groups') %></td>
+                        <td><%= datarows[i].req_type == 1 ? 'Student' : 'Teaching Assistant' %></td>
+                      </tr>
+                      <% } %>
+                    </tbody>
+                  </table>
+                <% } %>
+              </div>
+            </div>
+            <!-- put your stuff here -->
+          </div>
+        </div>
+        <!-- End of Content -->
+
+        <!-- Footer -->
+        <% include partials/footer.ejs %>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Right Box -->
+
+    </div>
+    <!-- End of Main Content -->
+
+    <!-- Additional Javascript -->
+    <script src="javascripts/label_template.js"></script>
+  </body>
+</html>

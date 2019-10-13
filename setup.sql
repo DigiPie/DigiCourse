@@ -1,11 +1,11 @@
 -- This file will be executed each time the project is deployed to Heroku
+DROP TABLE IF EXISTS StudentGroups CASCADE;
 DROP TABLE IF EXISTS CourseGroups CASCADE;
 DROP TABLE IF EXISTS Manages CASCADE;
 DROP TABLE IF EXISTS Enrollments CASCADE;
 DROP TABLE IF EXISTS Courses CASCADE;
 DROP TABLE IF EXISTS Students CASCADE;
 DROP TABLE IF EXISTS Professors CASCADE;
-DROP TABLE IF EXISTS TeachingAssistants CASCADE;
 DROP TABLE IF EXISTS Accounts CASCADE;
 DROP TABLE IF EXISTS student_info CASCADE;
 
@@ -26,12 +26,26 @@ CREATE TABLE Courses (
 	c_desc    	varchar(2000) NOT NULL
 );
 
+CREATE TABLE Students (
+	s_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_id),
+	s_name   	varchar(100) NOT NULL,
+	yr_study 	integer NOT NULL,
+	major		varchar(100) NOT NULL
+);
+
 CREATE TABLE CourseGroups (
-	c_id  		varchar(9) REFERENCES Courses (c_id),
+	c_id  		varchar(9),
 	g_num  		integer,
 	g_capacity 	integer NOT NULL,
 	PRIMARY KEY (c_id, g_num),
 	FOREIGN KEY (c_id) REFERENCES Courses (c_id) ON DELETE CASCADE
+);
+
+CREATE TABLE StudentGroups (
+	c_id  		varchar(9) REFERENCES Courses (c_id),
+	g_num  		integer,
+	s_id  		varchar(9) REFERENCES Students (s_id),
+	PRIMARY KEY (c_id, g_num, s_id)
 );
 
 CREATE TABLE Manages (
@@ -40,13 +54,6 @@ CREATE TABLE Manages (
 	PRIMARY KEY (p_id, c_id)
 );
 
-CREATE TABLE Students (
-	s_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_id),
-	s_name   	varchar(100) NOT NULL,
-	yr_study 	integer NOT NULL,
-	major		varchar(100) NOT NULL,
-	is_ta		boolean DEFAULT FALSE
-);
 
 CREATE TABLE Enrollments (
 	s_id		varchar(9) REFERENCES Students (s_id),
@@ -58,6 +65,14 @@ CREATE TABLE Enrollments (
 	PRIMARY KEY (s_id, c_id, req_datetime),
 	FOREIGN KEY (p_id) REFERENCES Professors (p_id)
 );
+
+CREATE OR REPLACE VIEW CourseEnrollments AS (
+	SELECT c_id, s_id, s_name, req_type
+	FROM Courses
+	NATURAL JOIN Enrollments
+	NATURAL JOIN Students
+	WHERE req_status
+); 
 
 CREATE TABLE student_info (
 	matric  varchar(9) PRIMARY KEY,
@@ -89,11 +104,20 @@ INSERT INTO Students VALUES ('A0000001A', 'Leslie Cole', 1, 'SOC');
 INSERT INTO Students VALUES ('A0000002B', 'Myra Morgan', 2, 'SOC');
 INSERT INTO Students VALUES ('A0000003C', 'Raymond Benson', 2, 'SOC');
 INSERT INTO Students VALUES ('A0000004D', 'Wendy Kelley', 3,'SOC');
-INSERT INTO Students VALUES ('A0000005E', 'Patrick Bowers', 3,'FOE', TRUE);
+INSERT INTO Students VALUES ('A0000005E', 'Patrick Bowers', 3,'FOE');
+
+INSERT INTO CourseGroups VAlUES ('CS2102', 1, 5);
+INSERT INTO CourseGroups VAlUES ('CS2102', 2, 5);
+INSERT INTO CourseGroups VAlUES ('CS2102', 3, 5);
+INSERT INTO CourseGroups VAlUES ('CS2102', 4, 5);
+INSERT INTO CourseGroups VAlUES ('CS2100', 1, 5);
+
+INSERT INTO StudentGroups VAlUES ('CS2102', 4, 'A0000001A');
 
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000003C', 'CS2102', 1, NOW());
+INSERT INTO Enrollments VALUES ('A0000004D', 'CS2102', 0, NOW());
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2100', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2100', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000003C', 'CS2030', 1, NOW());
