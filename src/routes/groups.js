@@ -63,6 +63,7 @@ router.post('/create', function(req, res, next) {
                 });
             }
         } else {
+            req.flash('success', `Successfully created group ${req.body.g_num} with capacity of ${req.body.g_capacity}.`);
             res.status(200).redirect('back');
         }
     });
