@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router({mergeParams: true})
+const entries = require('./entries');
 
 const { Pool } = require('pg')
 const pool = new Pool({
@@ -22,6 +23,12 @@ router.get('/', function(req, res, next) {
 	});
 });
 
+router.use('/:f_topic/:f_datetime/entries', function(req, res, next) {
+    req.forumTopic = req.params.f_topic;
+    req.forumDateTime = req.params.f_datetime;
+	next()
+}, entries);
+
 
 router.post('/create', function(req, res, next) {
     if (req.body.f_topic == '') {
@@ -38,13 +45,10 @@ router.post('/create', function(req, res, next) {
 
         pool.query(sql_query, (err, data) => {
             if (err) {
-                res.status(err.status || 500);
-                res.render('error', {
-                    message: "Something went wrong during the creation of forum, try again later.",
-                    error: err
-                });
+                req.flash('error', `Error. Please try again.`);
+                res.status(err.status || 500).redirect('back');
             } else {
-                req.flash('success', `Successfully created forum: "${req.body.f_topic}"`);
+                req.flash('success', `Successfully created forum "${req.body.f_topic}"`);
                 res.status(200).redirect('back');
             }
         });
