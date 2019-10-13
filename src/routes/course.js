@@ -12,12 +12,18 @@ var courseName;
 
 /**** Routing ****/
 router.get('/:cid', function(req, res, next) {
+	// Authentication
+	if (!req.user) {
+		req.flash('error','Login is required to access dashboard');
+		return res.redirect('/login');
+	}
+
 	var sql_query = `SELECT * FROM courses WHERE c_id =\'${req.params.cid}\'`;
 	pool.query(sql_query, (err, data) => {
 		res.render('course', {
 			isCourse: true, 
-			username: "Name",
-			accountType: "Student",
+			username: req.user.u_id,
+			accountType: req.user.u_type,
 			cid: req.params.cid,
 			data: data.rows 
 		});
