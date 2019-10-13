@@ -65,7 +65,7 @@ CREATE TABLE student_info (
 	faculty varchar(3) NOT NULL
 );
 
-INSERT INTO Accounts VALUES ('A0000001A', 'A');
+INSERT INTO Accounts VALUES ('A0000001A', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('A0000002B', 'B');
 INSERT INTO Accounts VALUES ('A0000003C', 'C');
 INSERT INTO Accounts VALUES ('A0000004D', 'D');
