@@ -6,6 +6,12 @@ const pool = new Pool({
 });
 
 router.get('/', function(req, res, next) {
+     // Authentication
+	if (!req.user) {
+		req.flash('error','Login is required to access dashboard');
+		return res.redirect('/login');
+    }
+    
     var sql_query = `SELECT c.s_id, c.s_name, s.g_num, c.req_type
             FROM CourseEnrollments c
             LEFT OUTER JOIN StudentGroups s
@@ -17,8 +23,9 @@ router.get('/', function(req, res, next) {
 	pool.query(sql_query, (err, data) => {
         res.render('groupsstudent', {
             isCourse: req.isCourse, 
-            username: req.username,
-            accountType: req.accountType, 
+            username: req.user.u_name,
+            accountType: req.user.u_type,
+            uid: req.user.u_id, 
             cid: req.cid,
             data: req.data,
             datarows: data.rows,

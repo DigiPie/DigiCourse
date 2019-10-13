@@ -10,11 +10,18 @@ const pool = new Pool({
 
 var sql_query = 'SELECT * FROM courses';
 router.get('/', function(req, res, next) {
+	// Authentication
+	if (!req.user) {
+		req.flash('error','Login is required to access dashboard');
+		return res.redirect('/login');
+	}
+
 	pool.query(sql_query, (err, data) => {
 		res.render('dashboard', { 
 			isCourse: false, 
-			username: "Name",
-			accountType: "Student", 
+			username: req.user.u_name,
+			accountType: req.user.u_type, 
+			uid: req.user.u_id,
 			data: data.rows 
 		});
 	});

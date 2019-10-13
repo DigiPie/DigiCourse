@@ -8,6 +8,12 @@ const pool = new Pool({
 });
 
 router.get('/', function(req, res, next) {
+     // Authentication
+	if (!req.user) {
+		req.flash('error','Login is required to access dashboard');
+		return res.redirect('/login');
+    }
+    
     var sql_query = `SELECT * FROM CourseEnrollments WHERE c_id =\'${req.params.cid}\' 
         AND req_type = 1
         AND s_id NOT IN (
@@ -36,8 +42,9 @@ router.get('/', function(req, res, next) {
         pool.query(group_list_query, (gerr, gdata) => {
             res.render('groupsassign', {
                 isCourse: req.isCourse, 
-                username: req.username,
-                accountType: req.accountType, 
+                username: req.user.u_name,
+                accountType: req.user.u_type,
+                uid: req.user.u_id, 
                 cid: req.cid,
                 data: req.data,
                 datarows: data.rows,
