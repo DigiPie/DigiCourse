@@ -3,7 +3,12 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  // If user is already logged in, redirect to dashboard
+  if (req.user) {
+    return res.redirect('/dashboard');
+  } else {
+    return res.redirect('/login');
+  }
 });
 
 module.exports = router;
