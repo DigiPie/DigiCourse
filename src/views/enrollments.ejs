@@ -40,15 +40,15 @@
                   <div class="alert alert-danger">
                     <%= messages.error %>
                   </div>
-                <% } else if (messages.success) { %>
+                <% } if (messages.success) { %>
                   <div class="alert alert-success">
                     <%= messages.success %>
                   </div>
-                <% }%>
+                <% } %>
                 <form id="html_form" role="form" method="post">
                   <div class="form-group">
-                    <label for="c_capacity">Course capacity</label>
-                    <input type="number" class="form-control" id="c_capacity" name="c_capacity" placeholder="Enter course capacity">
+                    <label for="c_capacity">Course current capacity: <%= capacity %><br>Enter new course capacity</label>
+                    <input type="number" class="form-control" id="c_capacity" name="c_capacity" value="<%= new_capacity %>">
                   </div>
                   <button type="submit" formaction="/course/<%= cid %>/enrollments/increase" class="btn btn-primary" >Submit</button>
                 </form>
