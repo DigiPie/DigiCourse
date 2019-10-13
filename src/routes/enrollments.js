@@ -12,6 +12,12 @@ var increase_count;
 
 /**** Routing ****/
 router.get('/', function(req, res, next) {
+    // Authentication
+	if (!req.user) {
+		req.flash('error','Login is required to access dashboard');
+		return res.redirect('/login');
+    }
+    
     const capacity_query = `SELECT c_capacity FROM Courses WHERE c_id = '${req.params.cid}'`;
 
     var sql_query = `SELECT s_id, c_id, req_type, p_id, req_status, TO_CHAR(req_datetime, 'Dy Mon DD YYYY HH24:MI:SS') req_datetime 
@@ -25,8 +31,9 @@ router.get('/', function(req, res, next) {
         pool.query(sql_query, (err, data) => {
             res.render('enrollments', {
                 isCourse: req.isCourse, 
-                username: req.username,
-                accountType: req.accountType, 
+                username: req.user.u_name,
+                accountType: req.user.u_type,
+                uid: req.user.u_id, 
                 cid: req.cid,
                 data: req.data,
                 datarows: data.rows,

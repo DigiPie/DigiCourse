@@ -19,8 +19,9 @@ router.get('/', function(req, res, next) {
 	pool.query(sql_query, (err, data) => {
 		res.render('dashboard', { 
 			isCourse: false, 
-			username: req.user.u_id,
+			username: req.user.u_name,
 			accountType: req.user.u_type, 
+			uid: req.user.u_id,
 			data: data.rows 
 		});
 	});
