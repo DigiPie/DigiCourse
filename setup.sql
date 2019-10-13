@@ -30,8 +30,7 @@ CREATE TABLE Students (
 	s_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_id),
 	s_name   	varchar(100) NOT NULL,
 	yr_study 	integer NOT NULL,
-	major		varchar(100) NOT NULL,
-	is_ta		boolean DEFAULT FALSE
+	major		varchar(100) NOT NULL
 );
 
 CREATE TABLE CourseGroups (
@@ -105,7 +104,7 @@ INSERT INTO Students VALUES ('A0000001A', 'Leslie Cole', 1, 'SOC');
 INSERT INTO Students VALUES ('A0000002B', 'Myra Morgan', 2, 'SOC');
 INSERT INTO Students VALUES ('A0000003C', 'Raymond Benson', 2, 'SOC');
 INSERT INTO Students VALUES ('A0000004D', 'Wendy Kelley', 3,'SOC');
-INSERT INTO Students VALUES ('A0000005E', 'Patrick Bowers', 3,'FOE', TRUE);
+INSERT INTO Students VALUES ('A0000005E', 'Patrick Bowers', 3,'FOE');
 
 INSERT INTO CourseGroups VAlUES ('CS2102', 1, 5);
 INSERT INTO CourseGroups VAlUES ('CS2102', 2, 5);
