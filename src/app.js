@@ -1,6 +1,11 @@
 var createError = require('http-errors');
 var express = require('express');
+var flash = require('express-flash');
+var passport = require('passport');
+var request = require('request');
+var session = require('express-session');
 var path = require('path');
+var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var port = process.env.PORT || 3000;
 var logger = require('morgan');
@@ -50,6 +55,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash());
+
+// Body parser init
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
+
+// Authentication
+require('./auth').init(app);
+app.use(session({
+  secret: process.env.SECRET,
+  resave: true,
+  saveUninitialized: true
+}))
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -94,6 +115,8 @@ app.use(function(req, res, next) {
 // Error handler
 app.use(function(err, req, res, next) {
   // Set locals
+  console.log(err);
+  
   if (err.status == 404) {
     res.locals.err_status = "Error: 404";
     res.locals.err_msg = "Page not found.";
