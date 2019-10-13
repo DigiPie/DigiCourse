@@ -18,7 +18,21 @@
 1. Change directory to the _src_ folder by entering the command `cd src`.
 2. Install the required packages by entering `npm install`.
 3. Create a file named _.env_ in the current directory (_src_).
-4. Open _.env_ and type in the following: `DATABASE_URL=postgres://username:password@localhost:5432/database_name` (e.g. `DATABASE_URL=postgres://postgres:password@localhost:5432/postgres`). Replace the fields accordingly (5432 is the default port for Postgres).
+4. Open _.env_ and enter the following: 
+```
+DATABASE_URL=postgres://<username>:<password>@<hostname>:<port>/<database_name>
+SECRET=<random_string>
+```
+Replace the fields in `< >` accordingly.
+
+Example:
+```
+DATABASE_URL=postgres://postgres:password@localhost:5432/postgres`)
+SECRET=xJ;2RnC/('#:C=xx
+```
+
+- 5432 is the default port for PostgreSQL
+- You can generate a random string here: [passwordsgenerator.net](https://passwordsgenerator.net/)
 
 ## Local server setup
 

@@ -9,13 +9,20 @@ const pool = new Pool({
 
 /**** Routing ****/
 router.get('/', function(req, res, next) {
+    // Authentication
+	if (!req.user) {
+		req.flash('error','Login is required to access dashboard');
+		return res.redirect('/login');
+    }
+
     var sql_query = `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime 
     FROM Forums WHERE c_id =\'${req.cid}\'`;
+    
 	pool.query(sql_query, (err, forums) => {
 		res.render('forum', {
 			isCourse: req.isCourse,
 			username: req.username,
-			accountType: req.accountType, 
+			accountType: req.user.u_type, 
 			cid: req.cid,
             data: req.data,
             forums: forums.rows

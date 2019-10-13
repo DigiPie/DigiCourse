@@ -1,3 +1,36 @@
-<h1><%= message %></h1>
-<h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Page Title -->
+    <title><%= err_status %></title>
+
+    <!-- CSS for Styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
+
+    <!-- JavaScript for Interactivity -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+</head>
+
+<body class="text-center bg-dark">
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-md-6 col-lg-6 mx-auto mt-5 p-5 bg-light border-error rounded">
+                    <img class="logo-mid mx-auto my-4" src="images/logo.png" />
+                <h1><%= err_status %></h1>
+                <h5><%= err_msg %></h5>
+                <br>
+                <a href="/"><i class="mdi mdi-logout"> </i>Return to home page</i></a>
+            </div>
+        </div>
+    </div>
+    <!-- End of Main Content -->
+</body>
+
+</html>

@@ -11,6 +11,12 @@ const groupsstudent = require('./groupsstudent');
 var courseName;
 
 router.get('/', function(req, res, next) {
+    // Authentication
+	if (!req.user) {
+		req.flash('error','Login is required to access dashboard');
+		return res.redirect('/login');
+    }
+    
     courseName = req.data;
 
     var sql_query =  
@@ -30,9 +36,10 @@ router.get('/', function(req, res, next) {
     
 	pool.query(sql_query, (err, data) => {
         res.render('groups', {
-            isCourse: req.isCourse, 
-            username: req.username,
-            accountType: req.accountType, 
+            isCourse: req.isCourse,
+            username: req.user.u_name,
+            accountType: req.user.u_type,
+            uid: req.user.u_id, 
             cid: req.cid,
             data: req.data,
             datarows: data.rows
@@ -72,8 +79,6 @@ router.post('/create', function(req, res, next) {
 
 router.use('/assign', function(req, res, next) {
 	req.isCourse = true, 
-	req.username = "Name",
-	req.accountType = "Professor",
 	req.cid = req.cid;
 	req.data = courseName;
 	next()
@@ -81,8 +86,6 @@ router.use('/assign', function(req, res, next) {
 
 router.use('/student', function(req, res, next) {
 	req.isCourse = true, 
-	req.username = "Name",
-	req.accountType = "Professor",
 	req.cid = req.cid,
 	req.data = courseName
 	next()
