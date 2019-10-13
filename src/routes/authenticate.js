@@ -9,7 +9,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 });
 
-/* Login */
 router.post('/', function (req, res, next) {
   passport.authenticate('local', function (err, user, info) {
     if (err) { 
@@ -31,8 +30,16 @@ router.post('/', function (req, res, next) {
   })(req, res, next);
 });
 
-/* GET home page. */
 router.get('/', function (req, res, next) {
+  // If user is already logged in, redirect to dashboard
+  if (req.user) {
+    return res.redirect('/dashboard');
+  } else {
+    return res.redirect('/login');
+  }
+});
+
+router.get('/login', function (req, res, next) {
   // If user is already logged in, redirect to dashboard
   if (req.user) {
     return res.redirect('/dashboard');
@@ -41,5 +48,6 @@ router.get('/', function (req, res, next) {
   req.flash('info', 'User: A0000001A\nPassword: DatabaseSystem');
   res.render('login');
 });
+
 
 module.exports = router;

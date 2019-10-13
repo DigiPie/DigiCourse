@@ -14,7 +14,6 @@ var logger = require('morgan');
 /* --- V7: Using dotenv     --- */
 require('dotenv').config();
 
-var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 /* --- V2: Adding Web Pages --- */
@@ -74,7 +73,6 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 /* --- V2: Adding Web Pages --- */
@@ -106,6 +104,7 @@ app.use('/dashboard', dashboardRouter);
 app.use('/course', courseRouter);
 
 /* Login/logout handling */
+app.use('/', authRouter);
 app.use('/login', authRouter);
 
 /* Error handling */
