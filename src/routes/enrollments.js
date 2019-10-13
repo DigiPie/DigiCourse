@@ -118,40 +118,33 @@ router.post('/accept', function(req, res, next) {
 	pool.query(check_query, (err, data) => {
         if (data.rows[0].available < scount) {
             increase_count = scount - data.rows[0].available + current_capacity;
-            console.log('1');
             if (ta_rows.length != 0) {
-                console.log('2a 1');
                 const update_sql = pgp.helpers.update(ta_rows, column_set) + where_sql;
                 pool.query(update_sql, (err, data) => {
-                    console.log('3');
                     if (err) {
-                        console.log('4');
                         res.status(err.status || 500);
                         res.render('error', {
                             message: "Something went wrong during the update, try again later.",
                             error: err
                         });
                     } else {
-                        console.log('5');
                         req.flash('success', `Successfully enrolled ${t_sid} as Teaching Assistant.\n `);
 
                         if (s_sid.length != '') {
                             req.flash('error', `Course capacity have reached, please increase the capacity to ${increase_count} to enroll ${s_sid}.`);
                         }
+
                         res.status(200).redirect('back');
                         return;
                     }
                 });
 
             } else {
-                console.log('2a 2');
-
                 req.flash('error', `Course capacity have reached, please increase the capacity to ${increase_count} to enroll ${s_sid}.`);
                 res.status(400).redirect('back');
                 return;
             }
         } else {
-            console.log('2b');
             const update_sql = pgp.helpers.update(selected_rows, column_set) + where_sql;
     
             pool.query(update_sql, (err, data) => {
