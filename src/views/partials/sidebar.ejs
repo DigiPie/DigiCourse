@@ -17,9 +17,15 @@
     <li class="nav-title"><%= data[0].c_name %></li>
     <li class="nav-category-divider">Course Main Menu</li>
     <li>
+      <a href="/course/<%= cid %>">
+        <span class="link-title">Overview</span>
+        <i class="mdi mdi-clipboard-text link-icon"></i>
+      </a>
+    </li>
+    <li>
       <a href="#">
         <span class="link-title">Announcement</span>
-        <i class="mdi mdi-clipboard-alert link-icon"></i>
+        <i class="mdi mdi-bullhorn link-icon"></i>
       </a>
     </li>
     <li>
@@ -34,6 +40,13 @@
         <i class="mdi mdi-google-classroom link-icon"></i>
       </a>
     </li>
+    <li>
+      <a href="/course/<%= cid %>/forum">
+        <span class="link-title">Forum</span>
+        <i class="mdi mdi-forum link-icon"></i>
+      </a>
+    </li>
+    <li class="nav-category-divider">Tools</li>
     <% if (accountType == 'Professor') {%>
     <li>
         <a href="/course/<%= cid %>/enrollments">
@@ -42,12 +55,6 @@
         </a>
       </li>
     <% } %> 
-    <li>
-      <a href="/course/<%= cid %>/forum">
-        <span class="link-title">Forum</span>
-        <i class="mdi mdi-forum link-icon"></i>
-      </a>
-    </li>
   </ul>
   <% } %>
   <!-- End of side bar menu -->
