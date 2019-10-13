@@ -37,11 +37,11 @@ router.post('/create', function(req, res, next) {
         return;
     }
 
-    var query_pid = `SELECT p_id FROM Manages WHERE c_id =\'${req.body.c_id}\'`;
+    var query_pid = `SELECT p_id FROM Manages WHERE c_id =\'${req.cid}\'`;
     pool.query(query_pid, (err, get_pid) => {
         var course_pid = get_pid.rows[0].p_id;
 
-        var sql_query = `INSERT INTO Forums VAlUES ('${course_pid}', '${req.body.c_id}', to_timestamp(${Date.now()} / 1000.0), '${req.body.f_topic}')`;
+        var sql_query = `INSERT INTO Forums VAlUES ('${course_pid}', '${req.cid}', to_timestamp(${Date.now()} / 1000.0), '${req.body.f_topic}')`;
 
         pool.query(sql_query, (err, data) => {
             if (err) {
