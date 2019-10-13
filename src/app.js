@@ -8,7 +8,6 @@ var session = require('express-session');
 var path = require('path');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-var flash = require('express-flash');
 var port = process.env.PORT || 3000;
 var logger = require('morgan');
 
@@ -56,15 +55,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-// Express Session Middleware
-app.use(session({
-  secret: 'keyboard cat',
-  resave: true,
-  saveUninitialized: true
-}));
-
-app.use(flash());
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());

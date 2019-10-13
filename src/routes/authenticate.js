@@ -38,7 +38,7 @@ router.get('/', function (req, res, next) {
     return res.redirect('/dashboard');
   }
 
-  req.flash('info', 'User: A0000001A\nPassword: DatabaseSystem')
+  req.flash('info', 'User: A0000001A\nPassword: DatabaseSystem');
   res.render('login');
 });
 
