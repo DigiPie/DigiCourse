@@ -149,3 +149,10 @@ nav > div a.nav-item.nav-link:focus {
   text-decoration: none;
 }
 
+/************************************************
+ * Search Page
+ ***********************************************/
+
+.clickable-row {
+  cursor: pointer;
+}

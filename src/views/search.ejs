@@ -2,7 +2,7 @@
 <html>
   <head>
 		<!-- Page Title -->
-    <title>User Dashboard</title>
+    <title>Course Search</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/label_template.css' />
     <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
@@ -36,23 +36,32 @@
           <div class="content-viewport">
             <div class="row">
               <div class="col-12 py-5">
-                <h4>Course Dashboard</h4>
+                <h4>Search Results for "<%= searchPhrase %>":</h4>
                 <!--<p class="text-gray">Welcome aboard, User</p>-->
+                <% if (dataNum > 0) { %>
+                <table class="table table-hover">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">CID</th>
+                      <th scope="col">Course Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% for(var i=0; i < datarows.length; i++) { %>
+                    <tr class='clickable-row' data-href='/course/<%= datarows[i].c_id %>'>
+                      <th scope="col"><%= i+1 %></th>
+                      <th scope="col"><%= datarows[i].c_id %></th>
+                      <th scope="col"><%= datarows[i].c_name %></th>
+                    </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+                <% } else { %>
+                <p>No Results found!</p>
+                <% } %> 
               </div>
             </div>
-            <!-- put your stuff here -->
-            <div class="container">
-              <div class="card-deck mb-3 text-center">
-                <% for(var i=0; i<datarows.length; i++) { %>
-                  <a class="card-a" href="/course/<%= datarows[i].c_id %>">
-                    <div class="card mb-4 shadow-sm">
-                      <div class="card-header"><strong><%= datarows[i].c_id %></strong></div>
-                      <div class="card-body"><%= datarows[i].c_name %></div>
-                    </div>
-                  </a>
-                <% } %>
-              </div>   <!-- end of card-deck -->
-            </div> <!-- end of container -->
           </div>
         </div>
         <!-- End of Content -->
@@ -68,5 +77,6 @@
 
     <!-- Additional Javascript -->
     <script src="/javascripts/label_template.js"></script>
+    <script src="/javascripts/search.js"></script>
   </body>
 </html>

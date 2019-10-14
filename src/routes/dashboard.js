@@ -29,7 +29,7 @@ router.get('/', function(req, res, next) {
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
 			uid: req.user.u_id,
-			data: data.rows 
+			datarows: data.rows 
 		});
 	});
 });
