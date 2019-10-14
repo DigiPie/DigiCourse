@@ -87,6 +87,11 @@ CREATE OR REPLACE VIEW CourseTeachingStaff AS (
 	WHERE req_type = 0
 ); 
 
+CREATE OR REPLACE VIEW CourseApplications AS (
+	SELECT C.c_id, C.c_name, M.p_id, S.s_id, S.s_name, E.req_type, E.req_datetime, E.p_id AS approver, E.req_status 
+	FROM Courses C NATURAL JOIN Manages M JOIN Enrollments E ON E.c_id = C.c_id NATURAL JOIN Students S
+); 
+
 CREATE TABLE student_info (
 	matric  varchar(9) PRIMARY KEY,
 	name    varchar(255) NOT NULL,
@@ -127,7 +132,7 @@ INSERT INTO Manages VALUES ('P0000001A','CS2100');
 INSERT INTO Manages VALUES ('P0000001A','CS2030');
 INSERT INTO Manages VALUES ('P0000001A','CS4102');
 INSERT INTO Manages VALUES ('P0000001A','CS4215');
-INSERT INTO Manages VALUES ('P0000002B','CS2100');
+INSERT INTO Manages VALUES ('P0000002B','BM5125');
 
 -- Students(s_id, s_name, yr_study, major) -> s_id
 INSERT INTO Students VALUES ('A0000001A', 'Leslie Cole', 1, 'SOC');
@@ -148,16 +153,18 @@ INSERT INTO StudentGroups VAlUES ('CS2102', 4, 'A0000001A');
 INSERT INTO StudentGroups VAlUES ('CS2100', 2, 'A0000001A');
 
 -- Enrollments (s_id, c_id, req_type, req_datetime, p_id, req_status) --> s_id, c_id, req_datetime
-INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 1, NOW());
-INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 1, NOW());
-INSERT INTO Enrollments VALUES ('A0000003C', 'CS2102', 1, NOW());
-INSERT INTO Enrollments VALUES ('A0000004D', 'CS2102', 0, NOW());
-INSERT INTO Enrollments VALUES ('A0000001A', 'CS2100', 1, NOW());
-INSERT INTO Enrollments VALUES ('A0000002B', 'CS2100', 1, NOW());
-INSERT INTO Enrollments VALUES ('A0000003C', 'CS2030', 1, NOW());
-INSERT INTO Enrollments VALUES ('A0000001A', 'CS4102', 1, NOW(), NULL, TRUE);
-INSERT INTO Enrollments VALUES ('A0000001A', 'CS4215', 1, NOW(), NULL, TRUE);
-INSERT INTO Enrollments VALUES ('A0000004D', 'CS4215', 0, NOW(), NULL, TRUE);
+INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 1, NOW()); 
+INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 1, NOW()); 
+INSERT INTO Enrollments VALUES ('A0000003C', 'CS2102', 1, NOW()); 
+INSERT INTO Enrollments VALUES ('A0000004D', 'CS2102', 0, NOW()); 
+INSERT INTO Enrollments VALUES ('A0000001A', 'CS2100', 1, NOW()); 
+INSERT INTO Enrollments VALUES ('A0000002B', 'CS2100', 1, NOW()); 
+INSERT INTO Enrollments VALUES ('A0000003C', 'CS2030', 1, NOW()); 
+INSERT INTO Enrollments VALUES ('A0000001A', 'CS4102', 1, NOW(), 'P0000001A', TRUE); 
+INSERT INTO Enrollments VALUES ('A0000001A', 'CS4215', 1, NOW(), 'P0000001A', TRUE); 
+INSERT INTO Enrollments VALUES ('A0000001A', 'CS2030', 0, NOW(), 'P0000001A', FALSE); 
+INSERT INTO Enrollments VALUES ('A0000001A', 'BM5125', 0, NOW(), NULL, FALSE); 
+INSERT INTO Enrollments VALUES ('A0000004D', 'CS4215', 0, NOW(), 'P0000001A', TRUE); 
 
 INSERT INTO student_info (matric, name, faculty) VALUES ('A0000001A', 'Leslie Cole', 'SOC');
 INSERT INTO student_info (matric, name, faculty) VALUES ('A0000002B', 'Myra Morgan', 'SOC');
