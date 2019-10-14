@@ -60,7 +60,10 @@
                 </form>
                 <% } %>
                 <br>
-                </br>
+                <div class="topnav">
+                  <div class="title">Forums for <%= cid %></div>
+                </div>
+                <br>
                 <% if (forums.length == 0) { %>
                 <h4>There are no forums in this module.</h4>
                 <% } else { %>
@@ -68,7 +71,7 @@
                   <table class="table">
                       <thead>
                         <tr>
-                          <th scope="col">Forum Topic:</th>
+                          <th scope="col">Topic:</th>
                           <th scope="col">Created On:</th>
                         </tr>
                       </thead>
