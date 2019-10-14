@@ -3,9 +3,11 @@ var router = express.Router();
 var forum = require('./forum');
 const enrollments = require('./enrollments');
 const groups = require('./groups');
+const details = require('./courseDetails');
 const { Pool } = require('pg')
 const pool = new Pool({
-	connectionString: process.env.DATABASE_URL
+	connectionString: process.env.DATABASE_URL,
+	multipleStatements: true
 });
 
 var courseName;
@@ -31,6 +33,13 @@ router.get('/:cid', function(req, res, next) {
 		courseName = data.rows;
 	});
 });
+
+router.use('/:cid/details', function(req, res, next) {
+	req.isCourse = true, 
+	req.cid = req.params.cid;
+	req.data = courseName;
+	next()
+}, details);
 
 router.use('/:cid/forum', function(req, res, next) {
 	req.isCourse = true, 

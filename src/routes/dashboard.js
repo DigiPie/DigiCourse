@@ -24,9 +24,6 @@ router.get('/', function(req, res, next) {
 
 	// Query
 	pool.query(sql_query, [req.user.u_id] , (err, data) => {
-
-		console.log(data);
-
 		res.render('dashboard', { 
 			isCourse: false, 
 			username: req.user.u_name,

@@ -78,5 +78,74 @@ td.min {
   text-decoration: none;
 }
 
+/************************************************
+ * Course Details
+ ***********************************************/
 
+nav > .nav.nav-tabs {
+  /*border: none;
+  color:#fff;
+  background:#C98986;
+  border-radius:0;*/
+}
+
+nav > div a.nav-item.nav-link {
+  border: none;
+  padding: 18px 25px;
+  border-radius: 0;
+  text-align: center;
+  color: black;
+}
+
+nav > div a.nav-item.nav-link.active {
+  border: none;
+  padding: 18px 25px;
+  /*color:#fff;
+  background:#C98986;*/
+  border-radius:0;
+  border-bottom:5px solid #efb200;
+}
+
+nav > div a.nav-item.nav-link.active:after {
+  content: "";
+  position: relative;
+  bottom: -60px;
+  left: -10%;
+  border: 15px solid transparent;
+  border-top-color: #efb200;
+}
+
+nav > div a.nav-item.nav-link:hover,
+nav > div a.nav-item.nav-link:focus {
+  background: #C5D5E4;
+  color:#fff;
+  border-radius:0;
+  transition:background 0.20s linear;
+}
+
+.tab-content {
+  background: #fdfdfd;
+  line-height: 25px;
+  border: 1px solid #ddd;
+  /*border-top:5px solid #C98986;
+  border-bottom:5px solid #e74c3c;*/
+  padding:30px 25px;
+  width: 100%;
+  min-height: 500px;
+}
+
+.staffcard {
+  cursor: default;
+}
+
+.staffcard:hover {
+  background-color: #fff;
+}
+
+.staffcard-a, .staffcard-a:visited, .staffcard-a:hover {
+  color: #fff;
+  border: none;
+  outline: 0;
+  text-decoration: none;
+}
 

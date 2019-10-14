@@ -80,6 +80,13 @@ CREATE OR REPLACE VIEW CourseManages AS (
 	NATURAL JOIN Professors
 ); 
 
+CREATE OR REPLACE VIEW CourseTeachingStaff AS (
+	SELECT c_id, c_name, p_id as t_id, p_name as name, 'Professor' as role FROM CourseManages
+	UNION
+	SELECT c_id, c_name, s_id as t_id, s_name as name, 'Teaching Assistant' as role FROM CourseEnrollments 
+	WHERE req_type = 0
+); 
+
 CREATE TABLE student_info (
 	matric  varchar(9) PRIMARY KEY,
 	name    varchar(255) NOT NULL,
@@ -150,6 +157,7 @@ INSERT INTO Enrollments VALUES ('A0000002B', 'CS2100', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000003C', 'CS2030', 1, NOW());
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS1010', 1, NOW(), NULL, TRUE);
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS4215', 1, NOW(), NULL, TRUE);
+INSERT INTO Enrollments VALUES ('A0000004D', 'CS4215', 0, NOW(), NULL, TRUE);
 
 INSERT INTO student_info (matric, name, faculty) VALUES ('A0000001A', 'Leslie Cole', 'SOC');
 INSERT INTO student_info (matric, name, faculty) VALUES ('A0000002B', 'Myra Morgan', 'SOC');

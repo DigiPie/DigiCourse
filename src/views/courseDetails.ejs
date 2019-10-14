@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title>Course Dashboard</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/label_template.css' />
+    <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  
+  </head>
+  <body class="header-fixed">
+
+  	<!-- nav bar -->
+    <% include partials/nav.ejs %>
+    <!-- End of Navbar -->
+
+    <!-- Main Content -->
+  	<div class="page-body">
+
+      <!-- side bar -->
+      <%- include partials/sidebar %>
+      <!-- End of Sidebar -->
+
+      <!-- Right Box -->
+      <div class="page-content-wrapper">
+        <!-- Content -->
+        <div class="page-content-wrapper-inner">
+          <div class="content-viewport">
+
+            <!-- put your stuff here -->
+            <nav>
+              <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Details</a>
+                <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Teaching Staff</a>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+              <!-- Tab 1 -->
+              <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                <h4><%= courseData[0].c_id %> <%= courseData[0].c_name %></h4>
+                <p><%= courseData[0].c_desc %></p>
+              </div>
+              <!-- Tab 2 -->
+              <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <div class="container">
+                  <div class="card-deck mb-3 text-center">
+                    <% for(var i=0; i < teachData.length; i++) { %>
+                      <div class="card staffcard mb-4 shadow-sm">
+                        <div class="card-header"><strong><%= teachData[i].name %></strong></div>
+                        <div class="card-body"><%= teachData[i].role %></div>
+                      </div>
+                    <% } %>
+                  </div>   <!-- end of card-deck -->
+                </div> <!-- end of container -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- End of Content -->
+
+        <!-- Footer -->
+        <% include partials/footer.ejs %>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Right Box -->
+
+    </div>
+    <!-- End of Main Content -->
+
+    <!-- Additional Javascript -->
+    <script src="javascripts/label_template.js"></script>
+  </body>
+</html>
