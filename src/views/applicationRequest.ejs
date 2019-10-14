@@ -2,7 +2,7 @@
 <html>
   <head>
 		<!-- Page Title -->
-    <title>Course Application and Requests</title>
+    <title>Course Application Request</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/label_template.css' />
     <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
@@ -35,87 +35,19 @@
         <div class="page-content-wrapper-inner">
           <div class="content-viewport">
 
-            <!-- Course Request -->
-            <div class="row">
-              <div class="col-12 py-5">
-                <h4>Application Request</h4>
-                <!--<p class="text-gray">Welcome aboard, User</p>-->
-                Search for modules by moduel code and name
-                get a list of modules, with actions at the side
-              </div> <!-- end of col-12 -->
-            </div> <!-- end of row -->
-
-            <hr/>
-
-            <% if (dataNum > 0) { %>
-            <!-- Course Application Status -->
+            <!-- Application Status -->
             <div class="row">
               <div class="col-12 py-5">
                 <h4>Application Status</h4>
                 <br/>
                 <!--<p class="text-gray">Welcome aboard, User</p>-->
-                <table class="table table-sm">
-                  <thead class="table-info">
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">CID</th>
-                      <th scope="col">Course Name</th>
-                      <% if (accountType == 'Professor') {%>
-                      <th scope="col">Request By</th>
-                      <% } %>
-                      <th scope="col">Type</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% for(var i=0; i < datarows.length; i++) { %>
-                    <tr>
-                      <th scope="col"><%= i+1 %></th>
-                      <th scope="col"><%= datarows[i].c_id %></th>
-                      <th scope="col"><%= datarows[i].c_name %></th>
-                      <% if (accountType == 'Professor') {%>
-                        <th scope="col"><%= datarows[i].s_name %></th>
-                      <% } %>
-                      <% if (datarows[i].req_type == 0) { %>
-                        <th scope="col">Teaching Assistant</th>
-                      <% } else { %>
-                        <th scope="col">Student</th>
-                      <% } %>
-                      <% if (datarows[i].req_status) { %> 
-                        <th scope="col">Approved</th>
-                        <th scope="col"></th>
-                      <% } else if (datarows[i].approver) { %> 
-                        <th scope="col">Rejected</th>
-                        <th scope="col"></th>
-                      <% } else { %> 
-                        <th scope="col">Pending</th>
-                        <% if (accountType == 'Professor') {%>
-                          <th scope="col">Approve / Reject</th>
-                        <% } else { %> 
-                          <th scope="col">Cancel</th>
-                        <% } %>
-                      <% } %>
-                      <!-- if accepted, drop action -->
-                      <!-- if rejected, appeal --> 
-                      <!-- if pending, cancel action --> 
-
-                      <!-- if accepted, won't appear on list -->
-                      <!-- if rejected, reconsider -->
-                      <!-- if pending, approve action -->
-                    </tr>
-                    <% } %>
-                  </tbody>
-                </table>
+                <a href="/applicationStatus" class="btn btn-primary active" role="button" aria-pressed="true">Application Status</a>
               </div> <!-- end of col-12 -->
             </div> <!-- end of row -->
 
-            <% } else { %>
-              <h4>Application Status</h4>
-              <p>No Application found!</p>
-            <% } %> 
-
-          </div> 
+            <hr/>
+            <!-- put your stuff here -->
+          </div>
         </div>
         <!-- End of Content -->
 

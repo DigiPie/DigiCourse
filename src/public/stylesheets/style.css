@@ -168,3 +168,28 @@ nav > div a.nav-item.nav-link:focus {
 .clickable-row {
   cursor: pointer;
 }
+
+/************************************************
+ * Application Page
+ * Referenced: https://stackoverflow.com/questions/8169027/how-can-i-submit-a-post-form-using-the-a-href-tag
+ ***********************************************/
+
+.btn-link {
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  color: #0000EE;
+  padding: 0;
+  /*text-decoration: underline;*/
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.input-normal {
+  border: none;
+  outline: none;
+  background: none;
+  cursor: default;
+}
+

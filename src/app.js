@@ -41,6 +41,7 @@ var dashboardRouter = require('./routes/dashboard');
 var courseRouter = require('./routes/course');
 var searchRouter = require('./routes/search');
 var applicationRequestRouter = require('./routes/applicationRequest');
+var applicationStatusRouter = require('./routes/applicationStatus');
 
 /* --- Authentication router  --- */
 var authRouter = require('./routes/authenticate');
@@ -105,6 +106,7 @@ app.use('/dashboard', dashboardRouter);
 app.use('/course', courseRouter);
 app.use('/search', searchRouter);
 app.use('/applicationRequest', applicationRequestRouter);
+app.use('/applicationStatus', applicationStatusRouter);
 
 /* Login/logout handling */
 app.use('/', authRouter);
