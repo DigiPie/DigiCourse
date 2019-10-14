@@ -20,7 +20,7 @@ router.get('/', function(req, res, next) {
 		res.render('entries', {
 			isCourse: req.isCourse,
 			username: req.user.u_name,
-			accountType: req.accountType, 
+			accountType: req.user.u_type, 
 			cid: req.cid,
 			data: req.data,
 			f_topic: req.f_topic,
