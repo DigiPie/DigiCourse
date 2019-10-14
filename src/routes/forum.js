@@ -1,11 +1,14 @@
 var express = require('express');
 var router = express.Router({mergeParams: true})
 const entries = require('./entries');
+const forumsassign = require('./forumsassign');
 
 const { Pool } = require('pg')
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
 });
+
+var forums_list;
 
 /**** Routing ****/
 router.get('/', function(req, res, next) {
@@ -26,7 +29,9 @@ router.get('/', function(req, res, next) {
 			cid: req.cid,
             data: req.data,
             forums: forums.rows
-		});
+        });
+        
+        forums_list = forums.rows;
 	});
 });
 
@@ -36,8 +41,13 @@ router.use('/:f_topic/:f_datetime/entries', function(req, res, next) {
 	next()
 }, entries);
 
+router.use('/assign', function(req, res, next) {
+    req.forums_list = forums_list;
+	next()
+}, forumsassign);
 
 router.post('/create', function(req, res, next) {
+    // Empty topic name
     if (req.body.f_topic == '') {
         req.flash('error', `Please enter a topic name for the new forum`);
         res.redirect(`/course/${req.cid}/forum`);
@@ -60,7 +70,6 @@ router.post('/create', function(req, res, next) {
             }
         });
     });
-    
 });
 
 module.exports = router;
