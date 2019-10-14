@@ -17,9 +17,15 @@ router.get('/', function(req, res, next) {
     }
 
     var sql_query = 
-    `SELECT *
-    FROM CourseGroups NATURAL LEFT JOIN ForumsGroups
-    WHERE c_id =\'${req.cid}\'`;
+    `SELECT g_num, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
+    FROM CourseGroups cg, Forums f
+    WHERE cg.c_id = f.c_id 
+    AND f.c_id =\'${req.cid}\'
+    EXCEPT
+    SELECT fg.g_num, TO_CHAR(fg.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') fdt
+    FROM ForumsGroups fg
+    ORDER BY g_num
+    `;
     
 	pool.query(sql_query, (err, result) => {
 		res.render('forumsassign', {
@@ -44,10 +50,11 @@ router.post('/', function(req, res, next) {
     
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].selected;
+        selected_rows[i].c_id = req.cid;
         console.log("HERE: ", selected_rows[i]);
     }
 
-    const column_set = new pgp.helpers.ColumnSet(['c_id', 'f_datetime', 'g_num'], {table: 'forumsgroups'});
+    const column_set = new pgp.helpers.ColumnSet(['f_datetime', 'g_num', 'c_id'], {table: 'forumsgroups'});
     const insert_sql = pgp.helpers.insert(selected_rows, column_set);
 
     console.log("SQL: ", insert_sql);

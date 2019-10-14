@@ -69,13 +69,10 @@
                             <% for (var i = 0; i < forumGroups.length; i++) { %>
                             <tr>
                                 <% if (forumGroups[i].f_datetime == forums[x].f_datetime) { %>
-                                    <td class="min"><input type="checkbox" name="row[<%= count %>][selected]" checked></td>
-                                <% } else { %> 
                                     <td class="min"><input type="checkbox" name="row[<%= count %>][selected]" ></td>
-                                <% } %>
-                                    <input type="hidden" name='row[<%= count %>][c_id]' value="<%= forumGroups[i].c_id %>">
                                     <input type="hidden" name='row[<%= count %>][f_datetime]' value="<%= forums[x].f_datetime %>">
                                     <td><input type="hidden" name='row[<%= count %>][g_num]' value="<%= forumGroups[i].g_num %>"><%= forumGroups[i].g_num %></td>
+                                <% } %>
                             </tr>
                             <% count += 1;} %>
                             <tr>
