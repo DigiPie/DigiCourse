@@ -30,7 +30,7 @@ router.get('/', function(req, res, next) {
 	pool.query(sql_query, (err, result) => {
 		res.render('forumsassign', {
 			isCourse: req.isCourse,
-			username: req.username,
+			username: req.user.u_name,
 			accountType: req.user.u_type, 
 			cid: req.cid,
             data: req.data,

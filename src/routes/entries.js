@@ -19,7 +19,7 @@ router.get('/', function(req, res, next) {
 	pool.query(sql_query, (err, entries) => {
 		res.render('entries', {
 			isCourse: req.isCourse,
-			username: req.username,
+			username: req.user.u_name,
 			accountType: req.accountType, 
 			cid: req.cid,
 			data: req.data,

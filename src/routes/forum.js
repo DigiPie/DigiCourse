@@ -38,11 +38,11 @@ router.get('/', function(req, res, next) {
             WHERE fg.c_id =\'${req.cid}\'
             AND sg.s_id =\'${req.user.u_id}\'`;
     }
-    
+
 	pool.query(sql_query, (err, forums) => {
 		res.render('forum', {
 			isCourse: req.isCourse,
-			username: req.username,
+			username: req.user.u_name,
 			accountType: req.user.u_type, 
 			cid: req.cid,
             data: req.data,
