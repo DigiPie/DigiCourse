@@ -28,6 +28,8 @@
         <i class="mdi mdi-information-outline link-icon"></i>
       </a>
     </li>
+    <li class="nav-category-divider">Tools</li>
+    <% if ( data[0].user_can_see ) { %>
     <li>
       <a href="#">
         <span class="link-title">Announcement</span>
@@ -52,7 +54,6 @@
         <i class="mdi mdi-forum link-icon"></i>
       </a>
     </li>
-    <li class="nav-category-divider">Tools</li>
     <% if (accountType == 'Professor') {%>
     <li>
         <a href="/course/<%= cid %>/enrollments">
@@ -60,6 +61,7 @@
           <i class="mdi mdi-google-classroom link-icon"></i>
         </a>
       </li>
+    <% } %> 
     <% } %> 
   </ul>
   <% } %>

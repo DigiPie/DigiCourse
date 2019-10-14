@@ -19,15 +19,27 @@ router.get('/:cid', function(req, res, next) {
 		return res.redirect('/login');
 	}
 
-	var sql_query = `SELECT * FROM courses WHERE c_id =\'${req.params.cid}\'`;
-	pool.query(sql_query, (err, data) => {
+	// Prepare SQL Statement
+	//var sql_query = `SELECT * FROM courses WHERE c_id =\'${req.params.cid}\'`;
+	var sql_query;
+	if (req.user.u_type == 'Professor') {
+		sql_query = 'SELECT C.c_id, C.c_name, (SELECT COUNT(*) > 0 FROM CourseManages CM WHERE CM.c_id = C.c_id AND CM.p_id = $1) AS user_can_see FROM Courses C WHERE C.c_id = $2';
+	} else {
+		sql_query = "SELECT C.c_id, C.c_name, (SELECT COUNT(*) > 0 FROM CourseEnrollments CE WHERE CE.c_id = C.c_id AND CE.s_id = $1) AS user_can_see FROM Courses C WHERE C.c_id = $2";
+	}
+
+	// Query
+	pool.query(sql_query, [req.user.u_id, req.params.cid], (err, data) => {
+
+		console.log(data.rows[0]);
+
 		res.render('course', {
 			isCourse: true, 
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
 			uid: req.user.u_id,
 			cid: req.params.cid,
-			data: data.rows 
+			data: data.rows,
 		});
 		courseName = data.rows;
 	});
