@@ -14,12 +14,30 @@ var forums_list;
 router.get('/', function(req, res, next) {
     // Authentication
 	if (!req.user) {
-		req.flash('error','Login is required to access dashboard');
+		req.flash('error','Login is required');
 		return res.redirect('/login');
     }
 
-    var sql_query = `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
-    FROM Forums WHERE c_id =\'${req.cid}\'`;
+    var sql_query;
+    if (req.user.u_type == 'Professor') {
+        sql_query = 
+        `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
+        FROM Forums 
+        WHERE c_id =\'${req.cid}\'`;
+    }
+    else {
+        sql_query = 
+        `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
+        FROM (
+            StudentGroups sg JOIN ForumsGroups fg
+            ON sg.c_id = fg.c_id
+            AND sg.g_num = fg.g_num) 
+            JOIN Forums f
+                ON f.f_datetime = fg.f_datetime
+                AND f.c_id = fg.c_id 
+            WHERE fg.c_id =\'${req.cid}\'
+            AND sg.s_id =\'${req.user.u_id}\'`;
+    }
     
 	pool.query(sql_query, (err, forums) => {
 		res.render('forum', {

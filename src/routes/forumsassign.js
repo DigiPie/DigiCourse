@@ -12,7 +12,7 @@ const pool = new Pool({
 router.get('/', function(req, res, next) {
     // Authentication
 	if (!req.user) {
-		req.flash('error','Login is required to access dashboard');
+		req.flash('error','Login is required');
 		return res.redirect('/login');
     }
 
@@ -51,13 +51,10 @@ router.post('/', function(req, res, next) {
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].selected;
         selected_rows[i].c_id = req.cid;
-        console.log("HERE: ", selected_rows[i]);
     }
 
     const column_set = new pgp.helpers.ColumnSet(['f_datetime', 'g_num', 'c_id'], {table: 'forumsgroups'});
     const insert_sql = pgp.helpers.insert(selected_rows, column_set);
-
-    console.log("SQL: ", insert_sql);
 
     pool.query(insert_sql, (err, data) => {
         if (err) {
