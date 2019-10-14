@@ -38,8 +38,8 @@
               <div class="col-12 py-5">
                 <% if (accountType == 'Professor') { %>
                 <div class="topnav">
-                  <a class="active" href="#">Create forum</a>
-                  <a href="/course/<%= cid %>/forum/assign">Assign forum</a>
+                  <a href="/course/<%= cid %>/forum">Create forum</a>
+                  <a class="active" href="#">Assign forum</a>
                 </div>
                 <br>
                 <% if (messages.error) {%>
@@ -50,42 +50,40 @@
                     <div class="alert alert-success">
                       <%= messages.success %>
                     </div>
-                  <% } %>
-                <form id="html_form" action="/course/<%= cid %>/forum/create" role="form" method="post">
-                  <div class="form-group">
-                    <label for="f_topic">Topic:</label>
-                    <input type="text" maxlength="100" class="form-control" id="f_topic" name="f_topic" placeholder="Enter topic name">
-                  </div>
-                  <button type="submit" class="btn btn-primary">Create forum</button>
-                </form>
                 <% } %>
-                <br>
-                <div class="topnav">
-                  <div class="title">Forums for <%= cid %></div>
-                </div>
-                <br>
-                <% if (forums.length == 0) { %>
-                <h4>There are no forums in this module.</h4>
-                <% } else { %>
                 <form id="html_form" role="form" method="post">
-                  <table class="table">
-                      <thead>
-                        <tr>
-                          <th scope="col">Topic:</th>
-                          <th scope="col">Created On:</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <% for (var i = 0; i < forums.length; i++) { %>
-                        <tr>
-                          <td><a href="/course/<%= cid %>/forum/<%= forums[i].f_topic %>/<%= forums[i].f_datetime %>/entries"><%= forums[i].f_topic %></a></td>
-                          <td><%= forums[i].f_datetime %></td>
-                        </tr>
-                        <% } %>
-                      </tbody>
+                    <% var count = 0; %>
+                    <% for (var x = 0; x < forums.length; x++) { %>
+                    <div class="topnav">
+                        <div class="title"><%= forums[x].f_topic %></div>
+                    </div>
+                    <br>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Group no.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (var i = 0; i < forumGroups.length; i++) { %>
+                            <tr>
+                                <% if (forumGroups[i].f_datetime == forums[x].f_datetime) { %>
+                                    <td class="min"><input type="checkbox" name="row[<%= count %>][selected]" ></td>
+                                    <input type="hidden" name='row[<%= count %>][f_datetime]' value="<%= forums[x].f_datetime %>">
+                                    <td><input type="hidden" name='row[<%= count %>][g_num]' value="<%= forumGroups[i].g_num %>"><%= forumGroups[i].g_num %></td>
+                                <% } %>
+                            </tr>
+                            <% count += 1;} %>
+                            <tr>
+                                <td><button type="submit" formaction="/course/<%= cid %>/forum/assign" class="btn btn-primary" >Submit</button></td>
+                            </tr>
+                        </tbody>
                     </table>
+                    <% } %>
                 </form>
                 <% } %>
+                <br>
               </div>
             </div>
             <!-- put your stuff here -->
@@ -103,6 +101,6 @@
     <!-- End of Main Content -->
 
     <!-- Additional Javascript -->
-    <script src="/javascripts/label_template.js"></script>
+    <script src="javascripts/label_template.js"></script>
   </body>
 </html>

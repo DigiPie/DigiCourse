@@ -8,6 +8,9 @@ DROP TABLE IF EXISTS Students CASCADE;
 DROP TABLE IF EXISTS Professors CASCADE;
 DROP TABLE IF EXISTS Accounts CASCADE;
 DROP TABLE IF EXISTS student_info CASCADE;
+DROP TABLE IF EXISTS Forums CASCADE;
+DROP TABLE IF EXISTS ForumEntries CASCADE;
+DROP TABLE IF EXISTS ForumsGroups CASCADE;
 
 CREATE TABLE Accounts (
 	u_id  		varchar(9) PRIMARY KEY,
@@ -98,6 +101,34 @@ CREATE TABLE student_info (
 	faculty varchar(3) NOT NULL
 );
 
+CREATE TABLE Forums (
+	p_id  		varchar(9) REFERENCES Professors (p_id),
+	c_id		varchar(9),
+	f_datetime timestamp NOT NULL,
+	f_topic		varchar(100) NOT NULL,
+	PRIMARY KEY (c_id, f_datetime),
+	FOREIGN KEY (c_id) REFERENCES Courses (c_id) ON DELETE CASCADE
+);
+
+CREATE TABLE ForumEntries (
+	c_id		varchar(9) NOT NULL,
+	f_datetime timestamp NOT NULL,
+	u_id		varchar(9) REFERENCES Accounts (u_id),
+	e_datetime	timestamp NOT NULL,
+	e_content	varchar(1000) NOT NULL,
+	PRIMARY KEY (c_id, f_datetime, u_id, e_datetime),
+	FOREIGN KEY (c_id, f_datetime) REFERENCES Forums(c_id, f_datetime) ON DELETE CASCADE
+);
+
+CREATE TABLE ForumsGroups (
+	c_id		varchar(9),
+	f_datetime timestamp NOT NULL,
+	g_num  		integer,
+	PRIMARY KEY (c_id, f_datetime, g_num),
+	FOREIGN KEY (c_id, g_num) REFERENCES CourseGroups (c_id, g_num) ON DELETE CASCADE,
+	FOREIGN KEY (c_id, f_datetime) REFERENCES Forums (c_id, f_datetime) ON DELETE CASCADE
+);
+
 -- Accounts(u_id, passwd) -> u_id
 INSERT INTO Accounts VALUES ('A0000001A', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('A0000002B', 'B');
@@ -177,3 +208,13 @@ INSERT INTO student_info (matric, name, faculty) VALUES ('A0000008H', 'Delia Fer
 INSERT INTO student_info (matric, name, faculty) VALUES ('A0000009I', 'Frances Wright', 'SCI');
 INSERT INTO student_info (matric, name, faculty) VALUES ('A0000010J', 'Alyssa Sims', 'SCI');
 
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-08-23 16:30:00', 'Assignment 0');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-09-01 13:30:30', 'Form project groups');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-10-13 21:30:30', 'Lecture Queries');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-10-13 22:30:30', 'Lecture Queries 2');
+
+INSERT INTO ForumEntries VALUES ('CS2102', '2019-10-13 21:30:30', 'A0000001A', NOW(), 'Can you provide more examples on the usage of triggers?');
+INSERT INTO ForumEntries VALUES ('CS2102', '2019-10-13 21:30:30', 'A0000002B', NOW(), 'Will we be tested on all topics for finals?');
+
+INSERT INTO ForumsGroups VAlUES ('CS2102', '2019-08-23 16:30:00', 4);
+INSERT INTO ForumsGroups VAlUES ('CS2102', '2019-10-13 21:30:30', 4);

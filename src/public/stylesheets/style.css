@@ -44,6 +44,18 @@ td.min {
   padding: 14px 16px;
   text-decoration: none;
   font-size: 17px;
+  font-weight: bold;
+}
+
+.topnav .title {
+  float: left;
+  text-align: center;
+  padding: 14px 16px;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 17px;
+  border-bottom: solid 6px #ff4400;
 }
 
 .topnav a:hover {
