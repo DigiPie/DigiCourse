@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title>Course Application Status</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/label_template.css' />
+    <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  
+  </head>
+  <body class="header-fixed">
+
+  	<!-- nav bar -->
+    <% include partials/nav.ejs %>
+    <!-- End of Navbar -->
+
+    <!-- Main Content -->
+  	<div class="page-body">
+
+      <!-- side bar -->
+      <% include partials/sidebar.ejs %>
+      <!-- End of Sidebar -->
+
+      <!-- Right Box -->
+      <div class="page-content-wrapper">
+        <!-- Content -->
+        <div class="page-content-wrapper-inner">
+          <div class="content-viewport">
+
+            <!-- Application Request -->
+            <div class="row">
+              <div class="col-12 py-5">
+                <h4>Application / Registration</h4>
+                <br/>
+                <!--<p class="text-gray">Welcome aboard, User</p>-->
+                <div class="topnav">
+                  <% if (accountType != 'Professor') {%>
+                  <a href="/applicationRequest">Make new Request</a>
+                  <% } %>
+                  <a class="active" href="#">Check Status</a>
+                </div>
+                <br/>
+
+                <% if (dataNum > 0) { %>
+                  <table class="table table-sm">
+                    <thead class="table-info">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">CID</th>
+                        <th scope="col">Course Name</th>
+                        <% if (accountType == 'Professor') {%>
+                        <th scope="col">Request By</th>
+                        <% } %>
+                        <th scope="col">Requesting For</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% for(var i=0; i < datarows.length; i++) { %>
+                      <form action="/applicationStatus" method="post">
+                        <input type="hidden" class="input-normal" name="s_id" value="<%= datarows[i].s_id %>"/>
+                        <input type="hidden" class="input-normal" name="req_dt" value="<%= datarows[i].req_datetime %>"/>
+                        <tr>
+                          <th scope="col"><%= i+1 %></th>
+                          <th scope="col"><input type="text" class="input-normal" name="c_id" value="<%= datarows[i].c_id %>"/></th>
+                          <th scope="col"><%= datarows[i].c_name %></th>
+                          <% if (accountType == 'Professor') {%>
+                            <th scope="col"><%= datarows[i].s_name %></th>
+                          <% } %>
+                          <% if (datarows[i].req_type == 0) { %>
+                            <th scope="col">Teaching Assistant</th>
+                          <% } else { %>
+                            <th scope="col">Student</th>
+                          <% } %>
+                          <% if (datarows[i].req_status) { %> 
+                            <th scope="col">Approved</th>
+                            <th scope="col"></th>
+                          <% } else if (datarows[i].approver) { %> 
+                            <th scope="col">Rejected</th>
+                            <th scope="col"></th>
+                          <% } else { %> 
+                            <th scope="col">Pending</th>
+                            <th scope="col">
+                              <% if (accountType == 'Professor') {%>
+                                <button type="submit" name="edit" class="btn-link">Approve / Reject</button>
+                              <% } else { %>
+                                <button type="submit" name="cancel" value="cancel" class="btn-link">Cancel</button>
+                              <% } %>
+                            </th>
+                          <% } %>
+                        </tr>
+                      </form>
+                      <% } %>
+                    </tbody>
+                  </table>
+                <% } else { %>
+                  <p>No Application found!</p>
+                <% } %> 
+
+              </div> <!-- end of col-12 -->
+            </div> <!-- end of row -->
+        <!-- End of Content -->
+
+        <!-- Footer -->
+        <% include partials/footer.ejs %>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Right Box -->
+
+    </div>
+    <!-- End of Main Content -->
+
+    <!-- Additional Javascript -->
+    <script src="/javascripts/label_template.js"></script>
+  </body>
+</html>

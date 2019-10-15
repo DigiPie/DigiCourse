@@ -31,7 +31,7 @@ router.post('/', function(req, res, next) {
     }
 
 	 // Prepare SQL Statement
-	var sql_query = "SELECT * FROM Courses WHERE LOWER(c_name) LIKE LOWER($1)";
+	var sql_query = "SELECT * FROM Courses WHERE LOWER(c_name) LIKE LOWER($1) OR LOWER(c_id) LIKE LOWER($1)";
 
 	// Query
 	pool.query(sql_query, ['%' + req.body.searchBox + '%'], (err, data) => {
