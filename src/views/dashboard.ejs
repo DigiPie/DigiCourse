@@ -36,16 +36,23 @@
           <div class="content-viewport">
             <div class="row">
               <div class="col-12 py-5">
-                <h4>Dashboard</h4>
-                <p class="text-gray">Welcome aboard, User</p>
+                <h4>Course Dashboard</h4>
+                <!--<p class="text-gray">Welcome aboard, User</p>-->
               </div>
             </div>
             <!-- put your stuff here -->
-            <ul>
-            <% for(var i=0; i<data.length; i++) { %>
-              <li><a href="/course/<%= data[i].c_id %>"><%= data[i].c_id %></a></li>
-            <% } %>
-            </ul>
+            <div class="container">
+              <div class="card-deck mb-3 text-center">
+                <% for(var i=0; i<datarows.length; i++) { %>
+                  <a class="card-a" href="/course/<%= datarows[i].c_id %>">
+                    <div class="card mb-4 shadow-sm">
+                      <div class="card-header"><strong><%= datarows[i].c_id %></strong></div>
+                      <div class="card-body"><%= datarows[i].c_name %></div>
+                    </div>
+                  </a>
+                <% } %>
+              </div>   <!-- end of card-deck -->
+            </div> <!-- end of container -->
           </div>
         </div>
         <!-- End of Content -->
@@ -60,6 +67,6 @@
     <!-- End of Main Content -->
 
     <!-- Additional Javascript -->
-    <script src="javascripts/label_template.js"></script>
+    <script src="/javascripts/label_template.js"></script>
   </body>
 </html>

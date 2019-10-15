@@ -2,7 +2,7 @@
   <!-- user profile -->
   <div class="user-profile">
     <div class="display-avatar animated-avatar">
-      <img class="profile-img img-lg rounded-circle" width="100" height="100" src="images/logo.png" alt="profile image">
+      <img class="profile-img img-lg rounded-circle" width="100" height="100" src="/images/logo.png" alt="profile image">
     </div>
     <div class="info-wrapper">
       <p class="user-name"><%= username %></p>
@@ -17,9 +17,23 @@
     <li class="nav-title"><%= data[0].c_name %></li>
     <li class="nav-category-divider">Course Main Menu</li>
     <li>
+      <a href="/course/<%= cid %>">
+        <span class="link-title">Overview</span>
+        <i class="mdi mdi-clipboard-text link-icon"></i>
+      </a>
+    </li>
+    <li>
+      <a href="/course/<%= cid %>/details">
+        <span class="link-title">Course Details</span>
+        <i class="mdi mdi-information-outline link-icon"></i>
+      </a>
+    </li>
+    <li class="nav-category-divider">Tools</li>
+    <% if ( data[0].user_can_see ) { %>
+    <li>
       <a href="#">
         <span class="link-title">Announcement</span>
-        <i class="mdi mdi-clipboard-alert link-icon"></i>
+        <i class="mdi mdi-bullhorn link-icon"></i>
       </a>
     </li>
     <li>
@@ -34,6 +48,12 @@
         <i class="mdi mdi-google-classroom link-icon"></i>
       </a>
     </li>
+    <li>
+      <a href="/course/<%= cid %>/forum">
+        <span class="link-title">Forum</span>
+        <i class="mdi mdi-forum link-icon"></i>
+      </a>
+    </li>
     <% if (accountType == 'Professor') {%>
     <li>
         <a href="/course/<%= cid %>/enrollments">
@@ -42,12 +62,7 @@
         </a>
       </li>
     <% } %> 
-    <li>
-      <a href="/course/<%= cid %>/forum">
-        <span class="link-title">Forum</span>
-        <i class="mdi mdi-forum link-icon"></i>
-      </a>
-    </li>
+    <% } %> 
   </ul>
   <% } %>
   <!-- End of side bar menu -->
