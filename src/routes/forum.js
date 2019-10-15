@@ -18,39 +18,57 @@ router.get('/', function(req, res, next) {
 		return res.redirect('/login');
     }
 
-    var sql_query;
-    if (req.user.u_type == 'Professor') {
-        sql_query = 
-        `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
-        FROM Forums 
-        WHERE c_id =\'${req.cid}\'`;
-    }
-    else {
-        sql_query = 
-        `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
-        FROM (
-            StudentGroups sg JOIN ForumsGroups fg
-            ON sg.c_id = fg.c_id
-            AND sg.g_num = fg.g_num) 
-            JOIN Forums f
-                ON f.f_datetime = fg.f_datetime
-                AND f.c_id = fg.c_id 
-            WHERE fg.c_id =\'${req.cid}\'
-            AND sg.s_id =\'${req.user.u_id}\'`;
-    }
-
-	pool.query(sql_query, (err, forums) => {
-		res.render('forum', {
-			isCourse: req.isCourse,
-			username: req.user.u_name,
-			accountType: req.user.u_type, 
-			cid: req.cid,
-            data: req.data,
-            forums: forums.rows
-        });
+    var check_user_permission = 
+    'SELECT u_id, CASE'
+		+ ' WHEN (SELECT COUNT(*) FROM Enrollments WHERE s_id = $1 AND c_id = $2 AND req_type = 0 AND req_status = \'TRUE\') = 1 THEN \'Teaching\''
+		+ ' WHEN (SELECT COUNT(*) FROM Professors WHERE p_id = $1) = 1 THEN \'Professor\''
+		+ ' ELSE \'null\''
+		+ ' END AS u_type'
+		+ ' FROM Accounts'
+        + ' WHERE u_id = $1';
         
-        forums_list = forums.rows;
-	});
+    pool.query(check_user_permission, [req.user.u_id, req.cid], (err, result) => {
+        if (result.rows.length != 1) {
+            req.flash('error','Login is required');
+            return res.redirect('/login');
+        
+        } else {
+            var sql_query;
+
+            if (result.rows[0].u_type == 'Teaching' || result.rows[0].u_type == 'Professor') {
+                sql_query = 
+                `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
+                FROM Forums 
+                WHERE c_id =\'${req.cid}\'`;
+            
+            } else {
+                sql_query = 
+                `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
+                FROM (
+                    StudentGroups sg JOIN ForumsGroups fg
+                    ON sg.c_id = fg.c_id
+                    AND sg.g_num = fg.g_num
+                )   JOIN Forums f
+                    ON f.f_datetime = fg.f_datetime
+                    AND f.c_id = fg.c_id 
+                WHERE fg.c_id =\'${req.cid}\'
+                AND sg.s_id =\'${req.user.u_id}\'`;
+            }
+
+            pool.query(sql_query, (err, forums) => {
+                res.render('forum', {
+                    isCourse: req.isCourse,
+                    username: req.user.u_name,
+                    accountType: req.user.u_type, 
+                    cid: req.cid,
+                    data: req.data,
+                    forums: forums.rows
+                });
+                    
+                forums_list = forums.rows;
+            });
+        }
+    });
 });
 
 router.use('/:f_topic/:f_datetime/entries', function(req, res, next) {
