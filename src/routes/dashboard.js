@@ -7,8 +7,6 @@ const pool = new Pool({
 });
 
 /**** Routing ****/
-
-var sql_query = 'SELECT * FROM courses';
 router.get('/', function(req, res, next) {
 	// Authentication
 	if (!req.user) {
@@ -16,13 +14,22 @@ router.get('/', function(req, res, next) {
 		return res.redirect('/login');
 	}
 
-	pool.query(sql_query, (err, data) => {
+	// Prepare SQL Statement
+	var sql_query;
+	if (req.user.u_type == 'Professor') {
+		sql_query = 'SELECT c_id, c_name FROM CourseManages WHERE p_id = $1';
+	} else {
+		sql_query = 'SELECT c_id, c_name FROM CourseEnrollments WHERE s_id = $1';
+	}
+
+	// Query
+	pool.query(sql_query, [req.user.u_id] , (err, data) => {
 		res.render('dashboard', { 
 			isCourse: false, 
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
 			uid: req.user.u_id,
-			data: data.rows 
+			datarows: data.rows 
 		});
 	});
 });

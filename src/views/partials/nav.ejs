@@ -3,8 +3,8 @@
   <!-- LOGO -->
 	<div class="t-header-brand-wrapper">
     <a href="/dashboard">
-      <img class="logo" src="images/logo.png" alt="">
-      <img class="logo-mini" src="images/logo.png" alt="">
+      <img class="logo" src="/images/logo.png" alt="">
+      <img class="logo-mini" src="/images/logo.png" alt="">
     </a>
   </div>
   <!-- Nav Bar -->
@@ -12,9 +12,9 @@
     <div class="t-header-content">
       <button class="t-header-toggler t-header-mobile-toggler d-block d-lg-none"><i class="mdi mdi-menu"></i></button>
       <!-- Search Bar -->
-      <form action="#" class="t-header-search-box">
+      <form action="/search" class="t-header-search-box" method="post">
         <div class="input-group">
-          <input type="text" class="form-control" id="searchBox" placeholder="Search" autocomplete="off">
+          <input type="text" class="form-control" name="searchBox" id="searchBox" placeholder="Search" autocomplete="off">
           <button class="btn btn-primary" type="submit"><i class="mdi mdi-arrow-right-thick"></i></button>
         </div>
       </form>
@@ -61,17 +61,17 @@
           </a>
           <div class="dropdown-menu navbar-dropdown dropdown-menu-right" aria-labelledby="applyDropdown">
             <div class="dropdown-header">
-              <h6 class="dropdown-title">Registration & Application</h6>
+              <h6 class="dropdown-title">Course Management</h6>
             </div>
             <div class="dropdown-body">
               <div class="dropdown-list">
                 <div class="content-wrapper">
-                  <a href="#">Request for Teaching Assistant</a>
+                  <a href="/applicationRequest">Application Requests</a>
                 </div>
               </div>
               <div class="dropdown-list">
                 <div class="content-wrapper">
-                  <a href="#">Apply/Drop Course</a>
+                  <a href="/applicationStatus">Application Status</a>
                 </div>
               </div>
             </div>

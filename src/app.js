@@ -8,7 +8,6 @@ var session = require('express-session');
 var path = require('path');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-var port = process.env.PORT || 3000;
 var logger = require('morgan');
 
 /* --- V7: Using dotenv     --- */
@@ -40,6 +39,7 @@ var insertRouter = require('./routes/insert');
 /* --- course template --- */
 var dashboardRouter = require('./routes/dashboard');
 var courseRouter = require('./routes/course');
+var searchRouter = require('./routes/search');
 
 /* --- Authentication router  --- */
 var authRouter = require('./routes/authenticate');
@@ -102,6 +102,7 @@ app.use('/insert', insertRouter);
 /* course template */
 app.use('/dashboard', dashboardRouter);
 app.use('/course', courseRouter);
+app.use('/search', searchRouter);
 
 /* Login/logout handling */
 app.use('/', authRouter);

@@ -2,7 +2,7 @@
 <html>
   <head>
 		<!-- Page Title -->
-    <title>Course Dashboard</title>
+    <title>Course Search</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/label_template.css' />
     <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
@@ -26,7 +26,7 @@
   	<div class="page-body">
 
       <!-- side bar -->
-      <%- include partials/sidebar %>
+      <% include partials/sidebar.ejs %>
       <!-- End of Sidebar -->
 
       <!-- Right Box -->
@@ -34,14 +34,34 @@
         <!-- Content -->
         <div class="page-content-wrapper-inner">
           <div class="content-viewport">
-
-            <main role="main" class="container">
-              <div class="jumbotron">
-                <h3><%= data[0].c_id %></h3>
-                <p class="lead"><%= data[0].c_name %></p>
+            <div class="row">
+              <div class="col-12 py-5">
+                <h4>Search Results for "<%= searchPhrase %>":</h4>
+                <!--<p class="text-gray">Welcome aboard, User</p>-->
+                <% if (dataNum > 0) { %>
+                <table class="table table-hover">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">CID</th>
+                      <th scope="col">Course Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% for(var i=0; i < datarows.length; i++) { %>
+                    <tr class='clickable-row' data-href='/course/<%= datarows[i].c_id %>'>
+                      <th scope="col"><%= i+1 %></th>
+                      <th scope="col"><%= datarows[i].c_id %></th>
+                      <th scope="col"><%= datarows[i].c_name %></th>
+                    </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+                <% } else { %>
+                <p>No Results found!</p>
+                <% } %> 
               </div>
-            </main>
-
+            </div>
           </div>
         </div>
         <!-- End of Content -->
@@ -57,5 +77,6 @@
 
     <!-- Additional Javascript -->
     <script src="/javascripts/label_template.js"></script>
+    <script src="/javascripts/search.js"></script>
   </body>
 </html>
