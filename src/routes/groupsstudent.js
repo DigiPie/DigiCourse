@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
 		return res.redirect('/login');
     }
     
-    var sql_query = `SELECT c.s_id, c.s_name, s.g_num, c.req_type
+    var sql_query = `SELECT c.s_id, c.u_name, s.g_num, c.req_type
             FROM CourseEnrollments c
             LEFT OUTER JOIN StudentGroups s
             ON c.c_id = s.c_id
