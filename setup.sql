@@ -14,12 +14,12 @@ DROP TABLE IF EXISTS ForumsGroups CASCADE;
 
 CREATE TABLE Accounts (
 	u_id  		varchar(9) PRIMARY KEY,
+	u_name 		varchar(100) NOT NULL,
 	passwd   	varchar(64) NOT NULL
 );
 
 CREATE TABLE Professors (
-	p_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_id),
-	p_name   	varchar(100) NOT NULL
+	p_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_id)
 );
 
 CREATE TABLE Courses (
@@ -31,7 +31,6 @@ CREATE TABLE Courses (
 
 CREATE TABLE Students (
 	s_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_id),
-	s_name   	varchar(100) NOT NULL,
 	yr_study 	integer NOT NULL,
 	major		varchar(100) NOT NULL
 );
@@ -64,30 +63,32 @@ CREATE TABLE Enrollments (
 	req_datetime timestamp NOT NULL,
 	p_id		varchar(9) DEFAULT NULL,
 	req_status	boolean DEFAULT FALSE,
-	PRIMARY KEY (s_id, c_id, req_datetime),
+	PRIMARY KEY (s_id, c_id),
 	FOREIGN KEY (p_id) REFERENCES Professors (p_id),
 	CHECK (req_type = 1 OR req_type = 0)
 );
 
 CREATE OR REPLACE VIEW CourseEnrollments AS (
-	SELECT c_id, c_name, s_id, s_name, req_type
+	SELECT c_id, c_name, s_id, u_name, req_type
 	FROM Courses
 	NATURAL JOIN Enrollments
 	NATURAL JOIN Students
+	JOIN Accounts ON s_id = u_id
 	WHERE req_status
 ); 
 
 CREATE OR REPLACE VIEW CourseManages AS (
-	SELECT c_id, c_name, p_id, p_name
+	SELECT c_id, c_name, p_id, u_name
 	FROM Courses
 	NATURAL JOIN Manages
 	NATURAL JOIN Professors
+	JOIN Accounts a ON p_id = u_id
 ); 
 
 CREATE OR REPLACE VIEW CourseTeachingStaff AS (
-	SELECT c_id, c_name, p_id as t_id, p_name as name, 'Professor' as role FROM CourseManages
+	SELECT c_id, c_name, p_id as t_id, u_name as name, 'Professor' as role FROM CourseManages
 	UNION
-	SELECT c_id, c_name, s_id as t_id, s_name as name, 'Teaching Assistant' as role FROM CourseEnrollments 
+	SELECT c_id, c_name, s_id as t_id, u_name as name, 'Teaching Assistant' as role FROM CourseEnrollments 
 	WHERE req_type = 0
 ); 
 
@@ -126,17 +127,17 @@ CREATE TABLE ForumsGroups (
 );
 
 -- Accounts(u_id, passwd) -> u_id
-INSERT INTO Accounts VALUES ('A0000001A', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
-INSERT INTO Accounts VALUES ('A0000002B', 'B');
-INSERT INTO Accounts VALUES ('A0000003C', 'C');
-INSERT INTO Accounts VALUES ('A0000004D', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
-INSERT INTO Accounts VALUES ('A0000005E', 'E');
-INSERT INTO Accounts VALUES ('P0000001A', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
-INSERT INTO Accounts VALUES ('P0000002B', 'B');
+INSERT INTO Accounts VALUES ('A0000001A', 'Leslie Cole', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
+INSERT INTO Accounts VALUES ('A0000002B', 'Myra Morgan', 'B');
+INSERT INTO Accounts VALUES ('A0000003C', 'Raymond Benson', 'C');
+INSERT INTO Accounts VALUES ('A0000004D', 'Wendy Kelley', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
+INSERT INTO Accounts VALUES ('A0000005E', 'Patrick Bowers', 'E');
+INSERT INTO Accounts VALUES ('P0000001A', 'Adi', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
+INSERT INTO Accounts VALUES ('P0000002B', 'John', 'B');
 
--- Professors(p_id, p_name) -> p_id
-INSERT INTO Professors VALUES ('P0000001A', 'Adi');
-INSERT INTO Professors VALUES ('P0000002B', 'John');
+-- Professors(p_id) -> p_id
+INSERT INTO Professors VALUES ('P0000001A');
+INSERT INTO Professors VALUES ('P0000002B');
 
 -- Courses(c_id, c_name, c_capacity, c_desc) -> c_id
 INSERT INTO Courses VALUES ('CS2102', 'Database Systems I', 200, 'The aim of this module is to introduce the fundamental concepts and techniques necessary for the understanding and practice of design and implementation of database applications and of the management of data with relational database management systems. The module covers practical and theoretical aspects of design with entity-relationship model, theory of functional dependencies and normalisation by decomposition in second, third and Boyce-Codd normal forms. The module covers practical and theoretical aspects of programming with SQL data definition and manipulation sublanguages, relational tuple calculus, relational domain calculus and relational algebra.');
@@ -162,11 +163,11 @@ INSERT INTO Manages VALUES ('P0000001A','CS4215');
 INSERT INTO Manages VALUES ('P0000002B','BM5125');
 
 -- Students(s_id, s_name, yr_study, major) -> s_id
-INSERT INTO Students VALUES ('A0000001A', 'Leslie Cole', 1, 'SOC');
-INSERT INTO Students VALUES ('A0000002B', 'Myra Morgan', 2, 'SOC');
-INSERT INTO Students VALUES ('A0000003C', 'Raymond Benson', 2, 'SOC');
-INSERT INTO Students VALUES ('A0000004D', 'Wendy Kelley', 3,'SOC');
-INSERT INTO Students VALUES ('A0000005E', 'Patrick Bowers', 3,'FOE');
+INSERT INTO Students VALUES ('A0000001A', 1, 'SOC');
+INSERT INTO Students VALUES ('A0000002B', 2, 'SOC');
+INSERT INTO Students VALUES ('A0000003C', 2, 'SOC');
+INSERT INTO Students VALUES ('A0000004D', 3,'SOC');
+INSERT INTO Students VALUES ('A0000005E', 3,'FOE');
 
 -- CourseGroups (c_id, g_num, g_capacity) --> c_id, g_num
 INSERT INTO CourseGroups VAlUES ('CS2102', 1, 5);
