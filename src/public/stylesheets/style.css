@@ -1,8 +1,195 @@
 body {
-  padding: 50px;
+  /*padding: 50px;*/
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+a, a:visited {
+  color: #007bff;
+  border: none;
+  outline: 0;
+  text-decoration: none;
+  transition: color .3s ease-in-out;
 }
+
+a:hover {
+  color: #02264B;
+  text-decoration: none;
+}
+
+.logo-mid {
+  width: 120px;
+}
+
+.border-error {
+  border: 2px solid #dc3545;
+}
+
+.border-prompt {
+  border: 2px solid #007bff;
+}
+
+td.min {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.topnav {
+  overflow: hidden;
+  color: #333;
+}
+
+.topnav a {
+  float: left;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.topnav .title {
+  float: left;
+  text-align: center;
+  padding: 14px 16px;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 17px;
+  border-bottom: solid 6px #ff4400;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+  border-bottom: solid 6px #efb200;
+}
+
+.topnav a {
+  color: black;
+}
+
+/************************************************
+ * Dashboard
+ ***********************************************/
+
+.card {
+  cursor: pointer;
+}
+
+.card:hover {
+  background-color: #eee;
+}
+
+.card-a, .card-a:visited, .card-a:hover {
+  color: black;
+  border: none;
+  outline: 0;
+  text-decoration: none;
+}
+
+/************************************************
+ * Course Details
+ ***********************************************/
+
+nav > .nav.nav-tabs {
+  /*border: none;
+  color:#fff;
+  background:#C98986;
+  border-radius:0;*/
+}
+
+nav > div a.nav-item.nav-link {
+  border: none;
+  padding: 18px 25px;
+  border-radius: 0;
+  text-align: center;
+  color: black;
+}
+
+nav > div a.nav-item.nav-link.active {
+  border: none;
+  padding: 18px 25px;
+  /*color:#fff;
+  background:#C98986;*/
+  border-radius:0;
+  border-bottom:5px solid #efb200;
+}
+
+nav > div a.nav-item.nav-link.active:after {
+  content: "";
+  position: relative;
+  bottom: -60px;
+  left: -10%;
+  border: 15px solid transparent;
+  border-top-color: #efb200;
+}
+
+nav > div a.nav-item.nav-link:hover,
+nav > div a.nav-item.nav-link:focus {
+  background: #C5D5E4;
+  color:#fff;
+  border-radius:0;
+  transition:background 0.20s linear;
+}
+
+.tab-content {
+  background: #fdfdfd;
+  line-height: 25px;
+  border: 1px solid #ddd;
+  /*border-top:5px solid #C98986;
+  border-bottom:5px solid #e74c3c;*/
+  padding:30px 25px;
+  width: 100%;
+  min-height: 500px;
+}
+
+.staffcard {
+  cursor: default;
+}
+
+.staffcard:hover {
+  background-color: #fff;
+}
+
+.staffcard-a, .staffcard-a:visited, .staffcard-a:hover {
+  color: #fff;
+  border: none;
+  outline: 0;
+  text-decoration: none;
+}
+
+/************************************************
+ * Search Page
+ ***********************************************/
+
+.clickable-row {
+  cursor: pointer;
+}
+
+/************************************************
+ * Application Page
+ * Referenced: https://stackoverflow.com/questions/8169027/how-can-i-submit-a-post-form-using-the-a-href-tag
+ ***********************************************/
+
+.btn-link {
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  color: #0000EE;
+  padding: 0;
+  /*text-decoration: underline;*/
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.input-normal {
+  border: none;
+  outline: none;
+  background: none;
+  cursor: default;
+}
+
