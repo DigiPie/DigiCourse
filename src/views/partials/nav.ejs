@@ -64,11 +64,13 @@
               <h6 class="dropdown-title">Course Management</h6>
             </div>
             <div class="dropdown-body">
+              <% if (accountType != 'Professor') {%>
               <div class="dropdown-list">
                 <div class="content-wrapper">
                   <a href="/applicationRequest">Course/TA Request</a>
                 </div>
               </div>
+              <% } %>
               <div class="dropdown-list">
                 <div class="content-wrapper">
                   <a href="/applicationStatus">Application Status</a>

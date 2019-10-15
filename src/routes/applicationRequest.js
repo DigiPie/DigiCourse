@@ -14,6 +14,11 @@ router.get('/', function(req, res, next) {
 		return res.redirect('/login');
 	}
 
+	// Professor no need to reach here
+	if (req.user.u_type == 'Professor') {
+		return res.redirect('/applicationStatus');
+	}
+
 	// Prepare SQL Statement
 	var sql_query = "SELECT C.c_id, C.c_name, (SELECT COUNT(*)=1 FROM Enrollments E WHERE E.c_id = C.c_id AND E.req_status=True AND E.p_id IS NOT NULL AND E.s_id = $1) AS enrolled FROM Courses C, Students S WHERE S.s_id = $1 AND NOT EXISTS (SELECT 1 FROM Enrollments E2 WHERE E2.c_id = C.c_id AND E2.s_id = S.s_id AND E2.req_status = False) ORDER BY enrolled";
 	// CHECK if user is a student

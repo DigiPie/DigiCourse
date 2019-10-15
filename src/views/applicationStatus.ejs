@@ -42,7 +42,9 @@
                 <br/>
                 <!--<p class="text-gray">Welcome aboard, User</p>-->
                 <div class="topnav">
+                  <% if (accountType != 'Professor') {%>
                   <a href="/applicationRequest">Make new Request</a>
+                  <% } %>
                   <a class="active" href="#">Check Status</a>
                 </div>
                 <br/>
