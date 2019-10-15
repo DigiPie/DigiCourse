@@ -30,9 +30,6 @@ router.get('/:cid', function(req, res, next) {
 
 	// Query
 	pool.query(sql_query, [req.user.u_id, req.params.cid], (err, data) => {
-
-		console.log(data.rows[0]);
-
 		res.render('course', {
 			isCourse: true, 
 			username: req.user.u_name,
@@ -60,6 +57,10 @@ router.use('/:cid/forum', function(req, res, next) {
 }, forum);
 
 router.use('/:cid/enrollments', function(req, res, next) {
+
+	console.log(req.params);
+	console.log(req.data);
+
 	req.isCourse = true, 
 	req.cid = req.params.cid;
 	req.data = courseName;

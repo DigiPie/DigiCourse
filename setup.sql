@@ -65,7 +65,8 @@ CREATE TABLE Enrollments (
 	p_id		varchar(9) DEFAULT NULL,
 	req_status	boolean DEFAULT FALSE,
 	PRIMARY KEY (s_id, c_id, req_datetime),
-	FOREIGN KEY (p_id) REFERENCES Professors (p_id)
+	FOREIGN KEY (p_id) REFERENCES Professors (p_id),
+	CHECK (req_type = 1 OR req_type = 0)
 );
 
 CREATE OR REPLACE VIEW CourseEnrollments AS (
@@ -88,11 +89,6 @@ CREATE OR REPLACE VIEW CourseTeachingStaff AS (
 	UNION
 	SELECT c_id, c_name, s_id as t_id, s_name as name, 'Teaching Assistant' as role FROM CourseEnrollments 
 	WHERE req_type = 0
-); 
-
-CREATE OR REPLACE VIEW CourseApplications AS (
-	SELECT C.c_id, C.c_name, M.p_id, S.s_id, S.s_name, E.req_type, E.req_datetime, E.p_id AS approver, E.req_status 
-	FROM Courses C NATURAL JOIN Manages M JOIN Enrollments E ON E.c_id = C.c_id NATURAL JOIN Students S
 ); 
 
 CREATE TABLE student_info (
