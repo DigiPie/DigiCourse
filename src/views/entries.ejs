@@ -48,7 +48,8 @@
                   <table class="table">
                       <thead>
                         <tr>
-                          <th scope="col">User:</th>
+                          <th scope="col">User ID:</th>
+                          <th scope="col">Name:</th>
                           <th scope="col">Entry:</th>
                           <th scope="col">Posted On:</th>
                         </tr>
@@ -57,6 +58,7 @@
                         <% for (var i = 0; i < entries.length; i++) { %>
                         <tr>
                           <td><%= entries[i].u_id %></td>
+                          <td><%= entries[i].u_name %></td>
                           <td><%= entries[i].e_content %></td>
                           <td><%= entries[i].e_datetime %></td>
                         </tr>
