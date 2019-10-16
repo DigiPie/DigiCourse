@@ -53,7 +53,6 @@ router.post('/post', function(req, res, next) {
             res.status(200).redirect('back');
         }
     });
-    
 });
 
 module.exports = router;

@@ -21,7 +21,7 @@ router.get('/', function(req, res, next) {
     var check_user_permission = 
     'SELECT u_id, CASE'
 		+ ' WHEN (SELECT COUNT(*) FROM Enrollments WHERE s_id = $1 AND c_id = $2 AND req_type = 0 AND req_status = \'TRUE\') = 1 THEN \'Teaching\''
-		+ ' WHEN (SELECT COUNT(*) FROM Professors WHERE p_id = $1) = 1 THEN \'Professor\''
+		+ ' WHEN (SELECT COUNT(*) FROM Manages WHERE p_id = $1 AND c_id = $2) = 1 THEN \'Professor\''
 		+ ' ELSE \'null\''
 		+ ' END AS u_type'
 		+ ' FROM Accounts'
@@ -33,16 +33,16 @@ router.get('/', function(req, res, next) {
             return res.redirect('/login');
         
         } else {
-            var sql_query;
+            var show_forums;
 
             if (result.rows[0].u_type == 'Teaching' || result.rows[0].u_type == 'Professor') {
-                sql_query = 
+                show_forums = 
                 `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
                 FROM Forums 
                 WHERE c_id =\'${req.cid}\'`;
             
             } else {
-                sql_query = 
+                show_forums = 
                 `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
                 FROM (
                     StudentGroups sg JOIN ForumsGroups fg
@@ -55,7 +55,7 @@ router.get('/', function(req, res, next) {
                 AND sg.s_id =\'${req.user.u_id}\'`;
             }
 
-            pool.query(sql_query, (err, forums) => {
+            pool.query(show_forums, (err, forums) => {
                 res.render('forum', {
                     isCourse: req.isCourse,
                     username: req.user.u_name,
@@ -90,21 +90,30 @@ router.post('/create', function(req, res, next) {
         return;
     }
 
-    var query_pid = `SELECT p_id FROM Manages WHERE c_id =\'${req.cid}\'`;
+    var check_prof_manages = 
+    'SELECT p_id' 
+    + ' FROM Manages' 
+    + ' WHERE c_id = $1'
+    + ' AND p_id = $2';
     
-    pool.query(query_pid, (err, get_pid) => {
-        var course_pid = get_pid.rows[0].p_id;
-        var sql_query = `INSERT INTO Forums VAlUES ('${course_pid}', '${req.cid}', to_timestamp(${Date.now()} / 1000), '${req.body.f_topic}')`;
+    pool.query(check_prof_manages, [req.cid, req.user.u_id], (err, get_pid) => {
+        if (get_pid.rows.length == 1) {
+            var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_id}', '${req.cid}', to_timestamp(${Date.now()} / 1000), '${req.body.f_topic}')`;
 
-        pool.query(sql_query, (err, data) => {
-            if (err) {
-                req.flash('error', `Error. Please try again.`);
-                res.status(err.status || 500).redirect('back');
-            } else {
-                req.flash('success', `Successfully created forum "${req.body.f_topic}"`);
-                res.status(200).redirect('back');
-            }
-        });
+            pool.query(insert_new_forum, (err, data) => {
+                if (err) {
+                    req.flash('error', `Error. Please try again.`);
+                    res.status(err.status || 500).redirect('back');
+                } else {
+                    req.flash('success', `Successfully created forum "${req.body.f_topic}"`);
+                    res.status(200).redirect('back');
+                }
+            });
+
+        } else { // Current user attempting to create new forum is not a managing professor of the course
+            req.flash('error','Login is required');
+            return res.redirect('/login');
+        }
     });
 });
 
