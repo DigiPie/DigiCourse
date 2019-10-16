@@ -37,22 +37,28 @@ router.get('/', function(req, res, next) {
 
 router.post('/post', function(req, res, next) {
     if (req.body.e_content == '') {
-        req.flash('error', `Please enter content for the new forum entry`);
+        req.flash('error', 'Please enter content for the new forum entry');
         res.redirect(`/course/${req.cid}/forum/${req.f_topic}/${req.f_datetime}/entries`);
         return;
     }
 
-    var sql_query = `INSERT INTO ForumEntries VAlUES ('${req.cid}', '${req.f_datetime}', '${req.user.u_id}', to_timestamp(${Date.now()} / 1000), '${req.body.e_content}')`;
+    if (req.body.e_content.length > 1000) {
+        req.flash('error', 'Error. Character limit exceeded');
+        res.status(500).redirect('back');
+    
+    } else {
+        var insert_new_entry = `INSERT INTO ForumEntries VAlUES ('${req.cid}', '${req.f_datetime}', '${req.user.u_id}', to_timestamp(${Date.now()} / 1000), '${req.body.e_content}')`;
 
-    pool.query(sql_query, (err, data) => {
-        if (err) {
-            req.flash('error', `Error. Please try again.`);
-            res.status(err.status || 500).redirect('back');
-        } else {
-            req.flash('success', 'Successfully posted new entry');
-            res.status(200).redirect('back');
-        }
-    });
+        pool.query(insert_new_entry, (err, data) => {
+            if (err) {
+                req.flash('error', `Error. Please try again.`);
+                res.status(err.status || 500).redirect('back');
+            } else {
+                req.flash('success', 'Successfully posted new entry');
+                res.status(200).redirect('back');
+            }
+        });
+    }
 });
 
 module.exports = router;

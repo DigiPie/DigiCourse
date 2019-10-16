@@ -83,7 +83,7 @@
                 <form id="html_form" action="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/entries/post"" role="form" method="post">
                     <div class="form-group">
                         <label for="e_content">Content:</label>
-                        <input type="text" maxlength="1000" class="form-control" id="e_content" name="e_content" placeholder="Enter content">
+                        <textarea id="e_content" name="e_content" class="form-control" maxlength="1000" placeholder="Enter content" rows="7"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Post entry</button>
                 </form>
