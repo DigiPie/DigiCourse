@@ -37,13 +37,14 @@ router.get('/', function(req, res, next) {
 
             if (result.rows[0].u_type == 'Teaching' || result.rows[0].u_type == 'Professor') {
                 show_forums = 
-                `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
+                `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM Forums 
-                WHERE c_id =\'${req.cid}\'`;
+                WHERE c_id =\'${req.cid}\'
+                ORDER BY f_datetime`;
             
             } else {
                 show_forums = 
-                `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
+                `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM (
                     StudentGroups sg JOIN ForumsGroups fg
                     ON sg.c_id = fg.c_id
@@ -52,7 +53,8 @@ router.get('/', function(req, res, next) {
                     ON f.f_datetime = fg.f_datetime
                     AND f.c_id = fg.c_id 
                 WHERE fg.c_id =\'${req.cid}\'
-                AND sg.s_id =\'${req.user.u_id}\'`;
+                AND sg.s_id =\'${req.user.u_id}\'
+                ORDER BY f.f_datetime`;
             }
 
             pool.query(show_forums, (err, forums) => {

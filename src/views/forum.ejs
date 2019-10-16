@@ -78,8 +78,8 @@
                       <tbody>
                         <% for (var i = 0; i < forums.length; i++) { %>
                         <tr>
-                          <td><a href="/course/<%= cid %>/forum/<%= forums[i].f_topic %>/<%= forums[i].f_datetime %>/entries"><%= forums[i].f_topic %></a></td>
-                          <td><%= forums[i].f_datetime %></td>
+                          <td><a href="/course/<%= cid %>/forum/<%= forums[i].f_topic %>/<%= forums[i].formatted %>/entries"><%= forums[i].f_topic %></a></td>
+                          <td><%= forums[i].formatted %></td>
                         </tr>
                         <% } %>
                       </tbody>

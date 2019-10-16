@@ -15,11 +15,12 @@ router.get('/', function(req, res, next) {
 	}
 	
     var show_entries = 
-    'SELECT fe.u_id, u_name, TO_CHAR(e_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') e_datetime, e_content'
+    'SELECT fe.u_id, u_name, TO_CHAR(e_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted, e_content'
     + ' FROM ForumEntries fe JOIN Accounts a'
     + ' ON fe.u_id = a.u_id'
     + ' WHERE c_id = $1' 
-    + ' AND f_datetime = $2';
+    + ' AND f_datetime = $2'
+    + ' ORDER BY e_datetime';
 
 	pool.query(show_entries, [req.cid, req.f_datetime], (err, entries) => {
 		res.render('entries', {
@@ -51,7 +52,7 @@ router.post('/post', function(req, res, next) {
 
         pool.query(insert_new_entry, (err, data) => {
             if (err) {
-                req.flash('error', `Error. Please try again.`);
+                req.flash('error', 'Error. Please try again.');
                 res.status(err.status || 500).redirect('back');
             } else {
                 req.flash('success', 'Successfully posted new entry');
