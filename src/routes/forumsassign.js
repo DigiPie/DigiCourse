@@ -20,16 +20,18 @@ router.get('/', function(req, res, next) {
     var get_forums_for_forumassign =
     'SELECT afg.f_topic, TO_CHAR(afg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM' 
-	+ ' (SELECT COUNT(g_num) c, f.f_datetime, f.f_topic'
-    + ' FROM ForumsGroups fg RIGHT JOIN Forums f'
-    + ' ON fg.c_id = f.c_id'
-    + ' AND fg.f_datetime = f.f_datetime'
-	+ ' WHERE f.c_id = $1'
-	+ ' GROUP BY f.f_datetime, f.f_topic) afg'
-    + ' WHERE afg.c < ('
-	+ ' SELECT COUNT(*)'
-	+ ' FROM CourseGroups'
-    + ' WHERE c_id = $1)'
+	+ ' ( SELECT COUNT(g_num) c, f.f_datetime, f.f_topic'
+    + '   FROM ForumsGroups fg RIGHT JOIN Forums f'
+    + '   ON fg.c_id = f.c_id'
+    + '   AND fg.f_datetime = f.f_datetime'
+	+ '   WHERE f.c_id = $1'
+    + '   GROUP BY f.f_datetime, f.f_topic'
+    + ' ) afg'
+    + ' WHERE afg.c <'
+	+ ' ( SELECT COUNT(*)'
+	+ '   FROM CourseGroups'
+    + '   WHERE c_id = $1'
+    + ' )'
     + ' ORDER BY afg.f_datetime'; 
 
     // For each forum, retrieve a list of group numbers that haven't been assigned to the forum.

@@ -8,8 +8,6 @@ const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
 });
 
-var forums_list;
-
 /**** Routing ****/
 router.get('/', function(req, res, next) {
     // Authentication
@@ -20,12 +18,24 @@ router.get('/', function(req, res, next) {
 
     var check_user_permission = 
     'SELECT u_id, CASE'
-		+ ' WHEN (SELECT COUNT(*) FROM Enrollments WHERE s_id = $1 AND c_id = $2 AND req_type = 0 AND req_status = \'TRUE\') = 1 THEN \'Teaching\''
-		+ ' WHEN (SELECT COUNT(*) FROM Manages WHERE p_id = $1 AND c_id = $2) = 1 THEN \'Professor\''
-		+ ' ELSE \'null\''
-		+ ' END AS u_type'
-		+ ' FROM Accounts'
-        + ' WHERE u_id = $1';
+    + ' WHEN' 
+    + ' ( SELECT COUNT(*)' 
+    + '   FROM Enrollments' 
+    + '   WHERE s_id = $1' 
+    + '   AND c_id = $2' 
+    + '   AND req_type = 0' 
+    + '   AND req_status = \'TRUE\''
+    + ' ) = 1 THEN \'Teaching\''
+    + ' WHEN' 
+    + ' ( SELECT COUNT(*)' 
+    + '   FROM Manages' 
+    + '   WHERE p_id = $1'
+    + '   AND c_id = $2'
+    + ' ) = 1 THEN \'Professor\''
+	+ ' ELSE \'null\''
+	+ ' END AS u_type'
+	+ ' FROM Accounts'
+    + ' WHERE u_id = $1';
         
     pool.query(check_user_permission, [req.user.u_id, req.cid], (err, result) => {
         if (result.rows.length != 1) {
@@ -66,8 +76,6 @@ router.get('/', function(req, res, next) {
                     data: req.data,
                     forums: forums.rows
                 });
-                    
-                forums_list = forums.rows;
             });
         }
     });
@@ -80,14 +88,13 @@ router.use('/:f_topic/:f_datetime/entries', function(req, res, next) {
 }, entries);
 
 router.use('/assign', function(req, res, next) {
-    req.forums_list = forums_list;
 	next()
 }, forumsassign);
 
 router.post('/create', function(req, res, next) {
     // Empty topic name
     if (req.body.f_topic == '') {
-        req.flash('error', `Please enter a topic name for the new forum`);
+        req.flash('error', 'Please enter a topic name for the new forum');
         res.redirect(`/course/${req.cid}/forum`);
         return;
     }
@@ -104,7 +111,7 @@ router.post('/create', function(req, res, next) {
 
             pool.query(insert_new_forum, (err, data) => {
                 if (err) {
-                    req.flash('error', `Error. Please try again.`);
+                    req.flash('error', 'Error. Please try again.');
                     res.status(err.status || 500).redirect('back');
                 } else {
                     req.flash('success', `Successfully created forum "${req.body.f_topic}"`);
