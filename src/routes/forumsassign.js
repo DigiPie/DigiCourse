@@ -16,34 +16,53 @@ router.get('/', function(req, res, next) {
 		return res.redirect('/login');
     }
 
-    var sql_query = 
-    `SELECT g_num, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') f_datetime
-    FROM CourseGroups cg, Forums f
-    WHERE cg.c_id = f.c_id 
-    AND f.c_id =\'${req.cid}\'
-    EXCEPT
-    SELECT fg.g_num, TO_CHAR(fg.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') fdt
-    FROM ForumsGroups fg
-    ORDER BY g_num
-    `;
+    // Retrieves a list of forums that can still be assigned to groups (hasn't been fully assigned to all groups).
+    var get_forums_for_forumassign =
+    'SELECT afg.f_topic, TO_CHAR(afg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
+    + ' FROM' 
+	+ ' (SELECT COUNT(g_num) c, f.f_datetime, f.f_topic'
+    + ' FROM ForumsGroups fg RIGHT JOIN Forums f'
+    + ' ON fg.c_id = f.c_id'
+    + ' AND fg.f_datetime = f.f_datetime'
+	+ ' WHERE f.c_id = $1'
+	+ ' GROUP BY f.f_datetime, f.f_topic) afg'
+    + ' WHERE afg.c < ('
+	+ ' SELECT COUNT(*)'
+	+ ' FROM CourseGroups'
+    + ' WHERE c_id = $1)'
+    + ' ORDER BY afg.f_datetime'; 
+
+    // For each forum, retrieve a list of group numbers that haven't been assigned to the forum.
+    var get_groups_for_forumassign = 
+    'SELECT g_num, TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
+    + ' FROM CourseGroups cg, Forums f'
+    + ' WHERE cg.c_id = f.c_id'
+    + ' AND f.c_id = $1'
+    + ' EXCEPT'
+    + ' SELECT fg.g_num, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') fdt'
+    + ' FROM ForumsGroups fg'
+    + ' ORDER BY g_num';
     
-	pool.query(sql_query, (err, result) => {
-		res.render('forumsassign', {
-			isCourse: req.isCourse,
-			username: req.user.u_name,
-			accountType: req.user.u_type, 
-			cid: req.cid,
-            data: req.data,
-            forums: req.forums_list,
-            forumGroups: result.rows
-		});
+	pool.query(get_forums_for_forumassign, [req.cid], (err, forums) => {
+        
+        pool.query(get_groups_for_forumassign, [req.cid], (err, result) => {
+            res.render('forumsassign', {
+                isCourse: req.isCourse,
+                username: req.user.u_name,
+                accountType: req.user.u_type, 
+                cid: req.cid,
+                data: req.data,
+                forums: forums.rows,
+                forumGroups: result.rows
+            });
+        });
     });
 });
 
 router.post('/', function(req, res, next) {
     const selected_rows = filter(req.body.row, { 'selected': 'on' });
     if (selected_rows.length == 0) {
-        req.flash('error', `Please select a group`);
+        req.flash('error', 'Please select a group');
         res.status(400).redirect('back');
         return;
     }
@@ -58,7 +77,7 @@ router.post('/', function(req, res, next) {
 
     pool.query(insert_sql, (err, data) => {
         if (err) {
-            req.flash('error', `Error. Please try again.`);
+            req.flash('error', 'Error. Please try again.');
             res.status(err.status || 500).redirect('back');
         } else {
             req.flash('success', 'Successfully assigned forum(s) to group(s).');
