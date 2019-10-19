@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router({mergeParams: true})
+
 const filter = require('lodash/filter');
 const pgp = require('pg-promise') ({capSQL: true});
-
 const { Pool } = require('pg')
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL

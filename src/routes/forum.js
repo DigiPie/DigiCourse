@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router({mergeParams: true})
+
 const entries = require('./entries');
 const forumsassign = require('./forumsassign');
-
 const { Pool } = require('pg')
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
@@ -81,16 +81,6 @@ router.get('/', function(req, res, next) {
     });
 });
 
-router.use('/:f_topic/:f_datetime/entries', function(req, res, next) {
-    req.f_topic = req.params.f_topic;
-    req.f_datetime = req.params.f_datetime;
-	next()
-}, entries);
-
-router.use('/assign', function(req, res, next) {
-	next()
-}, forumsassign);
-
 router.post('/create', function(req, res, next) {
     // Empty topic name
     if (req.body.f_topic == '') {
@@ -125,5 +115,39 @@ router.post('/create', function(req, res, next) {
         }
     });
 });
+
+router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
+    
+    // Delete a forum from the course only if the user is a managing professor of the course.
+    var delete_forum =
+    'DELETE FROM Forums'
+    + ' WHERE f_datetime = $1'
+    + ' AND c_id = $2'
+    + ' AND c_id IN'
+    + ' ( SELECT m.c_id'
+    + '   FROM Manages m'
+    + '   WHERE p_id = $3'
+    + ' )';
+
+    pool.query(delete_forum, [req.params.f_datetime, req.cid, req.user.u_id], (err, data) => {
+        if (err) {
+            req.flash('delFail', 'Unable to delete forum. Please try again.');
+            res.status(err.status || 500).redirect('back');
+        } else {
+            req.flash('delSuccess', `Successfully deleted forum "${req.params.f_topic}"`);
+            res.status(200).redirect('back');
+        }
+    });
+});
+
+router.use('/:f_topic/:f_datetime/entries', function(req, res, next) {
+    req.f_topic = req.params.f_topic;
+    req.f_datetime = req.params.f_datetime;
+	next()
+}, entries);
+
+router.use('/assign', function(req, res, next) {
+	next()
+}, forumsassign);
 
 module.exports = router;

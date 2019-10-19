@@ -64,6 +64,15 @@
                   <div class="title">Forums for <%= cid %></div>
                 </div>
                 <br>
+                <% if (messages.delFail) {%>
+                  <div class="alert alert-danger">
+                    <%= messages.delFail %>
+                  </div>
+                <% } else if (messages.delSuccess) { %>
+                    <div class="alert alert-success">
+                      <%= messages.delSuccess %>
+                    </div>
+                  <% } %>
                 <% if (forums.length == 0) { %>
                 <h4>There are no forums in this module.</h4>
                 <% } else { %>
@@ -73,6 +82,9 @@
                         <tr>
                           <th scope="col">Topic:</th>
                           <th scope="col">Created On:</th>
+                          <% if (accountType == 'Professor') { %>
+                          <th scope="col">Action:</th>
+                          <% } %>
                         </tr>
                       </thead>
                       <tbody>
@@ -80,6 +92,9 @@
                         <tr>
                           <td><a href="/course/<%= cid %>/forum/<%= forums[i].f_topic %>/<%= forums[i].formatted %>/entries"><%= forums[i].f_topic %></a></td>
                           <td><%= forums[i].formatted %></td>
+                          <% if (accountType == 'Professor') { %>
+                          <td><button type="submit" formaction="/course/<%= cid %>/forum/delete/<%= forums[i].f_topic %>/<%= forums[i].formatted %>" class="btn btn-primary">Delete</button></td>
+                          <% } %>
                         </tr>
                         <% } %>
                       </tbody>
