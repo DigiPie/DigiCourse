@@ -38,9 +38,11 @@
               <div class="col-12 py-5">
                 <div class="topnav">
                   <a class="active" href="#">Student roster</a>
+                  <% if (accountType == 'Professor') {%>
                   <a href="/course/<%= cid %>/groups/create">Create group</a>
                   <a href="/course/<%= cid %>/groups/assign"">Assign group</a>
                   <a href="/course/<%= cid %>/groups/unassign">Unassign group</a>
+                  <% } %> 
                 </div>
                 </br>
                 <% if (datarows.length == 0) { %>

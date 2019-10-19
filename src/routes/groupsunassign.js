@@ -13,6 +13,13 @@ router.get('/', function(req, res, next) {
 		req.flash('error','Login is required to access dashboard');
 		return res.redirect('/login');
     }
+
+    if (req.user.u_type == "Student") {
+        return res.render('error', {
+            err_msg: "Page not found.",
+            err_status: "Error: 404"
+        });
+    }
     
     var sql_query = `SELECT c.s_id, c.u_name, s.g_num
             FROM CourseEnrollments c
