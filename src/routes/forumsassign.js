@@ -17,7 +17,7 @@ router.get('/', function(req, res, next) {
     }
 
     // Retrieves a list of forums that can still be assigned to groups (hasn't been fully assigned to all groups).
-    var get_forums_for_forumassign =
+    var get_forums_for_assign =
     'SELECT afg.f_topic, TO_CHAR(afg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM' 
 	+ ' ( SELECT COUNT(g_num) c, f.f_datetime, f.f_topic'
@@ -35,7 +35,7 @@ router.get('/', function(req, res, next) {
     + ' ORDER BY afg.f_datetime'; 
 
     // For each forum, retrieve a list of group numbers that haven't been assigned to the forum.
-    var get_groups_for_forumassign = 
+    var get_groups_for_assign = 
     'SELECT g_num, TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM CourseGroups cg, Forums f'
     + ' WHERE cg.c_id = f.c_id'
@@ -45,10 +45,10 @@ router.get('/', function(req, res, next) {
     + ' FROM ForumsGroups fg'
     + ' ORDER BY g_num';
     
-	pool.query(get_forums_for_forumassign, [req.cid], (err, forums) => {
+	pool.query(get_forums_for_assign, [req.cid], (err, forums) => {
         
-        pool.query(get_groups_for_forumassign, [req.cid], (err, result) => {
-            res.render('forumsassign', {
+        pool.query(get_groups_for_assign, [req.cid], (err, result) => {
+            res.render('forumsAssign', {
                 isCourse: req.isCourse,
                 username: req.user.u_name,
                 accountType: req.user.u_type, 
@@ -63,6 +63,8 @@ router.get('/', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
     const selected_rows = filter(req.body.row, { 'selected': 'on' });
+
+    // No group selected for assign is not allowed. 
     if (selected_rows.length == 0) {
         req.flash('error', 'Please select a group');
         res.status(400).redirect('back');
@@ -75,9 +77,9 @@ router.post('/', function(req, res, next) {
     }
 
     const column_set = new pgp.helpers.ColumnSet(['f_datetime', 'g_num', 'c_id'], {table: 'forumsgroups'});
-    const insert_sql = pgp.helpers.insert(selected_rows, column_set);
+    const assign_forums_to_groups = pgp.helpers.insert(selected_rows, column_set);
 
-    pool.query(insert_sql, (err, data) => {
+    pool.query(assign_forums_to_groups, (err, data) => {
         if (err) {
             req.flash('error', 'Error. Please try again.');
             res.status(err.status || 500).redirect('back');
