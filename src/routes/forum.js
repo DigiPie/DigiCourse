@@ -16,7 +16,8 @@ router.get('/', function(req, res, next) {
 		return res.redirect('/login');
     }
 
-    var check_user_permission = 
+    // Checks whether the user is an approved TA of the course or a professor managing the course (to allow access to all forums in the course).
+    var check_forum_privilege = 
     'SELECT u_id, CASE'
     + ' WHEN' 
     + ' ( SELECT COUNT(*)' 
@@ -37,7 +38,7 @@ router.get('/', function(req, res, next) {
 	+ ' FROM Accounts'
     + ' WHERE u_id = $1';
         
-    pool.query(check_user_permission, [req.user.u_id, req.cid], (err, result) => {
+    pool.query(check_forum_privilege, [req.user.u_id, req.cid], (err, result) => {
         if (result.rows.length != 1) {
             req.flash('error','Login is required');
             return res.redirect('/login');
@@ -46,6 +47,7 @@ router.get('/', function(req, res, next) {
             var show_forums;
 
             if (result.rows[0].u_type == 'Teaching' || result.rows[0].u_type == 'Professor') {
+                // Approved teaching assistants and the professor(s) managing the course are able to view all forums. 
                 show_forums = 
                 `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM Forums 
@@ -53,15 +55,16 @@ router.get('/', function(req, res, next) {
                 ORDER BY f_datetime`;
             
             } else {
+                // Students can only view the forums that are assigned to the group they belong in.
                 show_forums = 
                 `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
-                FROM (
-                    StudentGroups sg JOIN ForumsGroups fg
-                    ON sg.c_id = fg.c_id
-                    AND sg.g_num = fg.g_num
-                )   JOIN Forums f
-                    ON f.f_datetime = fg.f_datetime
-                    AND f.c_id = fg.c_id 
+                FROM 
+                ( StudentGroups sg JOIN ForumsGroups fg
+                  ON sg.c_id = fg.c_id
+                  AND sg.g_num = fg.g_num
+                ) JOIN Forums f
+                ON f.f_datetime = fg.f_datetime
+                AND f.c_id = fg.c_id 
                 WHERE fg.c_id =\'${req.cid}\'
                 AND sg.s_id =\'${req.user.u_id}\'
                 ORDER BY f.f_datetime`;
@@ -82,36 +85,22 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/create', function(req, res, next) {
-    // Empty topic name
+    // Blank forum topic is not allowed.
     if (req.body.f_topic == '') {
         req.flash('error', 'Please enter a topic name for the new forum');
         res.redirect(`/course/${req.cid}/forum`);
         return;
     }
 
-    var check_prof_manages = 
-    'SELECT p_id' 
-    + ' FROM Manages' 
-    + ' WHERE c_id = $1'
-    + ' AND p_id = $2';
-    
-    pool.query(check_prof_manages, [req.cid, req.user.u_id], (err, get_pid) => {
-        if (get_pid.rows.length == 1) {
-            var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_id}', '${req.cid}', to_timestamp(${Date.now()} / 1000), '${req.body.f_topic}')`;
+    var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_id}', '${req.cid}', to_timestamp(${Date.now()} / 1000), '${req.body.f_topic}')`;
 
-            pool.query(insert_new_forum, (err, data) => {
-                if (err) {
-                    req.flash('error', 'Error. Please try again.');
-                    res.status(err.status || 500).redirect('back');
-                } else {
-                    req.flash('success', `Successfully created forum "${req.body.f_topic}"`);
-                    res.status(200).redirect('back');
-                }
-            });
-
-        } else { // Current user attempting to create new forum is not a managing professor of the course
-            req.flash('error','Login is required');
-            return res.redirect('/login');
+    pool.query(insert_new_forum, (err, data) => {
+        if (err) {
+            req.flash('error', 'Error. Please try again.');
+            res.status(err.status || 500).redirect('back');
+        } else {
+            req.flash('success', `Successfully created forum "${req.body.f_topic}"`);
+            res.status(200).redirect('back');
         }
     });
 });
@@ -140,12 +129,14 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
     });
 });
 
+// Child routing for forum entries.
 router.use('/:f_topic/:f_datetime/entries', function(req, res, next) {
     req.f_topic = req.params.f_topic;
     req.f_datetime = req.params.f_datetime;
 	next()
 }, entries);
 
+// Child routing for forum assign.
 router.use('/assign', function(req, res, next) {
 	next()
 }, forumsassign);

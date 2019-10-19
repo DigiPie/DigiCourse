@@ -52,6 +52,9 @@
                           <th scope="col">Name:</th>
                           <th scope="col">Entry:</th>
                           <th scope="col">Posted On:</th>
+                          <% if (f_delete_privilege == true) { %>
+                          <th scope="col">Action:</th>
+                          <% } %>
                         </tr>
                       </thead>
                       <tbody>
@@ -61,6 +64,9 @@
                           <td><%= entries[i].u_name %></td>
                           <td><%= entries[i].e_content %></td>
                           <td><%= entries[i].formatted %></td>
+                          <% if (f_delete_privilege == true) { %>
+                          <td><button type="submit" formaction="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/entries/delete/<%= entries[i].u_id %>/<%= entries[i].formatted %>" class="btn btn-primary">Delete</button></td>
+                          <% } %>
                         </tr>
                         <% } %>
                       </tbody>
@@ -80,7 +86,7 @@
                     <%= messages.success %>
                 </div>
                 <% } %>
-                <form id="html_form" action="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/entries/post"" role="form" method="post">
+                <form id="html_form" action="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/entries/post" role="form" method="post">
                     <div class="form-group">
                         <label for="e_content">Content:</label>
                         <textarea id="e_content" name="e_content" class="form-control" maxlength="1000" placeholder="Enter content" rows="7"></textarea>
