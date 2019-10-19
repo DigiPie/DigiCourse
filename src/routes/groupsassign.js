@@ -73,10 +73,9 @@ router.post('/', function(req, res, next) {
 
     pool.query(insert_sql, (err, data) => {
         if (err) {
-            res.status(err.status || 500);
             res.render('error', {
-                message: "Something went wrong during insertion, try again later.",
-                error: err
+                err_msg: "Something went wrong during insertion, try again later.",
+                err_status: err.status || 500
             });
         } else {
             res.status(200).redirect('back');

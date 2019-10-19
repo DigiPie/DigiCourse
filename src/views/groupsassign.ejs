@@ -39,7 +39,8 @@
                 <div class="topnav">
                   <a href="/course/<%= cid %>/groups">Create group</a>
                   <a class="active" href="#">Assign group</a>
-                  <a href="/course/<%= cid %>/groups/student">Student roaster</a>
+                  <a href="/course/<%= cid %>/groups/unassign">Unassign group</a>
+                  <a href="/course/<%= cid %>/groups/student">Student roster</a>
                 </div>
               </br>
                 <% if (messages.error) {%>
@@ -48,7 +49,7 @@
                   </div>
                 <% } %>
                 <% if (datarows.length == 0) { %>
-                <h4>All students has a group in this module.</h4>
+                <h4>All students has a group in this module or there are no students enrolled in this module.</h4>
                 <% } else { %>
                   <form id="html_form" role="form" method="post">
                     <label for="g_num">Select group number</label>
