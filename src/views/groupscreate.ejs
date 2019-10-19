@@ -14,7 +14,7 @@
 		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-
+  
   </head>
   <body class="header-fixed">
 
@@ -37,35 +37,58 @@
             <div class="row">
               <div class="col-12 py-5">
                 <div class="topnav">
-                  <a href="/course/<%= cid %>/groups">Create group</a>
-                  <a href="/course/<%= cid %>/groups/assign"">Assign group</a>
+                  <a href="/course/<%= cid %>/groups">Student roster</a>
+                  <a class="active" href="#">Create group</a>
+                  <a href="/course/<%= cid %>/groups/assign">Assign group</a>
                   <a href="/course/<%= cid %>/groups/unassign">Unassign group</a>
-                  <a class="active" href="#">Student roster</a>
                 </div>
                 </br>
+                <% if (messages.error) {%>
+                  <div class="alert alert-danger">
+                    <%= messages.error %>
+                  </div>
+                <% } else if (messages.success) { %>
+                    <div class="alert alert-success">
+                      <%= messages.success %>
+                    </div>
+                  <% } %>
+                <form id="html_form" action="/course/<%= cid %>/groups/create" role="form" method="post">
+                  <div class="form-group">
+                    <label for="g_num">Group number</label>
+                    <input type="number" class="form-control" id="g_num" name="g_num" placeholder="Enter group number">
+                  </div>
+                  <div class="form-group">
+                    <label for="g_capacity">Group capacity</label>
+                    <input type="number" class="form-control" id="g_capacity" name="g_capacity" value="4">
+                  </div>
+                  <input type="hidden" name='c_id' value="<%= cid %>">
+                  <button type="submit" class="btn btn-primary">Create group</button>
+                </form>
+                <br>
+                </br>
                 <% if (datarows.length == 0) { %>
-                <h4>There are no students enrolled in this module.</h4>
+                <h4>There are no groups in this module.</h4>
                 <% } else { %>
+                <form id="html_form" role="form" method="post">
                   <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Student ID</th>
-                        <th scope="col">Student name</th>
-                        <th scope="col">Group number</th>
-                        <th scope="col">Type</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <% for (var i = 0; i < datarows.length; i++) { %>
-                      <tr>
-                        <td><%= datarows[i].s_id %></td>
-                        <td><%= datarows[i].u_name %></td>
-                        <td><%= datarows[i].g_num ? datarows[i].g_num : (datarows[i].req_type == 0 ? 'All groups' : 'No groups') %></td>
-                        <td><%= datarows[i].req_type == 1 ? 'Student' : 'Teaching Assistant' %></td>
-                      </tr>
-                      <% } %>
-                    </tbody>
-                  </table>
+                      <thead>
+                        <tr>
+                          <th scope="col">Group number</th>
+                          <th scope="col">Group capacity</th>
+                          <th scope="col">Number of enrolled</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% for (var i = 0; i < datarows.length; i++) { %>
+                        <tr>
+                          <td><%= datarows[i].g_num %></td>
+                          <td><%= datarows[i].g_capacity %></td>
+                          <td><%= datarows[i].enrolled %></td>
+                        </tr>
+                        <% } %>
+                      </tbody>
+                    </table>
+                </form>
                 <% } %>
               </div>
             </div>
