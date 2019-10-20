@@ -41,7 +41,7 @@ router.get('/', function(req, res, next) {
     + ' FROM ForumEntries fe JOIN Accounts a'
     + ' ON fe.u_id = a.u_id'
     + ' WHERE c_id = $1' 
-    + ' AND f_datetime = $2'
+    + ' AND TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $2'
     + ' ORDER BY e_datetime';
 
 	pool.query(check_forum_privilege, [req.user.u_id, req.cid], (err, result) => {
@@ -83,12 +83,13 @@ router.post('/post', function(req, res, next) {
         res.status(500).redirect('back');
     
     } else {
-        var insert_new_entry = `INSERT INTO ForumEntries VAlUES ('${req.cid}', '${req.f_datetime}', '${req.user.u_id}', to_timestamp(${Date.now()} / 1000), '${req.body.e_content}')`;
+        var insert_new_entry = `INSERT INTO ForumEntries VAlUES ('${req.cid}', '${req.f_datetime}', '${req.user.u_id}', NOW(), '${req.body.e_content}')`;
 
         pool.query(insert_new_entry, (err, data) => {
             if (err) {
                 req.flash('error', 'Error. Please try again.');
                 res.status(err.status || 500).redirect('back');
+
             } else {
                 req.flash('success', 'Successfully posted new entry');
                 res.status(200).redirect('back');
@@ -99,34 +100,54 @@ router.post('/post', function(req, res, next) {
 
 router.post('/delete/:e_author/:e_datetime', function(req, res, next) {
     
-    // Delete an entry from a course forum only if the user is a managing professor or an approved TA of the course.
-    var delete_entry =
-    'DELETE FROM ForumEntries'
-    + ' WHERE e_datetime = $1'
-    + ' AND u_id = $2'
-    + ' AND c_id = $3'
-    + ' AND' 
+    // Before deleting, update 'e_deleted_by' col of the entry for audit trail purpose.
+    // Update 'e_deleted_by' col of the entry only if the user is a managing professor or teaching assistant of the course.
+    var update_deleted_by =
+    'UPDATE ForumEntries' 
+    + ' SET e_deleted_by = $1'
+    + ' WHERE TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $2'
+    + ' AND u_id = $3'
+    + ' AND TO_CHAR(e_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $4'
+    + ' AND c_id = $5'
+    + ' AND'
     + ' ( c_id IN'
     + '   ( SELECT m.c_id'
     + '     FROM Manages m'
-    + '     WHERE p_id = $4'
+    + '     WHERE p_id = $1'
     + '   )'
     + ' OR c_id IN'
     + '    ( SELECT e.c_id'
     + '      FROM Enrollments e'
-    + '      WHERE s_id = $4'
+    + '      WHERE s_id = $1'
     + '      AND req_type = 0'
     + '      AND req_status = \'TRUE\''
     + '    )'
     + ' )';
 
-    pool.query(delete_entry, [req.params.e_datetime, req.params.e_author, req.cid, req.user.u_id], (err, data) => {
-        if (err) {
+    var delete_entry =
+    'DELETE FROM ForumEntries'
+    + ' WHERE TO_CHAR(e_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $1'
+    + ' AND u_id = $2'
+    + ' AND c_id = $3'
+    + ' AND TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $4';
+
+    pool.query(update_deleted_by, [req.user.u_id, req.f_datetime, req.params.e_author, req.params.e_datetime, req.cid], (err, result) => {
+
+        if (err | result.rowCount == 0) {
             req.flash('delFail', 'Unable to delete entry. Please try again.');
-            res.status(err.status || 500).redirect('back');
+            res.status(500).redirect('back');
+        
         } else {
-            req.flash('delSuccess', `Successfully deleted entry posted by ${req.params.e_author} on ${req.params.e_datetime}`);
-            res.status(200).redirect('back');
+            pool.query(delete_entry, [req.params.e_datetime, req.params.e_author, req.cid, req.f_datetime], (err, data) => {
+                if (err || data.rowCount == 0) {
+                    req.flash('delFail', 'Unable to delete entry. Please try again.');
+                    res.status(500).redirect('back');
+
+                } else {
+                    req.flash('delSuccess', `Successfully deleted entry posted by ${req.params.e_author} on ${req.params.e_datetime}`);
+                    res.status(200).redirect('back');
+                }
+            });
         }
     });
 });

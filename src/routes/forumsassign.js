@@ -46,7 +46,6 @@ router.get('/', function(req, res, next) {
     + ' ORDER BY g_num';
     
 	pool.query(get_forums_for_assign, [req.cid], (err, forums) => {
-        
         pool.query(get_groups_for_assign, [req.cid], (err, result) => {
             res.render('forumsAssign', {
                 isCourse: req.isCourse,
@@ -80,9 +79,9 @@ router.post('/', function(req, res, next) {
     const assign_forums_to_groups = pgp.helpers.insert(selected_rows, column_set);
 
     pool.query(assign_forums_to_groups, (err, data) => {
-        if (err) {
+        if (err || data.rowCount == 0) {
             req.flash('error', 'Error. Please try again.');
-            res.status(err.status || 500).redirect('back');
+            res.status(500).redirect('back');
         } else {
             req.flash('success', 'Successfully assigned forum(s) to group(s).');
             res.status(200).redirect('back');

@@ -31,7 +31,6 @@ router.get('/', function(req, res, next) {
     + ' ORDER BY g_num';
     
 	pool.query(get_forums_for_unassign, [req.cid], (err, forums) => {
-        console.log(err, forums);
         pool.query(get_groups_for_unassign, [req.cid], (err, result) => {
             res.render('forumsUnassign', {
                 isCourse: req.isCourse,
@@ -62,14 +61,15 @@ router.post('/', function(req, res, next) {
         unassign_groups_from_forums += 
         `DELETE FROM ForumsGroups
         WHERE c_id = '${req.cid}'
-        AND f_datetime = '${selected_rows[i].f_datetime}'
+        AND TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = '${selected_rows[i].f_datetime}'
         AND g_num = '${selected_rows[i].g_num}'; `;
     }
 
     pool.query(unassign_groups_from_forums, (err, data) => {
-        if (err) {
+        if (err || data.rowCount == 0) {
             req.flash('error', 'Error. Please try again.');
-            res.status(err.status || 500).redirect('back');
+            res.status(500).redirect('back');
+            
         } else {
             req.flash('success', 'Successfully unassigned groups(s) from forums(s).');
             res.status(200).redirect('back');

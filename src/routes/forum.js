@@ -93,12 +93,13 @@ router.post('/create', function(req, res, next) {
         return;
     }
 
-    var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_id}', '${req.cid}', to_timestamp(${Date.now()} / 1000), '${req.body.f_topic}')`;
+    var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_id}', '${req.cid}', NOW(), '${req.body.f_topic}')`;
 
     pool.query(insert_new_forum, (err, data) => {
         if (err) {
             req.flash('error', 'Error. Please try again.');
             res.status(err.status || 500).redirect('back');
+
         } else {
             req.flash('success', `Successfully created forum "${req.body.f_topic}"`);
             res.status(200).redirect('back');
@@ -107,25 +108,42 @@ router.post('/create', function(req, res, next) {
 });
 
 router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
-    
-    // Delete a forum from the course only if the user is a managing professor of the course.
-    var delete_forum =
-    'DELETE FROM Forums'
-    + ' WHERE f_datetime = $1'
-    + ' AND c_id = $2'
+    // Before deleting, update 'e_deleted_by' of all entries tied to this forum for audit trail purpose.
+    // Update 'e_deleted_by' of all entries tied to this forum only if the user is a managing professor of the course.
+    var update_deleted_by =
+    'UPDATE ForumEntries' 
+    + ' SET e_deleted_by = $1'
+    + ' WHERE TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $2'
+    + ' AND c_id = $3'
     + ' AND c_id IN'
     + ' ( SELECT m.c_id'
     + '   FROM Manages m'
-    + '   WHERE p_id = $3'
+    + '   WHERE m.p_id = $1'
     + ' )';
+    
+    var delete_forum =
+    'DELETE FROM Forums'
+    + ' WHERE TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $1'
+    + ' AND c_id = $2';
 
-    pool.query(delete_forum, [req.params.f_datetime, req.cid, req.user.u_id], (err, data) => {
+    pool.query(update_deleted_by, [req.user.u_id, req.params.f_datetime, req.cid], (err, result) => {
         if (err) {
+            // Unable to update 'e_deleted_by' col of entries tied to this forum, do not proceed to delete.
             req.flash('delFail', 'Unable to delete forum. Please try again.');
-            res.status(err.status || 500).redirect('back');
+            res.status(500).redirect('back');
+
         } else {
-            req.flash('delSuccess', `Successfully deleted forum "${req.params.f_topic}"`);
-            res.status(200).redirect('back');
+            // Successfully updated 'e_deleted_by' col of entries tied to the forum, proceed to delete.
+            pool.query(delete_forum, [req.params.f_datetime, req.cid], (err, data) => {
+                if (err) {
+                    req.flash('delFail', 'Unable to delete forum. Please try again.');
+                    res.status(500).redirect('back');
+                    
+                } else {
+                    req.flash('delSuccess', `Successfully deleted forum "${req.params.f_topic}"`);
+                    res.status(200).redirect('back');
+                }
+            });
         }
     });
 });
