@@ -68,6 +68,26 @@ CREATE TABLE Enrollments (
 	CHECK (req_type = 1 OR req_type = 0)
 );
 
+-- Check if the professor accepting is managing this course
+CREATE OR REPLACE FUNCTION f_check_prof() RETURNS TRIGGER AS $$ 
+	BEGIN
+		IF NEW.p_id IS NULL THEN 
+			RETURN NEW;
+		ELSIF NEW.p_id = (SELECT p_id FROM Manages
+			WHERE p_id = NEW.p_id
+			AND c_id = NEW.c_id) THEN
+				RETURN NEW;
+		END IF;
+		
+		RAISE NOTICE 'Trigger professor does not manages this course';
+		RETURN NULL;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_prof
+BEFORE INSERT OR UPDATE ON Enrollments
+FOR EACH ROW EXECUTE PROCEDURE f_check_prof();
+
 CREATE OR REPLACE VIEW CourseEnrollments AS (
 	SELECT c_id, c_name, s_id, u_name, req_type
 	FROM Courses
