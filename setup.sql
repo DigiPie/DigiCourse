@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS Accounts CASCADE;
 DROP TABLE IF EXISTS student_info CASCADE;
 DROP TABLE IF EXISTS Forums CASCADE;
 DROP TABLE IF EXISTS ForumEntries CASCADE;
+DROP TABLE IF EXISTS ForumEntriesLog CASCADE;
 DROP TABLE IF EXISTS ForumsGroups CASCADE;
 
 CREATE TABLE Accounts (
@@ -164,38 +165,122 @@ CREATE TABLE student_info (
 );
 
 CREATE TABLE Forums (
-	p_id  		varchar(9) REFERENCES Professors (p_id),
-	c_id		varchar(9),
-	f_datetime timestamp NOT NULL,
-	f_topic		varchar(100) NOT NULL,
+	p_id			varchar(9) REFERENCES Professors (p_id),
+	c_id			varchar(9),
+	f_datetime		timestamp NOT NULL,
+	f_topic			varchar(100) NOT NULL,
 	PRIMARY KEY (c_id, f_datetime),
 	FOREIGN KEY (c_id) REFERENCES Courses (c_id) ON DELETE CASCADE
 );
 
 CREATE TABLE ForumEntries (
-	c_id		varchar(9) NOT NULL,
-	f_datetime timestamp NOT NULL,
-	u_id		varchar(9) REFERENCES Accounts (u_id),
-	e_datetime	timestamp NOT NULL,
-	e_content	varchar(1000) NOT NULL,
+	c_id			varchar(9) NOT NULL,
+	f_datetime		timestamp NOT NULL,
+	u_id			varchar(9) REFERENCES Accounts (u_id),
+	e_datetime		timestamp NOT NULL,
+	e_content		varchar(1000) NOT NULL,
+	e_deleted_by	varchar(9) DEFAULT NULL,
 	PRIMARY KEY (c_id, f_datetime, u_id, e_datetime),
+	FOREIGN KEY (e_deleted_by) REFERENCES Accounts (u_id),
 	FOREIGN KEY (c_id, f_datetime) REFERENCES Forums(c_id, f_datetime) ON DELETE CASCADE
 );
 
 CREATE TABLE ForumsGroups (
-	c_id		varchar(9),
-	f_datetime timestamp NOT NULL,
-	g_num  		integer,
+	c_id			varchar(9),
+	f_datetime		timestamp NOT NULL,
+	g_num			integer,
 	PRIMARY KEY (c_id, f_datetime, g_num),
 	FOREIGN KEY (c_id, g_num) REFERENCES CourseGroups (c_id, g_num) ON DELETE CASCADE,
 	FOREIGN KEY (c_id, f_datetime) REFERENCES Forums (c_id, f_datetime) ON DELETE CASCADE
 );
 
+-- Rows in ForumEntriesLog should not be deleted due to cascade e.g. forum/course deleted.
+CREATE TABLE ForumEntriesLog (
+	c_id				varchar(9) NOT NULL,
+	f_datetime			timestamp NOT NULL,
+	f_topic				varchar(100) NOT NULL,
+	e_author_id			varchar(9) NOT NULL,
+	e_author_name		varchar(100) NOT NULL,
+	e_datetime			timestamp NOT NULL,
+	e_content			varchar(1000) NOT NULL,
+	e_delete_id			varchar(9) NOT NULL,
+	e_delete_name		varchar(100) NOT NULL,
+	e_delete_datetime	timestamp NOT NULL,
+	PRIMARY KEY (c_id, f_datetime, e_author_id, e_datetime)
+);
+
+-- Replace the formatted f_datetime with the actual f_datetime timestamp in Forums table
+CREATE OR REPLACE FUNCTION replace_f_datetime()
+RETURNS trigger AS $$ 
+BEGIN
+	NEW.f_datetime :=(SELECT f_datetime FROM Forums WHERE TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(NEW.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') AND c_id = NEW.c_id);
+RETURN NEW;
+END; $$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER insert_entry
+BEFORE INSERT
+ON ForumEntries
+FOR EACH ROW
+EXECUTE PROCEDURE replace_f_datetime();
+
+CREATE TRIGGER insert_forum_group
+BEFORE INSERT
+ON ForumsGroups
+FOR EACH ROW
+EXECUTE PROCEDURE replace_f_datetime();
+
+-- Establish audit trail for deleted forum entries by using triggers to insert into 'ForumEntriesLog' table
+CREATE OR REPLACE FUNCTION bef_delete_forum()
+RETURNS trigger AS $$ 
+BEGIN
+	DELETE FROM ForumEntries
+	WHERE c_id = OLD.c_id
+	AND f_datetime = OLD.f_datetime;
+RETURN OLD;
+END; $$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER delete_forum
+BEFORE DELETE
+ON Forums
+FOR EACH ROW
+EXECUTE PROCEDURE bef_delete_forum();
+
+CREATE OR REPLACE FUNCTION bef_delete_entries()
+RETURNS trigger AS $$ 
+DECLARE
+	author_name		varchar(100);
+	delete_name		varchar(100);
+	forum_topic		varchar(100);
+BEGIN
+	SELECT f_topic INTO forum_topic
+	FROM Forums
+	WHERE f_datetime = OLD.f_datetime
+	AND c_id = OLD.c_id;
+
+	SELECT u_name INTO author_name
+	FROM Accounts
+	WHERE u_id = OLD.u_id;
+
+	SELECT u_name INTO delete_name
+	FROM Accounts
+	WHERE u_id = OLD.e_deleted_by;
+
+	INSERT into ForumEntriesLog 
+	VALUES (OLD.c_id, OLD.f_datetime, forum_topic, OLD.u_id, author_name, OLD.e_datetime, OLD.e_content, OLD.e_deleted_by, delete_name, NOW());
+RETURN OLD;
+END; $$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER delete_entries
+BEFORE DELETE
+ON ForumEntries
+FOR EACH ROW
+EXECUTE PROCEDURE bef_delete_entries();
+
 -- Accounts(u_id, passwd) -> u_id
 INSERT INTO Accounts VALUES ('A0000001A', 'Leslie Cole', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('A0000002B', 'Myra Morgan', 'B');
 INSERT INTO Accounts VALUES ('A0000003C', 'Raymond Benson', 'C');
-INSERT INTO Accounts VALUES ('A0000004D', 'Wendy Kelley', 'D');
+INSERT INTO Accounts VALUES ('A0000004D', 'Wendy Kelley', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('A0000005E', 'Patrick Bowers', 'E');
 INSERT INTO Accounts VALUES ('P0000001A', 'Adi', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('P0000002B', 'John', 'B');
@@ -273,10 +358,13 @@ INSERT INTO student_info (matric, name, faculty) VALUES ('A0000010J', 'Alyssa Si
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-08-23 16:30:00', 'Assignment 0');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-09-01 13:30:30', 'Form project groups');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-10-13 21:30:30', 'Lecture Queries');
-INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-10-13 22:30:30', 'Lecture Queries 2');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-10-13 22:30:30', 'Assignment 2');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', NOW(), 'Project Queries');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', NOW() - INTERVAL '10 min', 'Consultation');
 
 INSERT INTO ForumEntries VALUES ('CS2102', '2019-10-13 21:30:30', 'A0000001A', NOW(), 'Can you provide more examples on the usage of triggers?');
 INSERT INTO ForumEntries VALUES ('CS2102', '2019-10-13 21:30:30', 'A0000002B', NOW(), 'Will we be tested on all topics for finals?');
+INSERT INTO ForumEntries VALUES ('CS2102', '2019-10-13 22:30:30', 'A0000002B', NOW(), 'When will the marks be released?');
 
 INSERT INTO ForumsGroups VAlUES ('CS2102', '2019-08-23 16:30:00', 4);
 INSERT INTO ForumsGroups VAlUES ('CS2102', '2019-10-13 21:30:30', 4);

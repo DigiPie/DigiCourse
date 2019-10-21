@@ -40,6 +40,7 @@
                 <div class="topnav">
                   <a href="/course/<%= cid %>/forum">Create forum</a>
                   <a class="active" href="#">Assign forum</a>
+                  <a href="/course/<%= cid %>/forum/unassign">Unassign forum</a>
                 </div>
                 <br>
                 <% if (messages.error) {%>
@@ -68,9 +69,9 @@
                         <tbody>
                             <% for (var i = 0; i < forumGroups.length; i++) { %>
                             <tr>
-                                <% if (forumGroups[i].f_datetime == forums[x].f_datetime) { %>
+                                <% if (forumGroups[i].formatted == forums[x].formatted) { %>
                                     <td class="min"><input type="checkbox" name="row[<%= count %>][selected]" ></td>
-                                    <input type="hidden" name='row[<%= count %>][f_datetime]' value="<%= forums[x].f_datetime %>">
+                                    <input type="hidden" name='row[<%= count %>][f_datetime]' value="<%= forums[x].formatted %>">
                                     <td><input type="hidden" name='row[<%= count %>][g_num]' value="<%= forumGroups[i].g_num %>"><%= forumGroups[i].g_num %></td>
                                 <% } %>
                             </tr>
