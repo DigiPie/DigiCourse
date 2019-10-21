@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
 	// Authentication
 	if (!req.user) {
 		req.flash('error','Login is required.');
-		return res.redirect('/login');
+        return res.redirect('/login');
     }
     
     // Checks whether the user is an approved TA of the course or a professor managing the course (to allow deletion of forum entries).
