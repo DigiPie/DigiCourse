@@ -40,7 +40,8 @@ CREATE TABLE CourseGroups (
 	g_num  		integer,
 	g_capacity 	integer NOT NULL,
 	PRIMARY KEY (c_id, g_num),
-	FOREIGN KEY (c_id) REFERENCES Courses (c_id) ON DELETE CASCADE
+	FOREIGN KEY (c_id) REFERENCES Courses (c_id) ON DELETE CASCADE,
+	CHECK (g_capacity > 0)
 );
 
 CREATE TABLE StudentGroups (
