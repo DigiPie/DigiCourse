@@ -40,7 +40,7 @@
                   <a class="active" href="#">Student roster</a>
                   <% if (accountType == 'Professor') {%>
                   <a href="/course/<%= cid %>/groups/create">Create group</a>
-                  <a href="/course/<%= cid %>/groups/assign"">Assign group</a>
+                  <a href="/course/<%= cid %>/groups/assign">Assign group</a>
                   <a href="/course/<%= cid %>/groups/unassign">Unassign group</a>
                   <% } %> 
                 </div>
@@ -62,7 +62,7 @@
                       <tr>
                         <td><%= datarows[i].s_id %></td>
                         <td><%= datarows[i].u_name %></td>
-                        <td><%= datarows[i].g_num ? datarows[i].g_num : 'No groups' %></td>
+                        <td><%= datarows[i].g_num ? datarows[i].g_num : 'No group' %></td>
                         <td><%= datarows[i].req_type == 1 ? 'Student' : 'Teaching Assistant' %></td>
                       </tr>
                       <% } %>

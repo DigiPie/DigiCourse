@@ -48,7 +48,7 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
     const selected_rows = filter(req.body.row, { 'selected': 'on' });
     if (selected_rows.length == 0) {
-        req.flash('error', `Please select a student`);
+        req.flash('error', `Please select a student.`);
         res.status(400).redirect('back');
         return;
     }
@@ -70,7 +70,7 @@ router.post('/', function(req, res, next) {
                 err_status: err.status || 500
             });
         } else {
-            req.flash('success', `Successfully unassign ${sids}`);
+            req.flash('success', `Successfully unassigned ${sids}.`);
             res.status(200).redirect('back');
         }
 	});
