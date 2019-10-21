@@ -165,30 +165,30 @@ CREATE TABLE student_info (
 );
 
 CREATE TABLE Forums (
-	p_id  		varchar(9) REFERENCES Professors (p_id),
-	c_id		varchar(9),
-	f_datetime timestamp NOT NULL,
-	f_topic		varchar(100) NOT NULL,
+	p_id			varchar(9) REFERENCES Professors (p_id),
+	c_id			varchar(9),
+	f_datetime		timestamp NOT NULL,
+	f_topic			varchar(100) NOT NULL,
 	PRIMARY KEY (c_id, f_datetime),
 	FOREIGN KEY (c_id) REFERENCES Courses (c_id) ON DELETE CASCADE
 );
 
 CREATE TABLE ForumEntries (
-	c_id		varchar(9) NOT NULL,
-	f_datetime 	timestamp NOT NULL,
-	u_id		varchar(9) REFERENCES Accounts (u_id),
-	e_datetime	timestamp NOT NULL,
-	e_content	varchar(1000) NOT NULL,
-	e_deleted_by varchar(9) DEFAULT NULL,
+	c_id			varchar(9) NOT NULL,
+	f_datetime		timestamp NOT NULL,
+	u_id			varchar(9) REFERENCES Accounts (u_id),
+	e_datetime		timestamp NOT NULL,
+	e_content		varchar(1000) NOT NULL,
+	e_deleted_by	varchar(9) DEFAULT NULL,
 	PRIMARY KEY (c_id, f_datetime, u_id, e_datetime),
 	FOREIGN KEY (e_deleted_by) REFERENCES Accounts (u_id),
 	FOREIGN KEY (c_id, f_datetime) REFERENCES Forums(c_id, f_datetime) ON DELETE CASCADE
 );
 
 CREATE TABLE ForumsGroups (
-	c_id		varchar(9),
-	f_datetime timestamp NOT NULL,
-	g_num  		integer,
+	c_id			varchar(9),
+	f_datetime		timestamp NOT NULL,
+	g_num			integer,
 	PRIMARY KEY (c_id, f_datetime, g_num),
 	FOREIGN KEY (c_id, g_num) REFERENCES CourseGroups (c_id, g_num) ON DELETE CASCADE,
 	FOREIGN KEY (c_id, f_datetime) REFERENCES Forums (c_id, f_datetime) ON DELETE CASCADE
@@ -196,16 +196,16 @@ CREATE TABLE ForumsGroups (
 
 -- Rows in ForumEntriesLog should not be deleted due to cascade e.g. forum/course deleted.
 CREATE TABLE ForumEntriesLog (
-	c_id		varchar(9) NOT NULL,
-	f_datetime 	timestamp NOT NULL,
-	f_topic		varchar(100) NOT NULL,
-	e_author_id	varchar(9) NOT NULL,
-	e_author_name varchar(100) NOT NULL,
-	e_datetime	timestamp NOT NULL,
-	e_content	varchar(1000) NOT NULL,
-	e_delete_id varchar(9) NOT NULL,
-	e_delete_name varchar(100) NOT NULL,
-	e_delete_datetime timestamp NOT NULL,
+	c_id				varchar(9) NOT NULL,
+	f_datetime			timestamp NOT NULL,
+	f_topic				varchar(100) NOT NULL,
+	e_author_id			varchar(9) NOT NULL,
+	e_author_name		varchar(100) NOT NULL,
+	e_datetime			timestamp NOT NULL,
+	e_content			varchar(1000) NOT NULL,
+	e_delete_id			varchar(9) NOT NULL,
+	e_delete_name		varchar(100) NOT NULL,
+	e_delete_datetime	timestamp NOT NULL,
 	PRIMARY KEY (c_id, f_datetime, e_author_id, e_datetime)
 );
 
