@@ -36,30 +36,20 @@ router.get('/', function(req, res, next) {
             uid: req.user.u_id, 
             cid: req.cid,
             data: req.data,
-            datarows: data.rows,
+            datarows: data.rows
         });
-    }); 
-    
+    });
 });
 
 router.use('/create', function(req, res, next) {
-	req.isCourse = true, 
-	req.cid = req.cid,
-	req.data = courseName
 	next()
 }, groupscreate);
 
 router.use('/assign', function(req, res, next) {
-	req.isCourse = true, 
-	req.cid = req.cid;
-	req.data = courseName;
 	next()
 }, groupsassign);
 
 router.use('/unassign', function(req, res, next) {
-	req.isCourse = true, 
-	req.cid = req.cid;
-	req.data = courseName;
 	next()
 }, groupsunassign);
 
