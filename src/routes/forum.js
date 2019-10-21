@@ -13,7 +13,7 @@ const pool = new Pool({
 router.get('/', function(req, res, next) {
     // Authentication
 	if (!req.user) {
-		req.flash('error','Login is required');
+		req.flash('error','Login is required.');
 		return res.redirect('/login');
     }
 
@@ -41,7 +41,7 @@ router.get('/', function(req, res, next) {
         
     pool.query(check_forum_privilege, [req.user.u_id, req.cid], (err, result) => {
         if (result.rows.length != 1) {
-            req.flash('error','Login is required');
+            req.flash('error','Login is required.');
             return res.redirect('/login');
         
         } else {
@@ -88,7 +88,7 @@ router.get('/', function(req, res, next) {
 router.post('/create', function(req, res, next) {
     // Blank forum topic is not allowed.
     if (req.body.f_topic == '') {
-        req.flash('error', 'Please enter a topic name for the new forum');
+        req.flash('error', 'Please enter a topic name for the new forum.');
         res.redirect(`/course/${req.cid}/forum`);
         return;
     }
@@ -101,7 +101,7 @@ router.post('/create', function(req, res, next) {
             res.status(err.status || 500).redirect('back');
 
         } else {
-            req.flash('success', `Successfully created forum "${req.body.f_topic}"`);
+            req.flash('success', `Successfully created forum "${req.body.f_topic}".`);
             res.status(200).redirect('back');
         }
     });
@@ -140,7 +140,7 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
                     res.status(500).redirect('back');
                     
                 } else {
-                    req.flash('delSuccess', `Successfully deleted forum "${req.params.f_topic}"`);
+                    req.flash('delSuccess', `Successfully deleted forum "${req.params.f_topic}".`);
                     res.status(200).redirect('back');
                 }
             });

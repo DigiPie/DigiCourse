@@ -10,7 +10,7 @@ const pool = new Pool({
 router.get('/', function(req, res, next) {
 	// Authentication
 	if (!req.user) {
-		req.flash('error','Login is required');
+		req.flash('error','Login is required.');
 		return res.redirect('/login');
     }
     
@@ -72,14 +72,14 @@ router.get('/', function(req, res, next) {
 router.post('/post', function(req, res, next) {
     // Blank forum entry is not allowed.
     if (req.body.e_content == '') {
-        req.flash('error', 'Please enter content for the new forum entry');
+        req.flash('error', 'Please enter content for the new forum entry.');
         res.redirect(`/course/${req.cid}/forum/${req.f_topic}/${req.f_datetime}/entries`);
         return;
     }
 
     // Content exceeding character limit of 1000 is not allowed.
     if (req.body.e_content.length > 1000) {
-        req.flash('error', 'Error. Character limit exceeded');
+        req.flash('error', 'Error. Character limit exceeded.');
         res.status(500).redirect('back');
     
     } else {
@@ -88,10 +88,10 @@ router.post('/post', function(req, res, next) {
         pool.query(insert_new_entry, (err, data) => {
             if (err) {
                 req.flash('error', 'Error. Please try again.');
-                res.status(err.status || 500).redirect('back');
+                res.status(500).redirect('back');
 
             } else {
-                req.flash('success', 'Successfully posted new entry');
+                req.flash('success', 'Successfully posted new entry.');
                 res.status(200).redirect('back');
             }
         });
@@ -133,7 +133,7 @@ router.post('/delete/:e_author/:e_datetime', function(req, res, next) {
 
     pool.query(update_deleted_by, [req.user.u_id, req.f_datetime, req.params.e_author, req.params.e_datetime, req.cid], (err, result) => {
 
-        if (err | result.rowCount == 0) {
+        if (err || result.rowCount == 0) {
             req.flash('delFail', 'Unable to delete entry. Please try again.');
             res.status(500).redirect('back');
         
@@ -144,7 +144,7 @@ router.post('/delete/:e_author/:e_datetime', function(req, res, next) {
                     res.status(500).redirect('back');
 
                 } else {
-                    req.flash('delSuccess', `Successfully deleted entry posted by ${req.params.e_author} on ${req.params.e_datetime}`);
+                    req.flash('delSuccess', `Successfully deleted entry posted by ${req.params.e_author} on ${req.params.e_datetime}.`);
                     res.status(200).redirect('back');
                 }
             });

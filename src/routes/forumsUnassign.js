@@ -11,7 +11,7 @@ const pool = new Pool({
 router.get('/', function(req, res, next) {
     // Authentication
 	if (!req.user) {
-		req.flash('error','Login is required');
+		req.flash('error','Login is required.');
 		return res.redirect('/login');
     }
 
@@ -50,7 +50,7 @@ router.post('/', function(req, res, next) {
     
     // No group selected for unassign is not allowed. 
     if (selected_rows.length == 0) {
-        req.flash('error', 'Please select a group');
+        req.flash('error', 'Please select a group.');
         res.status(400).redirect('back');
         return;
     }
