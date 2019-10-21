@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS StudentGroups CASCADE;
 DROP TABLE IF EXISTS CourseGroups CASCADE;
 DROP TABLE IF EXISTS Manages CASCADE;
 DROP TABLE IF EXISTS Enrollments CASCADE;
+DROP TABLE IF EXISTS CourseEnrollments CASCADE;
 DROP TABLE IF EXISTS Courses CASCADE;
 DROP TABLE IF EXISTS Students CASCADE;
 DROP TABLE IF EXISTS Professors CASCADE;
@@ -107,14 +108,39 @@ CREATE TRIGGER check_prof
 BEFORE INSERT OR UPDATE ON Enrollments
 FOR EACH ROW EXECUTE PROCEDURE f_check_prof();
 
-CREATE OR REPLACE VIEW CourseEnrollments AS (
-	SELECT c_id, c_name, s_id, u_name, req_type
-	FROM Courses
-	NATURAL JOIN Enrollments
-	NATURAL JOIN Students
-	JOIN Accounts ON s_id = u_id
-	WHERE req_status
-); 
+CREATE TABLE CourseEnrollments (
+	c_id		varchar(9) REFERENCES Courses (c_id),
+	c_name    	varchar(200),
+	s_id		varchar(9) REFERENCES Students (s_id),
+	u_name 		varchar(100) NOT NULL,
+	req_type	integer NOT NULL	
+);
+
+CREATE OR REPLACE FUNCTION f_insert_course_enrollments() RETURNS TRIGGER AS $$ 
+	DECLARE 
+		course_name	varchar(200);
+		user_name	varchar(100);
+	BEGIN
+		SELECT c_name INTO course_name
+		FROM Courses
+		WHERE c_id = NEW.c_id;
+
+		SELECT u_name INTO user_name
+		FROM Accounts
+		WHERE u_id = NEW.s_id;
+
+		INSERT INTO CourseEnrollments
+		VALUES (NEW.c_id, course_name, NEW.s_id, user_name, NEW.req_type);
+		
+		RETURN NEW;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER insert_course_enrollments
+BEFORE INSERT OR UPDATE ON Enrollments
+FOR EACH ROW  
+WHEN (NEW.req_status) 
+EXECUTE PROCEDURE f_insert_course_enrollments();
 
 CREATE OR REPLACE VIEW CourseManages AS (
 	SELECT c_id, c_name, p_id, u_name
