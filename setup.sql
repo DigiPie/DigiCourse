@@ -51,6 +51,24 @@ CREATE TABLE StudentGroups (
 	PRIMARY KEY (c_id, g_num, s_id)
 );
 
+-- Check if the professor accepting is managing this course
+CREATE OR REPLACE FUNCTION f_is_student_enrolled() RETURNS TRIGGER AS $$ 
+	BEGIN
+		IF NEW.s_id = (SELECT s_id FROM CourseEnrollments
+			WHERE s_id = NEW.s_id
+			AND c_id = NEW.c_id) THEN
+				RETURN NEW;
+		END IF;
+		
+		RAISE NOTICE 'Trigger student is not enrolled in this course';
+		RETURN NULL;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER is_student_enrolled
+BEFORE INSERT OR UPDATE ON StudentGroups
+FOR EACH ROW EXECUTE PROCEDURE f_is_student_enrolled();
+
 CREATE TABLE Manages (
 	p_id  		varchar(9) REFERENCES Professors (p_id),
 	c_id  		varchar(9) REFERENCES Courses (c_id),
