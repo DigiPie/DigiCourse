@@ -5,8 +5,9 @@ const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
 });
 
+const groupscreate = require('./groupscreate');
 const groupsassign = require('./groupsassign');
-const groupsstudent = require('./groupsstudent');
+const groupsunassign = require('./groupsunassign');
 
 var courseName;
 
@@ -19,24 +20,17 @@ router.get('/', function(req, res, next) {
     
     courseName = req.data;
 
-    var sql_query =  
-        `SELECT c.*, cs.enrolled
-        FROM CourseGroups c
-        JOIN (
-            SELECT c.c_id, c.g_num, count(s.c_id) enrolled
-            FROM CourseGroups c
+    var sql_query = `SELECT c.s_id, c.u_name, s.g_num, c.req_type
+            FROM CourseEnrollments c
             LEFT OUTER JOIN StudentGroups s
             ON c.c_id = s.c_id
-            AND c.g_num = s.g_num
-            GROUP BY c.c_id, c.g_num
-            ORDER BY g_num) cs
-        ON c.c_id = cs.c_id
-        AND c.g_num = cs.g_num
-        WHERE c.c_id = '${req.cid}'`;
-    
+            AND c.s_id = s.s_id
+            WHERE c.c_id = \'${req.params.cid}\'
+            ORDER BY c.req_type, c.s_id`;
+
 	pool.query(sql_query, (err, data) => {
         res.render('groups', {
-            isCourse: req.isCourse,
+            isCourse: req.isCourse, 
             username: req.user.u_name,
             accountType: req.user.u_type,
             uid: req.user.u_id, 
@@ -45,50 +39,18 @@ router.get('/', function(req, res, next) {
             datarows: data.rows
         });
     });
-    
 });
 
-router.post('/create', function(req, res, next) {
-    if (req.body.g_num == '' || isNaN(req.body.g_num)) {
-        req.flash('error', `Please enter a valid group number`);
-        res.redirect(`/course/${req.body.c_id}/groups`);
-        return;
-    }
-
-    var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.body.c_id}', '${req.body.g_num}', '${req.body.g_capacity}')`;
-
-	pool.query(sql_query, (err, data) => {
-        if (err) {
-            if (err.code == 23505) {
-                req.flash('error', `This group number ${req.body.g_num} has already been created, please use another number.`);
-                res.redirect(`/course/${req.body.c_id}/groups`);
-            } else {
-                res.status(err.status || 500);
-                res.render('error', {
-                    message: "Something went wrong during the creation of group, try again later.",
-                    error: err
-                });
-            }
-        } else {
-            req.flash('success', `Successfully created group ${req.body.g_num} with capacity of ${req.body.g_capacity}.`);
-            res.status(200).redirect('back');
-        }
-    });
-    
-});
+router.use('/create', function(req, res, next) {
+	next()
+}, groupscreate);
 
 router.use('/assign', function(req, res, next) {
-	req.isCourse = true, 
-	req.cid = req.cid;
-	req.data = courseName;
 	next()
 }, groupsassign);
 
-router.use('/student', function(req, res, next) {
-	req.isCourse = true, 
-	req.cid = req.cid,
-	req.data = courseName
+router.use('/unassign', function(req, res, next) {
 	next()
-}, groupsstudent);
+}, groupsunassign);
 
 module.exports = router;
