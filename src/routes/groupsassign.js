@@ -13,6 +13,13 @@ router.get('/', function(req, res, next) {
 		req.flash('error','Login is required to access dashboard');
 		return res.redirect('/login');
     }
+
+    if (req.user.u_type == "Student") {
+        return res.render('error', {
+            err_msg: "Page not found.",
+            err_status: "Error: 404"
+        });
+    }
     
     var sql_query = `SELECT * FROM CourseEnrollments WHERE c_id =\'${req.params.cid}\' 
         AND req_type = 1
@@ -73,10 +80,9 @@ router.post('/', function(req, res, next) {
 
     pool.query(insert_sql, (err, data) => {
         if (err) {
-            res.status(err.status || 500);
             res.render('error', {
-                message: "Something went wrong during insertion, try again later.",
-                error: err
+                err_msg: "Something went wrong during insertion, try again later.",
+                err_status: err.status || 500
             });
         } else {
             res.status(200).redirect('back');

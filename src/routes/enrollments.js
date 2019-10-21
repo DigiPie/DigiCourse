@@ -122,10 +122,9 @@ router.post('/accept', function(req, res, next) {
                 const update_sql = pgp.helpers.update(ta_rows, column_set) + where_sql;
                 pool.query(update_sql, (err, data) => {
                     if (err) {
-                        res.status(err.status || 500);
                         res.render('error', {
-                            message: "Something went wrong during the update, try again later.",
-                            error: err
+                            err_msg: "Something went wrong during the update, try again later.",
+                            err_status: err.status || 500
                         });
                     } else {
                         req.flash('success', `Successfully enrolled ${t_sid} as Teaching Assistant.\n `);
@@ -149,10 +148,9 @@ router.post('/accept', function(req, res, next) {
     
             pool.query(update_sql, (err, data) => {
                 if (err) {
-                    res.status(err.status || 500);
                     res.render('error', {
-                        message: "Something went wrong during the update, try again later.",
-                        error: err
+                        err_msg: "Something went wrong during the update, try again later.",
+                        err_status: err.status || 500
                     });
                 } else {
                     req.flash('success', `Successfully enrolled ${sids}.`);
@@ -189,10 +187,9 @@ router.post('/reject', function(req, res, next) {
     	
 	pool.query(update_sql, (err, data) => {
         if (err) {
-            res.status(err.status || 500);
             res.render('error', {
-                message: "Something went wrong during the update, try again later.",
-                error: err
+                err_msg: "Something went wrong during the update, try again later.",
+                err_status: err.status || 500
             });
         } else {
             req.flash('success', `Successfully rejected ${sids}.`);

@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS StudentGroups CASCADE;
 DROP TABLE IF EXISTS CourseGroups CASCADE;
 DROP TABLE IF EXISTS Manages CASCADE;
 DROP TABLE IF EXISTS Enrollments CASCADE;
+DROP TABLE IF EXISTS CourseEnrollments CASCADE;
 DROP TABLE IF EXISTS Courses CASCADE;
 DROP TABLE IF EXISTS Students CASCADE;
 DROP TABLE IF EXISTS Professors CASCADE;
@@ -41,7 +42,8 @@ CREATE TABLE CourseGroups (
 	g_num  		integer,
 	g_capacity 	integer NOT NULL,
 	PRIMARY KEY (c_id, g_num),
-	FOREIGN KEY (c_id) REFERENCES Courses (c_id) ON DELETE CASCADE
+	FOREIGN KEY (c_id) REFERENCES Courses (c_id) ON DELETE CASCADE,
+	CHECK (g_capacity > 0)
 );
 
 CREATE TABLE StudentGroups (
@@ -50,6 +52,24 @@ CREATE TABLE StudentGroups (
 	s_id  		varchar(9) REFERENCES Students (s_id),
 	PRIMARY KEY (c_id, g_num, s_id)
 );
+
+-- Check if the professor accepting is managing this course
+CREATE OR REPLACE FUNCTION f_is_student_enrolled() RETURNS TRIGGER AS $$ 
+	BEGIN
+		IF NEW.s_id = (SELECT s_id FROM CourseEnrollments
+			WHERE s_id = NEW.s_id
+			AND c_id = NEW.c_id) THEN
+				RETURN NEW;
+		END IF;
+		
+		RAISE NOTICE 'Trigger student is not enrolled in this course';
+		RETURN NULL;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER is_student_enrolled
+BEFORE INSERT OR UPDATE ON StudentGroups
+FOR EACH ROW EXECUTE PROCEDURE f_is_student_enrolled();
 
 CREATE TABLE Manages (
 	p_id  		varchar(9) REFERENCES Professors (p_id),
@@ -69,14 +89,59 @@ CREATE TABLE Enrollments (
 	CHECK (req_type = 1 OR req_type = 0)
 );
 
-CREATE OR REPLACE VIEW CourseEnrollments AS (
-	SELECT c_id, c_name, s_id, u_name, req_type
-	FROM Courses
-	NATURAL JOIN Enrollments
-	NATURAL JOIN Students
-	JOIN Accounts ON s_id = u_id
-	WHERE req_status
-); 
+-- Check if the professor accepting is managing this course
+CREATE OR REPLACE FUNCTION f_check_prof() RETURNS TRIGGER AS $$ 
+	BEGIN
+		IF NEW.p_id IS NULL THEN 
+			RETURN NEW;
+		ELSIF NEW.p_id = (SELECT p_id FROM Manages
+			WHERE p_id = NEW.p_id
+			AND c_id = NEW.c_id) THEN
+				RETURN NEW;
+		END IF;
+		
+		RAISE NOTICE 'Trigger professor does not manages this course';
+		RETURN NULL;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_prof
+BEFORE INSERT OR UPDATE ON Enrollments
+FOR EACH ROW EXECUTE PROCEDURE f_check_prof();
+
+CREATE TABLE CourseEnrollments (
+	c_id		varchar(9) REFERENCES Courses (c_id),
+	c_name    	varchar(200),
+	s_id		varchar(9) REFERENCES Students (s_id),
+	u_name 		varchar(100) NOT NULL,
+	req_type	integer NOT NULL	
+);
+
+CREATE OR REPLACE FUNCTION f_insert_course_enrollments() RETURNS TRIGGER AS $$ 
+	DECLARE 
+		course_name	varchar(200);
+		user_name	varchar(100);
+	BEGIN
+		SELECT c_name INTO course_name
+		FROM Courses
+		WHERE c_id = NEW.c_id;
+
+		SELECT u_name INTO user_name
+		FROM Accounts
+		WHERE u_id = NEW.s_id;
+
+		INSERT INTO CourseEnrollments
+		VALUES (NEW.c_id, course_name, NEW.s_id, user_name, NEW.req_type);
+		
+		RETURN NEW;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER insert_course_enrollments
+BEFORE INSERT OR UPDATE ON Enrollments
+FOR EACH ROW  
+WHEN (NEW.req_status) 
+EXECUTE PROCEDURE f_insert_course_enrollments();
 
 CREATE OR REPLACE VIEW CourseManages AS (
 	SELECT c_id, c_name, p_id, u_name
