@@ -53,7 +53,7 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
     if (req.body.g_num == '' || isNaN(req.body.g_num)) {
         req.flash('error', `Please enter a valid group number`);
-        res.redirect(`/course/${req.body.c_id}/groups`);
+        res.redirect('back');
         return;
     }
 
@@ -62,13 +62,12 @@ router.post('/', function(req, res, next) {
 	pool.query(sql_query, (err, data) => {
         if (err) {
             if (err.code == 23505) {
-                req.flash('error', `This group number ${req.body.g_num} has already been created, please use another number.`);
-                res.redirect(`/course/${req.body.c_id}/groups`);
+                req.flash('error', `Unable to create a group with this group number ${req.body.g_num}. This number is already in use by an existing group.`);
+                res.redirect('back');
             } else {
-                res.status(err.status || 500);
                 res.render('error', {
-                    message: "Something went wrong during the creation of group, try again later.",
-                    error: err
+                    err_msg: "Something went wrong during insertion, try again later.",
+                    err_status: err.status || 500
                 });
             }
         } else {
