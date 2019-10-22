@@ -121,7 +121,9 @@ CREATE OR REPLACE FUNCTION f_check_prof() RETURNS TRIGGER AS $$
 			RETURN NEW;
 		ELSIF NEW.p_id = (SELECT p_id FROM Manages
 			WHERE p_id = NEW.p_id
-			AND c_id = NEW.c_id) THEN
+			AND c_id = NEW.c_id
+			AND c_year = NEW.c_year
+			AND c_sem = NEW.c_sem) THEN
 				RETURN NEW;
 		END IF;
 		
@@ -310,6 +312,7 @@ INSERT INTO Accounts VALUES ('A0000002B', 'Myra Morgan', 'B');
 INSERT INTO Accounts VALUES ('A0000003C', 'Raymond Benson', 'C');
 INSERT INTO Accounts VALUES ('A0000004D', 'Wendy Kelley', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('A0000005E', 'Patrick Bowers', 'E');
+INSERT INTO Accounts VALUES ('A0000006F', 'Brooklyn DontShow', 'F');
 INSERT INTO Accounts VALUES ('P0000001A', 'Adi', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('P0000002B', 'John', 'B');
 
@@ -333,6 +336,7 @@ INSERT INTO CourseDetails VALUES ('CS4215', 'Programming Language implementation
 INSERT INTO CourseDetails VALUES ('CS2100', 'Computer Organizations', 'The objective of this module is to familiarise students with the fundamentals of computing devices. Through this module students will understand the basics of data representation, and how the various parts of a computer work, separately and with each other. This allows students to understand the issues in computing devices, and how these issues affect the implementation of solutions. Topics covered include data representation systems, combinational and sequential circuit design techniques, assembly language, processor execution cycles, pipelining, memory hierarchy and input/output systems.');
 
 -- CourseYearSem(c_id, c_year, c_sem, c_capacity) -> c_id, c_year, c_sem
+INSERT INTO CourseYearSem VALUES ('CS2102', 2018, 1, 100);
 INSERT INTO CourseYearSem VALUES ('CS2102', 2019, 1, 200);
 INSERT INTO CourseYearSem VALUES ('CS3102', 2019, 1, 200);
 INSERT INTO CourseYearSem VALUES ('CS4102', 2019, 1, 200);
@@ -348,6 +352,7 @@ INSERT INTO CourseYearSem VALUES ('CS4215', 2019, 1, 200);
 INSERT INTO CourseYearSem VALUES ('CS2100', 2019, 1, 200);
 
 -- Manages(p_id, c_id) -> p_id, c_id
+INSERT INTO Manages VALUES ('P0000001A','CS2102', 2018, 1);
 INSERT INTO Manages VALUES ('P0000001A','CS2102', 2019, 1);
 INSERT INTO Manages VALUES ('P0000001A','CS2100', 2019, 1);
 INSERT INTO Manages VALUES ('P0000001A','CS2030', 2019, 1);
@@ -361,19 +366,19 @@ INSERT INTO Students VALUES ('A0000002B', 2, 'SOC');
 INSERT INTO Students VALUES ('A0000003C', 2, 'SOC');
 INSERT INTO Students VALUES ('A0000004D', 3,'SOC');
 INSERT INTO Students VALUES ('A0000005E', 3,'FOE');
+INSERT INTO Students VALUES ('A0000006F', 4,'SOC');
 
 -- CourseGroups (c_id, c_year, c_sem, g_num, g_capacity) --> c_id, c_year, c_sem, g_num
+INSERT INTO CourseGroups VAlUES ('CS2102', 2018, 1, 999, 999);
 INSERT INTO CourseGroups VAlUES ('CS2102', 2019, 1, 1, 5);
 INSERT INTO CourseGroups VAlUES ('CS2102', 2019, 1, 2, 5);
 INSERT INTO CourseGroups VAlUES ('CS2102', 2019, 1, 3, 5);
 INSERT INTO CourseGroups VAlUES ('CS2102', 2019, 1, 4, 5);
 INSERT INTO CourseGroups VAlUES ('CS2100', 2019, 1, 1, 5);
 
--- StudentGroups (c_id, c_year, c_sem, g_num, s_id) --> c_id, c_year, c_sem, g_num, s_id
-INSERT INTO StudentGroups VAlUES ('CS2102', 4, 2019, 1, 'A0000001A');
-INSERT INTO StudentGroups VAlUES ('CS2100', 2, 2019, 1, 'A0000001A');
-
 -- Enrollments (s_id, c_id, c_year, c_sem, req_type, req_datetime, p_id, req_status) --> s_id, c_id, c_year, c_sem, req_datetime
+INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', FALSE); 
+INSERT INTO Enrollments VALUES ('A0000006F', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2019, 1, 1, NOW()); 
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2019, 1, 1, NOW()); 
 INSERT INTO Enrollments VALUES ('A0000003C', 'CS2102', 2019, 1, 1, NOW()); 
@@ -386,6 +391,11 @@ INSERT INTO Enrollments VALUES ('A0000001A', 'CS4215', 2019, 1, 1, NOW(), 'P0000
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2030', 2019, 1, 0, NOW(), 'P0000001A', FALSE); 
 INSERT INTO Enrollments VALUES ('A0000001A', 'BM5125', 2019, 1, 0, NOW(), NULL, FALSE); 
 INSERT INTO Enrollments VALUES ('A0000004D', 'CS4215', 2019, 1, 0, NOW(), 'P0000001A', TRUE); 
+
+-- StudentGroups (c_id, c_year, c_sem, g_num, s_id) --> c_id, c_year, c_sem, g_num, s_id
+INSERT INTO StudentGroups VAlUES ('CS2102', 2018, 1, 999, 'A0000006F');
+INSERT INTO StudentGroups VAlUES ('CS2102', 2019, 1, 4, 'A0000001A');
+INSERT INTO StudentGroups VAlUES ('CS2100', 2019, 1, 2, 'A0000001A');
 
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-08-23 16:30:00', 'Assignment 0');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-09-01 13:30:30', 'Form project groups');
