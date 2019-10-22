@@ -197,36 +197,62 @@ CREATE TABLE student_info (
 CREATE TABLE Forums (
 	p_id			varchar(9) REFERENCES Professors (p_id),
 	c_id			varchar(9),
+	c_year			smallint,
+	c_sem			smallint,
 	f_datetime		timestamp NOT NULL,
 	f_topic			varchar(100) NOT NULL,
-	PRIMARY KEY (c_id, f_datetime),
-	FOREIGN KEY (c_id) REFERENCES CourseYearSem (c_id) ON DELETE CASCADE
+	PRIMARY KEY (c_id, c_year, c_sem, f_datetime),
+	FOREIGN KEY (c_id, c_year, c_sem) REFERENCES CourseYearSem (c_id, c_year, c_sem) ON DELETE CASCADE
+
+	/* Primary key rationale:
+	c_id, c_year, c_sem (to identify the course).
+	f_datetime (to identify a forum).
+	
+	1) Professors may create many forums with the same f_topic (e.g. to be assigned to different groups).
+	2) Highly unlikely for more than 1 forum to be created at the same time in a course.
+	Hence f_datetime is chosen as part of the primary key, and not f_topic.
+	*/
 );
 
 CREATE TABLE ForumEntries (
 	c_id			varchar(9) NOT NULL,
+	c_year			smallint,
+	c_sem			smallint,
 	f_datetime		timestamp NOT NULL,
 	u_id			varchar(9) REFERENCES Accounts (u_id),
 	e_datetime		timestamp NOT NULL,
 	e_content		varchar(1000) NOT NULL,
 	e_deleted_by	varchar(9) DEFAULT NULL,
-	PRIMARY KEY (c_id, f_datetime, u_id, e_datetime),
+	PRIMARY KEY (c_id, c_year, c_sem, f_datetime, u_id, e_datetime),
 	FOREIGN KEY (e_deleted_by) REFERENCES Accounts (u_id),
-	FOREIGN KEY (c_id, f_datetime) REFERENCES Forums(c_id, f_datetime) ON DELETE CASCADE
+	FOREIGN KEY (c_id, c_year, c_sem, f_datetime) REFERENCES Forums(c_id, c_year, c_sem, f_datetime) ON DELETE CASCADE
+	
+	/* Primary key rationale:
+	c_id, c_year, c_sem, f_datetime (to identify the forum).
+	u_id and e_datetime (to identify an entry).
+	
+	1) Multiple entries can be posted at the same time by different users.
+	2) The same user can post multiple entries within a forum.
+	3) A normal user cannot possibly post multiple entries at the same time within a forum.
+	Hence both u_id and e_datetime have to be used to identify an entry within a forum.
+	*/
 );
 
 CREATE TABLE ForumsGroups (
 	c_id			varchar(9),
+	c_year			smallint,
+	c_sem			smallint,
 	f_datetime		timestamp NOT NULL,
 	g_num			integer,
 	PRIMARY KEY (c_id, f_datetime, g_num),
-	FOREIGN KEY (c_id, g_num) REFERENCES CourseGroups (c_id, g_num) ON DELETE CASCADE,
-	FOREIGN KEY (c_id, f_datetime) REFERENCES Forums (c_id, f_datetime) ON DELETE CASCADE
+	FOREIGN KEY (c_id, c_year, c_sem, g_num) REFERENCES CourseGroups (c_id, c_year, c_sem, g_num) ON DELETE CASCADE,
+	FOREIGN KEY (c_id, c_year, c_sem, f_datetime) REFERENCES Forums (c_id, c_year, c_sem, f_datetime) ON DELETE CASCADE
 );
 
--- Rows in ForumEntriesLog should not be deleted due to cascade e.g. forum/course deleted.
 CREATE TABLE ForumEntriesLog (
 	c_id				varchar(9) NOT NULL,
+	c_year				smallint,
+	c_sem				smallint,
 	f_datetime			timestamp NOT NULL,
 	f_topic				varchar(100) NOT NULL,
 	e_author_id			varchar(9) NOT NULL,
@@ -236,14 +262,14 @@ CREATE TABLE ForumEntriesLog (
 	e_delete_id			varchar(9) NOT NULL,
 	e_delete_name		varchar(100) NOT NULL,
 	e_delete_datetime	timestamp NOT NULL,
-	PRIMARY KEY (c_id, f_datetime, e_author_id, e_datetime)
+	PRIMARY KEY (c_id, c_year, c_sem, f_datetime, e_author_id, e_datetime)
 );
 
 -- Replace the formatted f_datetime with the actual f_datetime timestamp in Forums table
 CREATE OR REPLACE FUNCTION replace_f_datetime()
 RETURNS trigger AS $$ 
 BEGIN
-	NEW.f_datetime :=(SELECT f_datetime FROM Forums WHERE TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(NEW.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') AND c_id = NEW.c_id);
+	NEW.f_datetime :=(SELECT f_datetime FROM Forums WHERE TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(NEW.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') AND c_id = NEW.c_id AND c_year = NEW.c_year AND c_sem = NEW.c_sem);
 RETURN NEW;
 END; $$ LANGUAGE 'plpgsql';
 
@@ -265,6 +291,8 @@ RETURNS trigger AS $$
 BEGIN
 	DELETE FROM ForumEntries
 	WHERE c_id = OLD.c_id
+	AND c_year = OLD.c_year
+	AND c_sem = OLD.c_sem
 	AND f_datetime = OLD.f_datetime;
 RETURN OLD;
 END; $$ LANGUAGE 'plpgsql';
@@ -285,7 +313,9 @@ BEGIN
 	SELECT f_topic INTO forum_topic
 	FROM Forums
 	WHERE f_datetime = OLD.f_datetime
-	AND c_id = OLD.c_id;
+	AND c_id = OLD.c_id
+	AND c_year = OLD.c_year
+	AND c_sem = OLD.c_sem;
 
 	SELECT u_name INTO author_name
 	FROM Accounts
@@ -296,7 +326,7 @@ BEGIN
 	WHERE u_id = OLD.e_deleted_by;
 
 	INSERT into ForumEntriesLog 
-	VALUES (OLD.c_id, OLD.f_datetime, forum_topic, OLD.u_id, author_name, OLD.e_datetime, OLD.e_content, OLD.e_deleted_by, delete_name, NOW());
+	VALUES (OLD.c_id, OLD.c_year, OLD.c_sem, OLD.f_datetime, forum_topic, OLD.u_id, author_name, OLD.e_datetime, OLD.e_content, OLD.e_deleted_by, delete_name, NOW());
 RETURN OLD;
 END; $$ LANGUAGE 'plpgsql';
 
@@ -397,16 +427,16 @@ INSERT INTO StudentGroups VAlUES ('CS2102', 2018, 1, 999, 'A0000006F');
 INSERT INTO StudentGroups VAlUES ('CS2102', 2019, 1, 4, 'A0000001A');
 INSERT INTO StudentGroups VAlUES ('CS2100', 2019, 1, 2, 'A0000001A');
 
-INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-08-23 16:30:00', 'Assignment 0');
-INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-09-01 13:30:30', 'Form project groups');
-INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-10-13 21:30:30', 'Lecture Queries');
-INSERT INTO Forums VALUES ('P0000001A', 'CS2102', '2019-10-13 22:30:30', 'Assignment 2');
-INSERT INTO Forums VALUES ('P0000001A', 'CS2102', NOW(), 'Project Queries');
-INSERT INTO Forums VALUES ('P0000001A', 'CS2102', NOW() - INTERVAL '10 min', 'Consultation');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-08-23 16:30:00', 'Assignment 0');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-09-01 13:30:30', 'Form project groups');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-10-13 21:30:30', 'Lecture Queries');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-10-13 22:30:30', 'Assignment 2');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, NOW(), 'Project Queries');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, NOW() - INTERVAL '10 min', 'Consultation');
 
-INSERT INTO ForumEntries VALUES ('CS2102', '2019-10-13 21:30:30', 'A0000001A', NOW(), 'Can you provide more examples on the usage of triggers?');
-INSERT INTO ForumEntries VALUES ('CS2102', '2019-10-13 21:30:30', 'A0000002B', NOW(), 'Will we be tested on all topics for finals?');
-INSERT INTO ForumEntries VALUES ('CS2102', '2019-10-13 22:30:30', 'A0000002B', NOW(), 'When will the marks be released?');
+INSERT INTO ForumEntries VALUES ('CS2102', 2018, 1, '2018-10-13 21:30:30', 'A0000001A', NOW(), 'Can you provide more examples on the usage of triggers?');
+INSERT INTO ForumEntries VALUES ('CS2102', 2018, 1, '2018-10-13 21:30:30', 'A0000002B', NOW(), 'Will we be tested on all topics for finals?');
+INSERT INTO ForumEntries VALUES ('CS2102', 2018, 1, '2018-10-13 22:30:30', 'A0000002B', NOW(), 'When will the marks be released?');
 
-INSERT INTO ForumsGroups VAlUES ('CS2102', '2019-08-23 16:30:00', 4);
-INSERT INTO ForumsGroups VAlUES ('CS2102', '2019-10-13 21:30:30', 4);
+INSERT INTO ForumsGroups VAlUES ('CS2102', 2018, 1, '2018-08-23 16:30:00', 999);
+INSERT INTO ForumsGroups VAlUES ('CS2102', 2018, 1, '2018-10-13 21:30:30', 999);

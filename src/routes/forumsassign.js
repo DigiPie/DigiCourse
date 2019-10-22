@@ -23,14 +23,20 @@ router.get('/', function(req, res, next) {
 	+ ' ( SELECT COUNT(g_num) c, f.f_datetime, f.f_topic'
     + '   FROM ForumsGroups fg RIGHT JOIN Forums f'
     + '   ON fg.c_id = f.c_id'
+    + '   AND fg.c_year = f.c_year'
+    + '   AND fg.c_sem = f.c_sem'
     + '   AND fg.f_datetime = f.f_datetime'
-	+ '   WHERE f.c_id = $1'
+    + '   WHERE f.c_id = $1'
+    + '   AND f.c_year = $2'
+    + '   AND f.c_sem = $3'
     + '   GROUP BY f.f_datetime, f.f_topic'
     + ' ) afg'
     + ' WHERE afg.c <'
 	+ ' ( SELECT COUNT(*)'
 	+ '   FROM CourseGroups'
     + '   WHERE c_id = $1'
+    + '   AND c_year = $2'
+    + '   AND c_sem = $3'
     + ' )'
     + ' ORDER BY afg.f_datetime'; 
 
@@ -39,14 +45,21 @@ router.get('/', function(req, res, next) {
     'SELECT g_num, TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM CourseGroups cg, Forums f'
     + ' WHERE cg.c_id = f.c_id'
+    + ' AND cg.c_year = f.c_year'
+    + ' AND cg.c_sem = f.c_sem'
     + ' AND f.c_id = $1'
+    + ' AND f.c_year = $2'
+    + ' AND f.c_sem = $3'
     + ' EXCEPT'
     + ' SELECT fg.g_num, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') fdt'
     + ' FROM ForumsGroups fg'
+    + ' WHERE fg.c_id = $1'
+    + ' AND fg.c_year = $2'
+    + ' AND fg.c_sem = $3'
     + ' ORDER BY g_num';
     
-	pool.query(get_forums_for_assign, [req.cid], (err, forums) => {
-        pool.query(get_groups_for_assign, [req.cid], (err, result) => {
+	pool.query(get_forums_for_assign, [req.cid, req.year, req.sem], (err, forums) => {
+        pool.query(get_groups_for_assign, [req.cid, req.year, req.sem], (err, result) => {
             res.render('forumsAssign', {
                 isCourse: req.isCourse,
                 username: req.user.u_name,
@@ -73,9 +86,11 @@ router.post('/', function(req, res, next) {
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].selected;
         selected_rows[i].c_id = req.cid;
+        selected_rows[i].c_year = req.year;
+        selected_rows[i].c_sem = req.sem;
     }
 
-    const column_set = new pgp.helpers.ColumnSet(['f_datetime', 'g_num', 'c_id'], {table: 'forumsgroups'});
+    const column_set = new pgp.helpers.ColumnSet(['f_datetime', 'g_num', 'c_id', 'c_year', 'c_sem'], {table: 'forumsgroups'});
     const assign_forums_to_groups = pgp.helpers.insert(selected_rows, column_set);
 
     pool.query(assign_forums_to_groups, (err, data) => {
