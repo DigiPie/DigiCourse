@@ -28,13 +28,15 @@ CREATE TABLE Courses (
 	c_id  		varchar(9) PRIMARY KEY,
 	c_name    	varchar(200) NOT NULL,
 	c_capacity  integer NOT NULL,
-	c_desc    	varchar(2000) NOT NULL
+	c_desc    	varchar(2000) NOT NULL,
+	CHECK (c_capacity > 0)
 );
 
 CREATE TABLE Students (
 	s_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_id),
 	yr_study 	integer NOT NULL,
-	major		varchar(100) NOT NULL
+	major		varchar(100) NOT NULL,
+	CHECK (yr_study > 0 AND yr_study < 10)
 );
 
 CREATE TABLE CourseGroups (
@@ -43,6 +45,7 @@ CREATE TABLE CourseGroups (
 	g_capacity 	integer NOT NULL,
 	PRIMARY KEY (c_id, g_num),
 	FOREIGN KEY (c_id) REFERENCES Courses (c_id) ON DELETE CASCADE,
+	CHECK (g_num > 0),
 	CHECK (g_capacity > 0)
 );
 
@@ -50,7 +53,8 @@ CREATE TABLE StudentGroups (
 	c_id  		varchar(9) REFERENCES Courses (c_id),
 	g_num  		integer,
 	s_id  		varchar(9) REFERENCES Students (s_id),
-	PRIMARY KEY (c_id, g_num, s_id)
+	PRIMARY KEY (c_id, g_num, s_id),
+	CHECK (g_num > 0)
 );
 
 -- Check if the professor accepting is managing this course
