@@ -28,6 +28,8 @@ router.get('/', function(req, res, next) {
             LEFT OUTER JOIN StudentGroups s
             ON c.c_id = s.c_id
             AND c.g_num = s.g_num
+            WHERE c.c_year = '${req.year}'
+            AND c.c_sem = '${req.sem}'
             GROUP BY c.c_id, c.g_num
             ORDER BY g_num) cs
         ON c.c_id = cs.c_id
@@ -57,7 +59,7 @@ router.post('/', function(req, res, next) {
         return;
     }
 
-    var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.body.c_id}', '${req.body.g_num}', '${req.body.g_capacity}')`;
+    var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.body.c_id}', '${req.year}', '${req.sem}', '${req.body.g_num}', '${req.body.g_capacity}')`;
 
 	pool.query(sql_query, (err, data) => {
         if (err) {

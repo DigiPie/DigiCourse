@@ -23,6 +23,8 @@ router.get('/', function(req, res, next) {
     
     var sql_query = `SELECT * FROM CourseEnrollments WHERE c_id =\'${req.params.cid}\' 
         AND req_type = 1
+        AND c_year = '${req.year}'
+        AND c_sem = '${req.sem}' 
         AND s_id NOT IN (
             SELECT s_id
             FROM StudentGroups
@@ -37,6 +39,8 @@ router.get('/', function(req, res, next) {
             LEFT OUTER JOIN StudentGroups s
             ON c.c_id = s.c_id
             AND c.g_num = s.g_num
+            WHERE c.c_year = '${req.year}'
+            AND c.c_sem = '${req.sem}' 
             GROUP BY c.c_id, c.g_num
             ORDER BY g_num) cs
         ON c.c_id = cs.c_id
@@ -73,9 +77,11 @@ router.post('/', function(req, res, next) {
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].selected;
         selected_rows[i].g_num = req.body.g_num;
+        selected_rows[i].c_year = req.year;
+        selected_rows[i].c_sem = req.sem;
     }
 
-    const column_set = new pgp.helpers.ColumnSet(['c_id', 's_id', 'g_num'], {table: 'studentgroups'});
+    const column_set = new pgp.helpers.ColumnSet(['c_id', 'c_year', 'c_sem', 's_id', 'g_num'], {table: 'studentgroups'});
     const insert_sql = pgp.helpers.insert(selected_rows, column_set);
 
     pool.query(insert_sql, (err, data) => {

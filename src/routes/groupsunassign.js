@@ -27,6 +27,8 @@ router.get('/', function(req, res, next) {
             ON c.c_id = s.c_id
             AND c.s_id = s.s_id
             WHERE c.c_id = \'${req.params.cid}\'
+            AND c.c_year = '${req.year}'
+            AND c.c_sem = '${req.sem}'
             AND s.g_num IS NOT NULL
             ORDER BY c.req_type, c.s_id`;
 
@@ -58,7 +60,11 @@ router.post('/', function(req, res, next) {
     
     for (var i = 0; i < selected_rows.length; i++) {
         sids.push(selected_rows[i].s_id);
-        delete_query.push(`DELETE FROM StudentGroups WHERE c_id = '${selected_rows[i].c_id}' AND g_num = '${selected_rows[i].g_num}' AND s_id = '${selected_rows[i].s_id}'; `);
+        delete_query.push(`DELETE FROM StudentGroups WHERE c_id = '${selected_rows[i].c_id}' 
+        AND c_year = '${req.year}'
+        AND c_sem = '${req.sem}' 
+        AND g_num = '${selected_rows[i].g_num}' 
+        AND s_id = '${selected_rows[i].s_id}'; `);
     }
     sids = sids.join(', ');
     delete_query = delete_query.join('; ');

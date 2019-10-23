@@ -26,6 +26,8 @@ router.get('/', function(req, res, next) {
             ON c.c_id = s.c_id
             AND c.s_id = s.s_id
             WHERE c.c_id = \'${req.params.cid}\'
+            AND c.c_year = '${req.year}'
+            AND c.c_sem = '${req.sem}'
             ORDER BY c.req_type, c.s_id`;
 
 	pool.query(sql_query, (err, data) => {
