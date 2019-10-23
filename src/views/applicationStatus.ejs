@@ -47,64 +47,89 @@
                   <% } %>
                   <a class="active" href="#">Check Status</a>
                 </div>
-                <br/>
+              </div> <!-- end of col-12 -->
 
-                <% if (dataNum > 0) { %>
-                  <table class="table table-sm">
-                    <thead class="table-info">
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">CID</th>
-                        <th scope="col">Course Name</th>
-                        <% if (accountType == 'Professor') {%>
-                        <th scope="col">Request By</th>
-                        <% } %>
-                        <th scope="col">Requesting For</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <% for(var i=0; i < datarows.length; i++) { %>
-                      <form action="/applicationStatus" method="post">
-                        <input type="hidden" class="input-normal" name="s_id" value="<%= datarows[i].s_id %>"/>
-                        <input type="hidden" class="input-normal" name="req_dt" value="<%= datarows[i].req_datetime %>"/>
-                        <tr>
-                          <th scope="col"><%= i+1 %></th>
-                          <th scope="col"><input type="text" class="input-normal" name="c_code" value="<%= datarows[i].c_code %>"/></th>
-                          <th scope="col"><%= datarows[i].c_name %></th>
-                          <% if (accountType == 'Professor') {%>
-                            <th scope="col"><%= datarows[i].s_name %></th>
-                          <% } %>
-                          <% if (datarows[i].req_type == 0) { %>
-                            <th scope="col">Teaching Assistant</th>
-                          <% } else { %>
-                            <th scope="col">Student</th>
-                          <% } %>
-                          <% if (datarows[i].req_status) { %> 
-                            <th scope="col">Approved</th>
-                            <th scope="col"></th>
-                          <% } else if (datarows[i].approver) { %> 
-                            <th scope="col">Rejected</th>
-                            <th scope="col"></th>
-                          <% } else { %> 
-                            <th scope="col">Pending</th>
-                            <th scope="col">
-                              <% if (accountType == 'Professor') {%>
-                                <button type="submit" name="edit" class="btn-link">Approve / Reject</button>
-                              <% } else { %>
-                                <button type="submit" name="cancel" value="cancel" class="btn-link">Cancel</button>
-                              <% } %>
-                            </th>
-                          <% } %>
-                        </tr>
-                      </form>
+              <!-- Search form -->
+              <form action="/applicationStatus" class="form-inline requestSearchBar" method="post">
+                <i class="mdi mdi-magnify" aria-hidden="true"></i>
+                <input name="searchBox" id="searchBox" class="form-control form-control-sm ml-3 mr-3 w-75" type="text" placeholder="Search" aria-label="Search">
+                <button class="btn btn-primary active" type="submit"><i class="mdi mdi-magnify" aria-hidden="true"></i></button>
+                <a href="/applicationStatus" class="btn btn-primary active ml-2" role="button" aria-pressed="true"><i class="mdi mdi-refresh" aria-hidden="true"></i></a>
+              </form>
+
+              <% if (messages.error) {%>
+              <div class="alert alert-danger col-12">
+                <%= messages.error %>
+              </div>
+              <% } else if (messages.success) { %>
+                <div class="alert alert-success col-12">
+                  <%= messages.success %>
+                </div>
+              <% } %>
+
+              <% if (dataNum > 0) { %>
+              <div class="col-12 py-5">
+                <table class="table table-sm">
+                  <thead class="table-info">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">CID</th>
+                      <th scope="col">Course Name</th>
+                      <% if (accountType == 'Professor') {%>
+                      <th scope="col">Request By</th>
                       <% } %>
-                    </tbody>
-                  </table>
-                <% } else { %>
-                  <p>No Application found!</p>
-                <% } %> 
+                      <th scope="col">Requesting For</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% for(var i=0; i < datarows.length; i++) { %>
+                    <form action="/applicationStatus" method="post">
+                      <input type="hidden" class="input-normal" name="s_id" value="<%= datarows[i].s_id %>"/>
+                      <input type="hidden" class="input-normal" name="req_dt" value="<%= datarows[i].req_datetime %>"/>
+                      <tr>
+                        <th scope="col"><%= i+1 %></th>
+                        <th scope="col"><input type="text" class="input-normal" name="c_code" value="<%= datarows[i].c_code %>"/></th>
+                        <th scope="col"><%= datarows[i].c_name %></th>
+                        <% if (accountType == 'Professor') {%>
+                          <th scope="col"><%= datarows[i].studentname %></th>
+                        <% } %>
+                        <% if (datarows[i].req_type == 0) { %>
+                          <th scope="col">Teaching Assistant</th>
+                        <% } else { %>
+                          <th scope="col">Student</th>
+                        <% } %>
+                        <% if (datarows[i].req_status) { %> 
+                          <th scope="col">Approved</th>
+                          <th scope="col">-</th>
+                        <% } else if (datarows[i].approver) { %> 
+                          <th scope="col">Rejected</th>
+                          <th scope="col">
+                            <% if (accountType == 'Professor') {%>
+                              <button type="submit" name="edit" class="btn-link">View Enrollment</button>
+                            <% } else { %>
+                              <button type="submit" name="cancel" value="cancel" class="btn-link">Cancel</button>
+                            <% } %>
+                          </th>
+                        <% } else { %> 
+                          <th scope="col">Pending</th>
+                          <th scope="col">
+                            <% if (accountType == 'Professor') {%>
+                              <button type="submit" name="edit" class="btn-link">View Enrollment</button>
+                            <% } else { %>
+                              <button type="submit" name="cancel" value="cancel" class="btn-link">Cancel</button>
+                            <% } %>
+                          </th>
+                        <% } %>
+                      </tr>
+                    </form>
+                    <% } %>
+                  </tbody>
+                </table>
+              <% } else { %>
+                <p>No Application found!</p>
+              <% } %> 
 
               </div> <!-- end of col-12 -->
             </div> <!-- end of row -->

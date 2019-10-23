@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const { Pool } = require('pg')
+const { Pool } = require('pg');
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
 });
@@ -20,14 +20,50 @@ router.get('/', function(req, res, next) {
 	}
 
 	// Prepare SQL Statement
-	var sql_query = "SELECT C.c_code, C.c_name, (SELECT COUNT(*)=1 FROM Enrollments E WHERE E.c_code = C.c_code AND E.req_status=True AND E.p_id IS NOT NULL AND E.s_id = $1) AS enrolled FROM Courses C, Students S WHERE S.s_id = $1 AND NOT EXISTS (SELECT 1 FROM Enrollments E2 WHERE E2.c_code = C.c_code AND E2.s_id = S.s_id AND E2.req_status = False) ORDER BY enrolled";
-	// CHECK if user is a student
-			// SELECT COUNT(*) = 1 FROM Students WHERE s_id = 'A0000001A';
-	// SELECT ALL Courses that the user has enrolled in
-			// SELECT c_code FROM Enrollments WHERE s_id = 'A0000001A' AND req_status = True AND p_id IS NOT NULL;
-	// SELECT ALL Courses that the user has not enrolled in
-			// SELECT c_code FROM Courses EXCEPT SELECT c_code FROM Enrollments WHERE s_id = 'A0000001A' AND req_status = True AND p_id IS NOT NULL;
-			// SELECT C.c_code FROM Courses C WHERE NOT EXISTS (SELECT 1 FROM Enrollments E WHERE E.c_code = C.c_code AND E.req_status=True AND E.s_id = 'A0000001A');
+	// select all courses that the user has not enrolled in before for this year and sem
+	//			AND there must no pending request for these courses
+	// 				enrolled: pid=not null + req_status=True
+	//				pending: pid=null + req_status=False
+	// select all courses that user can be a TA
+	// 		AND user must have enrolled into the course before and is not currently enrolled into
+	//		AND there is no pending/rejected request to be a TA for course this year and sem
+	// 		AND user can be a TA even if he have been a TA before
+	// 				applyingTA: pid=null + req_status=False 
+	var sql_query = `
+		WITH CurrentSemCourses AS (
+			SELECT c_code, c_year, c_sem, c_capacity
+			FROM CourseYearSem NATURAL JOIN (
+				SELECT c_year, c_sem 
+				FROM CourseYearSem
+				GROUP BY c_year, c_sem
+				ORDER BY c_year DESC, c_sem DESC
+				LIMIT 1 
+				) AS yearsem
+		), 
+		CourseRequestForUser AS (
+			SELECT c_code, c_year, c_sem, False AS canbe_ta
+			FROM CurrentSemCourses C 				
+			WHERE NOT EXISTS (						
+				SELECT 1 FROM Enrollments E
+				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1
+					AND ((E.p_id IS NOT NULL AND E.req_status=True) OR (E.p_id IS NULL AND E.req_status=False))
+			)
+			UNION
+			SELECT c_code, c_year, c_sem, True AS canbe_ta
+			FROM Enrollments F						
+			WHERE F.s_id=$1 AND F.req_type=1 AND F.p_id IS NOT NULL AND F.req_status=True
+				AND NOT EXISTS (					
+					SELECT 1 FROM CurrentSemCourses C
+					WHERE F.c_code=C.c_code AND F.c_year=C.c_year AND F.c_sem=C.c_sem
+				)
+				AND NOT EXISTS (					
+					SELECT 1 FROM Enrollments E2
+					WHERE E2.s_id=F.s_id AND E2.req_type=0 AND E2.c_code=F.c_code AND E2.req_status = FALSE
+				)
+		)
+		SELECT c_code, c_name, canbe_ta 
+		FROM CourseRequestForUser NATURAL JOIN CourseDetails
+		ORDER BY c_code, canbe_ta`; 
 
 	// Query
 	pool.query(sql_query, [req.user.u_username], (err, data) => {
@@ -46,7 +82,43 @@ router.post('/', function(req, res, next) {
 	// Handle redirection
 	if (req.body.searchBox) {
 		// Prepare SQL Statement
-		var sql_query = "SELECT C.c_code, C.c_name, (SELECT COUNT(*)=1 FROM Enrollments E WHERE E.c_code = C.c_code AND E.req_status=True AND E.p_id IS NOT NULL AND E.s_id = $1) AS enrolled FROM Courses C, Students S WHERE S.s_id = $1 AND (LOWER(c_name) LIKE LOWER($2) OR LOWER(c_code) LIKE LOWER($2)) ORDER BY enrolled";
+		// same as above except there is filtering
+		var sql_query = `
+		WITH CurrentSemCourses AS (
+			SELECT c_code, c_year, c_sem, c_capacity
+			FROM CourseYearSem NATURAL JOIN (
+				SELECT c_year, c_sem 
+				FROM CourseYearSem
+				GROUP BY c_year, c_sem
+				ORDER BY c_year DESC, c_sem DESC
+				LIMIT 1 
+				) AS yearsem
+		), 
+		CourseRequestForUser AS (
+			SELECT c_code, c_year, c_sem, False AS canbe_ta
+			FROM CurrentSemCourses C 				
+			WHERE NOT EXISTS (						
+				SELECT 1 FROM Enrollments E
+				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1
+					AND ((E.p_id IS NOT NULL AND E.req_status=True) OR (E.p_id IS NULL AND E.req_status=False))
+			)
+			UNION
+			SELECT c_code, c_year, c_sem, True AS canbe_ta
+			FROM Enrollments F						
+			WHERE F.s_id=$1 AND F.req_type=1 AND F.p_id IS NOT NULL AND F.req_status=True
+				AND NOT EXISTS (					
+					SELECT 1 FROM CurrentSemCourses C
+					WHERE F.c_code=C.c_code AND F.c_year=C.c_year AND F.c_sem=C.c_sem
+				)
+				AND NOT EXISTS (					
+					SELECT 1 FROM Enrollments E2
+					WHERE E2.s_id=F.s_id AND E2.req_type=0 AND E2.c_code=F.c_code AND E2.req_status = FALSE
+				)
+		)
+		SELECT c_code, c_name, canbe_ta 
+		FROM CourseRequestForUser NATURAL JOIN CourseDetails
+		WHERE LOWER(c_name) LIKE LOWER($2) OR LOWER(c_code) LIKE LOWER($2)
+		ORDER BY c_code, canbe_ta`; 
 
 		// Query
 		pool.query(sql_query, [req.user.u_username, "%" + req.body.searchBox + "%"], (err, data) => {
@@ -70,17 +142,29 @@ router.post('/', function(req, res, next) {
 		}
 
 		// Prepare SQL Statement
-		var sql_query = "INSERT INTO Enrollments VALUES ($1, $2, $3, NOW(), NULL, False)";
+		var sql_query = "INSERT INTO Enrollments VALUES ($1, $2, $3, $4, $5, NOW(), NULL, False)";
+
+		const current_year_sem_query = `
+		SELECT c_year, c_sem
+		FROM CourseYearSem
+		GROUP BY c_year, c_sem
+		ORDER BY c_year DESC, c_sem ASC
+		LIMIT 1`
 
 		// Query
-		pool.query(sql_query, [req.user.u_username, cid, type], (err, data) => {
-			if (err) {
-				req.flash('error', 'Error. Please try again');
-				res.status(err.status || 500).redirect('back');
-			} else {
-				req.flash('success', 'Successfully submitted Request');
-				res.status(200).redirect('/applicationRequest');
-			}
+		pool.query(current_year_sem_query, (err1, cdata) => {
+			year = cdata.rows[0].c_year;
+			sem = cdata.rows[0].c_sem;
+
+			pool.query(sql_query, [req.user.u_username, cid, year, sem, type], (err, data) => {
+				if (err) {
+					req.flash('error', 'Error. Please try again');
+					res.status(err.status || 500).redirect('back');
+				} else {
+					req.flash('success', 'Successfully submitted Request');
+					res.status(200).redirect('/applicationRequest');
+				}
+			});
 		});
 	}
 });
