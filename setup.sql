@@ -1,6 +1,7 @@
 -- This file will be executed each time the project is deployed to Heroku
 DROP TABLE IF EXISTS StudentGroups CASCADE;
 DROP TABLE IF EXISTS CourseGroups CASCADE;
+DROP TABLE IF EXISTS CourseManages CASCADE;
 DROP TABLE IF EXISTS Manages CASCADE;
 DROP TABLE IF EXISTS Enrollments CASCADE;
 DROP TABLE IF EXISTS CourseEnrollments CASCADE;
@@ -173,13 +174,40 @@ FOR EACH ROW
 WHEN (NEW.req_status) 
 EXECUTE PROCEDURE f_insert_course_enrollments();
 
-CREATE OR REPLACE VIEW CourseManages AS (
-	SELECT c_id, c_name, p_id, u_name
-	FROM Courses
-	NATURAL JOIN Manages
-	NATURAL JOIN Professors
-	JOIN Accounts a ON p_id = u_id
-); 
+CREATE TABLE CourseManages (
+	c_id  		varchar(9),
+	c_name		varchar(200),
+	c_year		smallint,
+	c_sem		smallint,
+	p_id		varchar(9) REFERENCES Accounts (u_id),
+	u_name		varchar(100),
+	PRIMARY KEY (c_id, c_year, c_sem, p_id),
+	FOREIGN KEY (c_id, c_year, c_sem) REFERENCES CourseYearSem (c_id, c_year, c_sem) ON DELETE CASCADE
+);
+
+CREATE OR REPLACE FUNCTION f_insert_course_manages() RETURNS TRIGGER AS $$ 
+	DECLARE 
+		course_name	varchar(200);
+		user_name	varchar(100);
+	BEGIN
+		SELECT c_name INTO course_name
+		FROM CourseDetails
+		WHERE c_id = NEW.c_id;
+
+		SELECT u_name INTO user_name
+		FROM Accounts
+		WHERE u_id = NEW.p_id;
+
+		INSERT INTO CourseManages
+		VALUES (NEW.c_id, course_name, NEW.c_year, NEW.c_sem, NEW.p_id, user_name);
+		
+		RETURN NEW;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER insert_course_manages
+BEFORE INSERT OR UPDATE ON Manages
+FOR EACH ROW EXECUTE PROCEDURE f_insert_course_manages();
 
 CREATE OR REPLACE VIEW CourseTeachingStaff AS (
 	SELECT c_id, c_name, p_id as t_id, u_name as name, 'Professor' as role FROM CourseManages
