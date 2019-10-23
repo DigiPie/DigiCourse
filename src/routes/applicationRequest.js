@@ -63,7 +63,7 @@ router.get('/', function(req, res, next) {
 		)
 		SELECT c_code, c_name, canbe_ta 
 		FROM CourseRequestForUser NATURAL JOIN CourseDetails
-		ORDER BY canbe_ta, c_code`; 
+		ORDER BY c_code, canbe_ta`; 
 
 	// Query
 	pool.query(sql_query, [req.user.u_username], (err, data) => {
@@ -118,7 +118,7 @@ router.post('/', function(req, res, next) {
 		SELECT c_code, c_name, canbe_ta 
 		FROM CourseRequestForUser NATURAL JOIN CourseDetails
 		WHERE LOWER(c_name) LIKE LOWER($2) OR LOWER(c_code) LIKE LOWER($2)
-		ORDER BY canbe_ta, c_code`; 
+		ORDER BY c_code, canbe_ta`; 
 
 		// Query
 		pool.query(sql_query, [req.user.u_username, "%" + req.body.searchBox + "%"], (err, data) => {

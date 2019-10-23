@@ -17,9 +17,44 @@ router.get('/', function(req, res, next) {
 	// Prepare SQL Statement
 	var sql_query;
 	if (req.user.u_type == 'Professor') {
-		sql_query = 'SELECT C.c_code, C.c_name, S.s_id, u_name, E.req_type, TO_CHAR(E.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') AS req_datetime , E.req_status, E.p_id AS approver FROM Enrollments E NATURAL JOIN CourseDetails C NATURAL JOIN Students S JOIN Accounts ON s.s_id = u_username WHERE EXISTS (SELECT 1 FROM Manages M WHERE M.c_code = E.c_code AND M.p_id = $1) ORDER BY E.req_status, approver DESC';
+		sql_query = `
+			WITH CurrentSemCourses AS (
+				SELECT c_code, c_year, c_sem, c_capacity
+				FROM CourseYearSem NATURAL JOIN (
+					SELECT c_year, c_sem 
+					FROM CourseYearSem
+					GROUP BY c_year, c_sem
+					ORDER BY c_year DESC, c_sem DESC
+					LIMIT 1 
+				) AS yearsem
+			)
+			SELECT A.u_name AS studentname, S.s_id, CD.c_code, CD.c_name, TO_CHAR(E.req_datetime, 'Dy Mon DD YYYY HH24:MI:SS') AS req_datetime, E.req_type, E.req_status, E.p_id AS approver
+			FROM Enrollments E NATURAL JOIN CourseDetails CD NATURAL JOIN Students S JOIN Accounts A ON E.s_id = A.u_username
+			WHERE EXISTS (
+				SELECT 1 FROM CurrentSemCourses C NATURAL JOIN Manages M
+				WHERE E.c_code=C.c_code AND E.c_year=C.c_year AND E.c_sem=C.c_sem
+					AND p_id = $1
+			)
+			ORDER BY c_code, req_status, approver`;
 	} else {
-		sql_query = 'SELECT C.c_code, C.c_name, S.s_id, u_name, E.req_type, TO_CHAR(E.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') AS req_datetime, E.req_status, E.p_id AS approver FROM Enrollments E NATURAL JOIN CourseDetails C NATURAL JOIN Students S JOIN Accounts ON s.s_id = u_username WHERE s_id = $1 ORDER BY E.req_status, approver DESC';
+		sql_query = `
+			WITH CurrentSemCourses AS (
+				SELECT c_code, c_year, c_sem, c_capacity
+				FROM CourseYearSem NATURAL JOIN (
+					SELECT c_year, c_sem 
+					FROM CourseYearSem
+					GROUP BY c_year, c_sem
+					ORDER BY c_year DESC, c_sem DESC
+					LIMIT 1 
+				) AS yearsem
+			)
+			SELECT A.u_name AS studentname, S.s_id, CD.c_code, CD.c_name, TO_CHAR(E.req_datetime, 'Dy Mon DD YYYY HH24:MI:SS') AS req_datetime, E.req_type, E.req_status, E.p_id AS approver
+			FROM Enrollments E NATURAL JOIN CourseDetails CD NATURAL JOIN Students S JOIN Accounts A ON E.s_id = A.u_username
+			WHERE EXISTS (
+				SELECT 1 FROM CurrentSemCourses C
+				WHERE E.c_code=C.c_code AND E.c_year=C.c_year AND E.c_sem=C.c_sem
+			) AND S.s_id=$1
+			ORDER BY c_code, req_status, approver`;
 	}
 
 	// Query
@@ -50,7 +85,13 @@ router.post('/', function(req, res, next) {
 	
 		// Query
 		pool.query(sql_query, [sid, cid, req_dt], (err, data) => {
-			res.redirect('/applicationStatus');
+			if (err) {
+				req.flash('error', 'Error. Please try again');
+				res.status(err.status || 500).redirect('back');
+			} else {
+				req.flash('success', 'Successfully cancelled application');
+				res.status(200).redirect('/applicationStatus');
+			}
 		});
 	} else {
 		return res.redirect('/course/' + cid);

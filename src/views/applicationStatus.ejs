@@ -74,7 +74,7 @@
                           <th scope="col"><input type="text" class="input-normal" name="c_code" value="<%= datarows[i].c_code %>"/></th>
                           <th scope="col"><%= datarows[i].c_name %></th>
                           <% if (accountType == 'Professor') {%>
-                            <th scope="col"><%= datarows[i].s_name %></th>
+                            <th scope="col"><%= datarows[i].studentname %></th>
                           <% } %>
                           <% if (datarows[i].req_type == 0) { %>
                             <th scope="col">Teaching Assistant</th>
@@ -83,15 +83,21 @@
                           <% } %>
                           <% if (datarows[i].req_status) { %> 
                             <th scope="col">Approved</th>
-                            <th scope="col"></th>
+                            <th scope="col">-</th>
                           <% } else if (datarows[i].approver) { %> 
                             <th scope="col">Rejected</th>
-                            <th scope="col"></th>
+                            <th scope="col">
+                              <% if (accountType == 'Professor') {%>
+                                <button type="submit" name="edit" class="btn-link">View Enrollment</button>
+                              <% } else { %>
+                                <button type="submit" name="cancel" value="cancel" class="btn-link">Cancel</button>
+                              <% } %>
+                            </th>
                           <% } else { %> 
                             <th scope="col">Pending</th>
                             <th scope="col">
                               <% if (accountType == 'Professor') {%>
-                                <button type="submit" name="edit" class="btn-link">Approve / Reject</button>
+                                <button type="submit" name="edit" class="btn-link">View Enrollment</button>
                               <% } else { %>
                                 <button type="submit" name="cancel" value="cancel" class="btn-link">Cancel</button>
                               <% } %>
