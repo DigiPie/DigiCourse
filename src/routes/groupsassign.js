@@ -21,31 +21,31 @@ router.get('/', function(req, res, next) {
         });
     }
     
-    var sql_query = `SELECT * FROM CourseEnrollments WHERE c_id =\'${req.params.cid}\' 
+    var sql_query = `SELECT * FROM CourseEnrollments WHERE c_code =\'${req.params.cid}\' 
         AND req_type = 1
         AND c_year = '${req.year}'
         AND c_sem = '${req.sem}' 
         AND s_id NOT IN (
             SELECT s_id
             FROM StudentGroups
-            WHERE c_id = \'${req.params.cid}\')`;
+            WHERE c_code = \'${req.params.cid}\')`;
 
     var group_list_query =  
         `SELECT c.g_num
         FROM CourseGroups c
         JOIN (
-            SELECT c.c_id, c.g_num, count(s.c_id) enrolled
+            SELECT c.c_code, c.g_num, count(s.c_code) enrolled
             FROM CourseGroups c
             LEFT OUTER JOIN StudentGroups s
-            ON c.c_id = s.c_id
+            ON c.c_code = s.c_code
             AND c.g_num = s.g_num
             WHERE c.c_year = '${req.year}'
             AND c.c_sem = '${req.sem}' 
-            GROUP BY c.c_id, c.g_num
+            GROUP BY c.c_code, c.g_num
             ORDER BY g_num) cs
-        ON c.c_id = cs.c_id
+        ON c.c_code = cs.c_code
         AND c.g_num = cs.g_num
-        WHERE c.c_id = '${req.cid}'
+        WHERE c.c_code = '${req.cid}'
         AND c.g_capacity <> cs.enrolled`;
 
 
@@ -81,7 +81,7 @@ router.post('/', function(req, res, next) {
         selected_rows[i].c_sem = req.sem;
     }
 
-    const column_set = new pgp.helpers.ColumnSet(['c_id', 'c_year', 'c_sem', 's_id', 'g_num'], {table: 'studentgroups'});
+    const column_set = new pgp.helpers.ColumnSet(['c_code', 'c_year', 'c_sem', 's_id', 'g_num'], {table: 'studentgroups'});
     const insert_sql = pgp.helpers.insert(selected_rows, column_set);
 
     pool.query(insert_sql, (err, data) => {

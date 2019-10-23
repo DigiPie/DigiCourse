@@ -24,9 +24,9 @@ router.get('/', function(req, res, next) {
     var sql_query = `SELECT c.s_id, c.u_name, s.g_num
             FROM CourseEnrollments c
             LEFT OUTER JOIN StudentGroups s
-            ON c.c_id = s.c_id
+            ON c.c_code = s.c_code
             AND c.s_id = s.s_id
-            WHERE c.c_id = \'${req.params.cid}\'
+            WHERE c.c_code = \'${req.params.cid}\'
             AND c.c_year = '${req.year}'
             AND c.c_sem = '${req.sem}'
             AND s.g_num IS NOT NULL
@@ -60,7 +60,7 @@ router.post('/', function(req, res, next) {
     
     for (var i = 0; i < selected_rows.length; i++) {
         sids.push(selected_rows[i].s_id);
-        delete_query.push(`DELETE FROM StudentGroups WHERE c_id = '${selected_rows[i].c_id}' 
+        delete_query.push(`DELETE FROM StudentGroups WHERE c_code = '${selected_rows[i].c_code}' 
         AND c_year = '${req.year}'
         AND c_sem = '${req.sem}' 
         AND g_num = '${selected_rows[i].g_num}' 

@@ -17,9 +17,9 @@ router.get('/', function(req, res, next) {
 	// Prepare SQL Statement
 	var sql_query;
 	if (req.user.u_type == 'Professor') {
-		sql_query = 'SELECT c_id, c_name FROM CourseManages WHERE p_id = $1';
+		sql_query = 'SELECT c_code, c_name FROM CourseManages WHERE p_id = $1';
 	} else {
-		sql_query = 'SELECT c_id, c_name FROM CourseEnrollments WHERE s_id = $1';
+		sql_query = 'SELECT c_code, c_name FROM CourseEnrollments WHERE s_id = $1';
 	}
 
 	// Query

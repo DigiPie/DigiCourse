@@ -23,9 +23,9 @@ router.get('/', function(req, res, next) {
     var sql_query = `SELECT c.s_id, c.u_name, s.g_num, c.req_type
             FROM CourseEnrollments c
             LEFT OUTER JOIN StudentGroups s
-            ON c.c_id = s.c_id
+            ON c.c_code = s.c_code
             AND c.s_id = s.s_id
-            WHERE c.c_id = \'${req.params.cid}\'
+            WHERE c.c_code = \'${req.params.cid}\'
             AND c.c_year = '${req.year}'
             AND c.c_sem = '${req.sem}'
             ORDER BY c.req_type, c.s_id`;

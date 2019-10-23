@@ -18,11 +18,11 @@ router.get('/', function(req, res, next) {
 		return res.redirect('/login');
     }
     
-    const capacity_query = `SELECT c_capacity FROM CourseYearSem WHERE c_id = '${req.params.cid}' AND c_year = '${req.year}' AND c_sem = '${req.sem}'`;
+    const capacity_query = `SELECT c_capacity FROM CourseYearSem WHERE c_code = '${req.params.cid}' AND c_year = '${req.year}' AND c_sem = '${req.sem}'`;
 
-    var sql_query = `SELECT s_id, c_id, req_type, p_id, req_status, TO_CHAR(req_datetime, 'Dy Mon DD YYYY HH24:MI:SS') req_datetime 
+    var sql_query = `SELECT s_id, c_code, req_type, p_id, req_status, TO_CHAR(req_datetime, 'Dy Mon DD YYYY HH24:MI:SS') req_datetime 
     FROM Enrollments 
-    WHERE c_id ='${req.params.cid}'
+    WHERE c_code ='${req.params.cid}'
     AND c_year = '${req.year}'
     AND c_sem = '${req.sem}'
     AND NOT req_status`;
@@ -58,9 +58,9 @@ router.post('/increase', function(req, res, next) {
         return;
     }
 
-    const column_set = new pgp.helpers.ColumnSet(['?c_id', 'c_capacity'], {table: 'courseyearsem'});
-    const update_sql = pgp.helpers.update({c_id: req.params.cid, c_capacity: req.body.c_capacity}, column_set) 
-    + ` WHERE c_id = '${req.params.cid}' AND c_year = '${req.year}' AND c_sem = '${req.sem}'`;
+    const column_set = new pgp.helpers.ColumnSet(['?c_code', 'c_capacity'], {table: 'courseyearsem'});
+    const update_sql = pgp.helpers.update({c_code: req.params.cid, c_capacity: req.body.c_capacity}, column_set) 
+    + ` WHERE c_code = '${req.params.cid}' AND c_year = '${req.year}' AND c_sem = '${req.sem}'`;
 
 	pool.query(update_sql, (err, data) => {
         if (err) {
@@ -110,18 +110,18 @@ router.post('/accept', function(req, res, next) {
     t_sid = t_sid.join(', ');
     s_sid = s_sid.join(', ');
 
-    const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_id', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
-    const where_sql = ` WHERE v.s_id = t.s_id AND v.c_id = t.c_id AND TO_CHAR(t.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = v.req_datetime AND t.c_year = '${req.year}'
+    const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_code', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
+    const where_sql = ` WHERE v.s_id = t.s_id AND v.c_code = t.c_code AND TO_CHAR(t.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = v.req_datetime AND t.c_year = '${req.year}'
     AND t.c_sem = '${req.sem}'`;
     var check_query = `SELECT c_capacity - (
             SELECT COUNT(*) scount
             FROM CourseEnrollments
-            WHERE c_id = '${req.params.cid}'
+            WHERE c_code = '${req.params.cid}'
             AND c_year = '${req.year}'
             AND c_sem = '${req.sem}'
             AND req_type = 1) available
         FROM CourseYearSem
-        WHERE c_id = '${req.params.cid}'
+        WHERE c_code = '${req.params.cid}'
         AND c_year = '${req.year}'
         AND c_sem = '${req.sem}'`;
 
@@ -193,9 +193,9 @@ router.post('/reject', function(req, res, next) {
 
     sids = sids.join(', ');
 
-    const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_id', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
+    const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_code', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
     const update_sql = pgp.helpers.update(selected_rows, column_set) 
-    + ' WHERE v.s_id = t.s_id AND v.c_id = t.c_id AND TO_CHAR(t.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = v.req_datetime';
+    + ' WHERE v.s_id = t.s_id AND v.c_code = t.c_code AND TO_CHAR(t.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = v.req_datetime';
     	
 	pool.query(update_sql, (err, data) => {
         if (err) {

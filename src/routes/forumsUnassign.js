@@ -19,11 +19,11 @@ router.get('/', function(req, res, next) {
     var get_forums_for_unassign =
     'SELECT distinct f.f_topic, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM ForumsGroups fg JOIN Forums f'
-    + ' ON fg.c_id = f.c_id'
+    + ' ON fg.c_code = f.c_code'
     + ' AND fg.c_year = f.c_year'
     + ' AND fg.c_sem = f.c_sem'
     + ' AND fg.f_datetime = f.f_datetime'
-    + ' WHERE fg.c_id = $1'
+    + ' WHERE fg.c_code = $1'
     + ' AND fg.c_year = $2'
     + ' AND fg.c_sem = $3'; 
 
@@ -31,7 +31,7 @@ router.get('/', function(req, res, next) {
     var get_groups_for_unassign = 
     ' SELECT fg.g_num, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM ForumsGroups fg'
-    + ' WHERE fg.c_id = $1'
+    + ' WHERE fg.c_code = $1'
     + ' AND fg.c_year = $2'
     + ' AND fg.c_sem = $3' 
     + ' ORDER BY g_num';
@@ -66,7 +66,7 @@ router.post('/', function(req, res, next) {
     for(var i = 0; i < selected_rows.length; i++) {
         unassign_groups_from_forums += 
         `DELETE FROM ForumsGroups
-        WHERE c_id = '${req.cid}'
+        WHERE c_code = '${req.cid}'
         AND c_year = '${req.year}'
         AND c_sem = '${req.sem}'
         AND TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = '${selected_rows[i].f_datetime}'

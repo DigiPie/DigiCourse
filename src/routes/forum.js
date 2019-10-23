@@ -24,7 +24,7 @@ router.get('/', function(req, res, next) {
     + ' ( SELECT COUNT(*)' 
     + '   FROM Enrollments' 
     + '   WHERE s_id = $1' 
-    + '   AND c_id = $2' 
+    + '   AND c_code = $2' 
     + '   AND c_year = $3'
     + '   AND c_sem = $4'
     + '   AND req_type = 0' 
@@ -34,7 +34,7 @@ router.get('/', function(req, res, next) {
     + ' ( SELECT COUNT(*)' 
     + '   FROM Manages' 
     + '   WHERE p_id = $1'
-    + '   AND c_id = $2'
+    + '   AND c_code = $2'
     + '   AND c_year = $3'
     + '   AND c_sem = $4'
     + ' ) = 1 THEN \'Professor\''
@@ -56,7 +56,7 @@ router.get('/', function(req, res, next) {
                 show_forums = 
                 `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM Forums 
-                WHERE c_id =\'${req.cid}\'
+                WHERE c_code =\'${req.cid}\'
                 AND c_year =\'${req.year}\'
                 AND c_sem =\'${req.sem}\'
                 ORDER BY f_datetime`;
@@ -67,16 +67,16 @@ router.get('/', function(req, res, next) {
                 `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM 
                 ( StudentGroups sg JOIN ForumsGroups fg
-                  ON sg.c_id = fg.c_id
+                  ON sg.c_code = fg.c_code
                   AND sg.c_year = fg.c_year
                   AND sg.c_sem = fg.c_sem
                   AND sg.g_num = fg.g_num
                 ) JOIN Forums f
                 ON f.f_datetime = fg.f_datetime
-                AND f.c_id = fg.c_id
+                AND f.c_code = fg.c_code
                 AND f.c_year = fg.c_year
                 AND f.c_sem = fg.c_sem
-                WHERE fg.c_id =\'${req.cid}\'
+                WHERE fg.c_code =\'${req.cid}\'
                 AND fg.c_year =\'${req.year}\'
                 AND fg.c_sem =\'${req.sem}\'
                 AND sg.s_id =\'${req.user.u_id}\'
@@ -126,11 +126,11 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
     'UPDATE ForumEntries' 
     + ' SET e_deleted_by = $1'
     + ' WHERE TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $2'
-    + ' AND c_id = $3'
+    + ' AND c_code = $3'
     + ' AND c_year = $4'
     + ' AND c_sem = $5'
-    + ' AND c_id IN'
-    + ' ( SELECT m.c_id'
+    + ' AND c_code IN'
+    + ' ( SELECT m.c_code'
     + '   FROM Manages m'
     + '   WHERE m.p_id = $1'
     + '   AND m.c_year = $4'
@@ -140,7 +140,7 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
     var delete_forum =
     'DELETE FROM Forums'
     + ' WHERE TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $1'
-    + ' AND c_id = $2'
+    + ' AND c_code = $2'
     + ' AND c_year = $3'
     + ' AND c_sem = $4';
 

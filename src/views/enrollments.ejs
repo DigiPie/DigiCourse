@@ -73,7 +73,7 @@
                         <tr>
                           <td class="min"><input type="checkbox" name="row[<%= i %>][accepted]" ></td>
                           <td><input type="hidden" name='row[<%= i %>][s_id]' value="<%= datarows[i].s_id %>"><%= datarows[i].s_id %></td>
-                          <td><input type="hidden" name='row[<%= i %>][c_id]' value="<%= datarows[i].c_id %>"><%= datarows[i].c_id %></td>
+                          <td><input type="hidden" name='row[<%= i %>][c_code]' value="<%= datarows[i].c_code %>"><%= datarows[i].c_code %></td>
                           <td><input type="hidden" name='row[<%= i %>][req_type]' value="<%= datarows[i].req_type %>"><%= datarows[i].req_type == 1 ? 'Student' : 'Teaching Assistant' %></td>
                           <td><input type="hidden" name='row[<%= i %>][req_datetime]' value="<%= datarows[i].req_datetime %>"><%= datarows[i].req_datetime %></td>
                           <td><%= datarows[i].p_id ? 'Rejected' : 'nil' %></td>

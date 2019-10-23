@@ -20,14 +20,14 @@ router.get('/', function(req, res, next) {
 	}
 
 	// Prepare SQL Statement
-	var sql_query = "SELECT C.c_id, C.c_name, (SELECT COUNT(*)=1 FROM Enrollments E WHERE E.c_id = C.c_id AND E.req_status=True AND E.p_id IS NOT NULL AND E.s_id = $1) AS enrolled FROM Courses C, Students S WHERE S.s_id = $1 AND NOT EXISTS (SELECT 1 FROM Enrollments E2 WHERE E2.c_id = C.c_id AND E2.s_id = S.s_id AND E2.req_status = False) ORDER BY enrolled";
+	var sql_query = "SELECT C.c_code, C.c_name, (SELECT COUNT(*)=1 FROM Enrollments E WHERE E.c_code = C.c_code AND E.req_status=True AND E.p_id IS NOT NULL AND E.s_id = $1) AS enrolled FROM Courses C, Students S WHERE S.s_id = $1 AND NOT EXISTS (SELECT 1 FROM Enrollments E2 WHERE E2.c_code = C.c_code AND E2.s_id = S.s_id AND E2.req_status = False) ORDER BY enrolled";
 	// CHECK if user is a student
 			// SELECT COUNT(*) = 1 FROM Students WHERE s_id = 'A0000001A';
 	// SELECT ALL Courses that the user has enrolled in
-			// SELECT c_id FROM Enrollments WHERE s_id = 'A0000001A' AND req_status = True AND p_id IS NOT NULL;
+			// SELECT c_code FROM Enrollments WHERE s_id = 'A0000001A' AND req_status = True AND p_id IS NOT NULL;
 	// SELECT ALL Courses that the user has not enrolled in
-			// SELECT c_id FROM Courses EXCEPT SELECT c_id FROM Enrollments WHERE s_id = 'A0000001A' AND req_status = True AND p_id IS NOT NULL;
-			// SELECT C.c_id FROM Courses C WHERE NOT EXISTS (SELECT 1 FROM Enrollments E WHERE E.c_id = C.c_id AND E.req_status=True AND E.s_id = 'A0000001A');
+			// SELECT c_code FROM Courses EXCEPT SELECT c_code FROM Enrollments WHERE s_id = 'A0000001A' AND req_status = True AND p_id IS NOT NULL;
+			// SELECT C.c_code FROM Courses C WHERE NOT EXISTS (SELECT 1 FROM Enrollments E WHERE E.c_code = C.c_code AND E.req_status=True AND E.s_id = 'A0000001A');
 
 	// Query
 	pool.query(sql_query, [req.user.u_id], (err, data) => {
@@ -46,7 +46,7 @@ router.post('/', function(req, res, next) {
 	// Handle redirection
 	if (req.body.searchBox) {
 		// Prepare SQL Statement
-		var sql_query = "SELECT C.c_id, C.c_name, (SELECT COUNT(*)=1 FROM Enrollments E WHERE E.c_id = C.c_id AND E.req_status=True AND E.p_id IS NOT NULL AND E.s_id = $1) AS enrolled FROM Courses C, Students S WHERE S.s_id = $1 AND (LOWER(c_name) LIKE LOWER($2) OR LOWER(c_id) LIKE LOWER($2)) ORDER BY enrolled";
+		var sql_query = "SELECT C.c_code, C.c_name, (SELECT COUNT(*)=1 FROM Enrollments E WHERE E.c_code = C.c_code AND E.req_status=True AND E.p_id IS NOT NULL AND E.s_id = $1) AS enrolled FROM Courses C, Students S WHERE S.s_id = $1 AND (LOWER(c_name) LIKE LOWER($2) OR LOWER(c_code) LIKE LOWER($2)) ORDER BY enrolled";
 
 		// Query
 		pool.query(sql_query, [req.user.u_id, "%" + req.body.searchBox + "%"], (err, data) => {
@@ -61,7 +61,7 @@ router.post('/', function(req, res, next) {
 		});
 	} else {
 		// Retrieve Information
-		var cid = req.body.c_id;
+		var cid = req.body.c_code;
 		var type = -1;
 		if (req.body.TA_req) {
 			type = 0;

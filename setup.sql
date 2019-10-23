@@ -27,17 +27,17 @@ CREATE TABLE Professors (
 );
 
 CREATE TABLE CourseDetails (
-	c_id		varchar(9) PRIMARY KEY,
+	c_code		varchar(9) PRIMARY KEY,
 	c_name    	varchar(200) NOT NULL,
 	c_desc    	varchar(2000) NOT NULL
 );
 
 CREATE TABLE CourseYearSem (
-	c_id  		varchar(9) REFERENCES CourseDetails (c_id),
+	c_code  		varchar(9) REFERENCES CourseDetails (c_code),
 	c_year		smallint,
 	c_sem		smallint,
 	c_capacity  smallint NOT NULL,
-	PRIMARY KEY (c_id, c_year, c_sem),
+	PRIMARY KEY (c_code, c_year, c_sem),
 	CHECK (c_year > 1905),
 	CHECK (c_sem > 0 AND c_sem < 5),
 	CHECK (c_capacity > 0)
@@ -51,25 +51,25 @@ CREATE TABLE Students (
 );
 
 CREATE TABLE CourseGroups (
-	c_id  		varchar(9),
+	c_code  		varchar(9),
 	c_year		smallint,
 	c_sem		smallint,
 	g_num  		smallint,
 	g_capacity 	smallint NOT NULL,
-	PRIMARY KEY (c_id, c_year, c_sem, g_num),
-	FOREIGN KEY (c_id, c_year, c_sem) REFERENCES CourseYearSem (c_id, c_year, c_sem) ON DELETE CASCADE,
+	PRIMARY KEY (c_code, c_year, c_sem, g_num),
+	FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE,
 	CHECK (g_num > 0),
 	CHECK (g_capacity > 0)
 );
 
 CREATE TABLE StudentGroups (
-	c_id  		varchar(9),
+	c_code  		varchar(9),
 	c_year		smallint,
 	c_sem		smallint,
 	g_num  		smallint,
 	s_id  		varchar(9) REFERENCES Students (s_id),
-	PRIMARY KEY (c_id, c_year, c_sem, s_id),
-	FOREIGN KEY (c_id, c_year, c_sem) REFERENCES CourseYearSem (c_id, c_year, c_sem) ON DELETE CASCADE,
+	PRIMARY KEY (c_code, c_year, c_sem, s_id),
+	FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE,
 	CHECK (g_num > 0)
 );
 
@@ -78,7 +78,7 @@ CREATE OR REPLACE FUNCTION f_is_student_enrolled() RETURNS TRIGGER AS $$
 	BEGIN
 		IF NEW.s_id = (SELECT s_id FROM CourseEnrollments
 			WHERE s_id = NEW.s_id
-			AND c_id = NEW.c_id
+			AND c_code = NEW.c_code
 			AND c_year = NEW.c_year
 			AND c_sem = NEW.c_sem) THEN
 				RETURN NEW;
@@ -95,25 +95,25 @@ FOR EACH ROW EXECUTE PROCEDURE f_is_student_enrolled();
 
 CREATE TABLE Manages (
 	p_id  		varchar(9) REFERENCES Professors (p_id),
-	c_id  		varchar(9),
+	c_code  		varchar(9),
 	c_year		smallint,
 	c_sem		smallint,
-	PRIMARY KEY (p_id, c_id, c_year, c_sem),
-	FOREIGN KEY (c_id, c_year, c_sem) REFERENCES CourseYearSem (c_id, c_year, c_sem) ON DELETE CASCADE
+	PRIMARY KEY (p_id, c_code, c_year, c_sem),
+	FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE
 );
 
 CREATE TABLE Enrollments (
 	s_id		varchar(9) REFERENCES Students (s_id),
-	c_id		varchar(9),
+	c_code		varchar(9),
 	c_year		smallint,
 	c_sem		smallint,
 	req_type	integer NOT NULL,
 	req_datetime timestamp NOT NULL,
 	p_id		varchar(9) DEFAULT NULL,
 	req_status	boolean DEFAULT FALSE,
-	PRIMARY KEY (s_id, c_id, c_year, c_sem),
+	PRIMARY KEY (s_id, c_code, c_year, c_sem),
 	FOREIGN KEY (p_id) REFERENCES Professors (p_id),
-	FOREIGN KEY (c_id, c_year, c_sem) REFERENCES CourseYearSem (c_id, c_year, c_sem) ON DELETE CASCADE,
+	FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE,
 	CHECK (req_type = 1 OR req_type = 0)
 );
 
@@ -124,7 +124,7 @@ CREATE OR REPLACE FUNCTION f_check_prof() RETURNS TRIGGER AS $$
 			RETURN NEW;
 		ELSIF NEW.p_id = (SELECT p_id FROM Manages
 			WHERE p_id = NEW.p_id
-			AND c_id = NEW.c_id
+			AND c_code = NEW.c_code
 			AND c_year = NEW.c_year
 			AND c_sem = NEW.c_sem) THEN
 				RETURN NEW;
@@ -140,14 +140,14 @@ BEFORE INSERT OR UPDATE ON Enrollments
 FOR EACH ROW EXECUTE PROCEDURE f_check_prof();
 
 CREATE TABLE CourseEnrollments (
-	c_id		varchar(9),
+	c_code		varchar(9),
 	c_year		smallint,
 	c_sem		smallint,
 	c_name    	varchar(200),
 	s_id		varchar(9) REFERENCES Students (s_id),
 	u_name 		varchar(100) NOT NULL,
 	req_type	integer NOT NULL,
-	FOREIGN KEY (c_id, c_year, c_sem) REFERENCES CourseYearSem (c_id, c_year, c_sem) ON DELETE CASCADE
+	FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE FUNCTION f_insert_course_enrollments() RETURNS TRIGGER AS $$ 
@@ -157,14 +157,14 @@ CREATE OR REPLACE FUNCTION f_insert_course_enrollments() RETURNS TRIGGER AS $$
 	BEGIN
 		SELECT c_name INTO course_name
 		FROM CourseDetails
-		WHERE c_id = NEW.c_id;
+		WHERE c_code = NEW.c_code;
 
 		SELECT u_name INTO user_name
 		FROM Accounts
 		WHERE u_id = NEW.s_id;
 
 		INSERT INTO CourseEnrollments
-		VALUES (NEW.c_id, NEW.c_year, NEW.c_sem, course_name, NEW.s_id, user_name, NEW.req_type);
+		VALUES (NEW.c_code, NEW.c_year, NEW.c_sem, course_name, NEW.s_id, user_name, NEW.req_type);
 		
 		RETURN NEW;
 	END;
@@ -177,14 +177,14 @@ WHEN (NEW.req_status)
 EXECUTE PROCEDURE f_insert_course_enrollments();
 
 CREATE TABLE CourseManages (
-	c_id  		varchar(9),
+	c_code  		varchar(9),
 	c_name		varchar(200),
 	c_year		smallint,
 	c_sem		smallint,
 	p_id		varchar(9) REFERENCES Accounts (u_id),
 	u_name		varchar(100),
-	PRIMARY KEY (c_id, c_year, c_sem, p_id),
-	FOREIGN KEY (c_id, c_year, c_sem) REFERENCES CourseYearSem (c_id, c_year, c_sem) ON DELETE CASCADE
+	PRIMARY KEY (c_code, c_year, c_sem, p_id),
+	FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE FUNCTION f_insert_course_manages() RETURNS TRIGGER AS $$ 
@@ -194,14 +194,14 @@ CREATE OR REPLACE FUNCTION f_insert_course_manages() RETURNS TRIGGER AS $$
 	BEGIN
 		SELECT c_name INTO course_name
 		FROM CourseDetails
-		WHERE c_id = NEW.c_id;
+		WHERE c_code = NEW.c_code;
 
 		SELECT u_name INTO user_name
 		FROM Accounts
 		WHERE u_id = NEW.p_id;
 
 		INSERT INTO CourseManages
-		VALUES (NEW.c_id, course_name, NEW.c_year, NEW.c_sem, NEW.p_id, user_name);
+		VALUES (NEW.c_code, course_name, NEW.c_year, NEW.c_sem, NEW.p_id, user_name);
 		
 		RETURN NEW;
 	END;
@@ -212,9 +212,9 @@ BEFORE INSERT OR UPDATE ON Manages
 FOR EACH ROW EXECUTE PROCEDURE f_insert_course_manages();
 
 CREATE OR REPLACE VIEW CourseTeachingStaff AS (
-	SELECT c_id, c_name, p_id as t_id, u_name as name, 'Professor' as role FROM CourseManages
+	SELECT c_code, c_name, p_id as t_id, u_name as name, 'Professor' as role FROM CourseManages
 	UNION
-	SELECT c_id, c_name, s_id as t_id, u_name as name, 'Teaching Assistant' as role FROM CourseEnrollments 
+	SELECT c_code, c_name, s_id as t_id, u_name as name, 'Teaching Assistant' as role FROM CourseEnrollments 
 	WHERE req_type = 0
 ); 
 
@@ -226,16 +226,16 @@ CREATE TABLE student_info (
 
 CREATE TABLE Forums (
 	p_id			varchar(9) REFERENCES Professors (p_id),
-	c_id			varchar(9),
+	c_code			varchar(9),
 	c_year			smallint,
 	c_sem			smallint,
 	f_datetime		timestamp NOT NULL,
 	f_topic			varchar(100) NOT NULL,
-	PRIMARY KEY (c_id, c_year, c_sem, f_datetime),
-	FOREIGN KEY (c_id, c_year, c_sem) REFERENCES CourseYearSem (c_id, c_year, c_sem) ON DELETE CASCADE
+	PRIMARY KEY (c_code, c_year, c_sem, f_datetime),
+	FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE
 
 	/* Primary key rationale:
-	c_id, c_year, c_sem (to identify the course).
+	c_code, c_year, c_sem (to identify the course).
 	f_datetime (to identify a forum).
 	
 	1) Professors may create many forums with the same f_topic (e.g. to be assigned to different groups).
@@ -245,7 +245,7 @@ CREATE TABLE Forums (
 );
 
 CREATE TABLE ForumEntries (
-	c_id			varchar(9) NOT NULL,
+	c_code			varchar(9) NOT NULL,
 	c_year			smallint,
 	c_sem			smallint,
 	f_datetime		timestamp NOT NULL,
@@ -253,12 +253,12 @@ CREATE TABLE ForumEntries (
 	e_datetime		timestamp NOT NULL,
 	e_content		varchar(1000) NOT NULL,
 	e_deleted_by	varchar(9) DEFAULT NULL,
-	PRIMARY KEY (c_id, c_year, c_sem, f_datetime, u_id, e_datetime),
+	PRIMARY KEY (c_code, c_year, c_sem, f_datetime, u_id, e_datetime),
 	FOREIGN KEY (e_deleted_by) REFERENCES Accounts (u_id),
-	FOREIGN KEY (c_id, c_year, c_sem, f_datetime) REFERENCES Forums(c_id, c_year, c_sem, f_datetime) ON DELETE CASCADE
+	FOREIGN KEY (c_code, c_year, c_sem, f_datetime) REFERENCES Forums(c_code, c_year, c_sem, f_datetime) ON DELETE CASCADE
 	
 	/* Primary key rationale:
-	c_id, c_year, c_sem, f_datetime (to identify the forum).
+	c_code, c_year, c_sem, f_datetime (to identify the forum).
 	u_id and e_datetime (to identify an entry).
 	
 	1) Multiple entries can be posted at the same time by different users.
@@ -269,18 +269,18 @@ CREATE TABLE ForumEntries (
 );
 
 CREATE TABLE ForumsGroups (
-	c_id			varchar(9),
+	c_code			varchar(9),
 	c_year			smallint,
 	c_sem			smallint,
 	f_datetime		timestamp NOT NULL,
 	g_num			integer,
-	PRIMARY KEY (c_id, f_datetime, g_num),
-	FOREIGN KEY (c_id, c_year, c_sem, g_num) REFERENCES CourseGroups (c_id, c_year, c_sem, g_num) ON DELETE CASCADE,
-	FOREIGN KEY (c_id, c_year, c_sem, f_datetime) REFERENCES Forums (c_id, c_year, c_sem, f_datetime) ON DELETE CASCADE
+	PRIMARY KEY (c_code, f_datetime, g_num),
+	FOREIGN KEY (c_code, c_year, c_sem, g_num) REFERENCES CourseGroups (c_code, c_year, c_sem, g_num) ON DELETE CASCADE,
+	FOREIGN KEY (c_code, c_year, c_sem, f_datetime) REFERENCES Forums (c_code, c_year, c_sem, f_datetime) ON DELETE CASCADE
 );
 
 CREATE TABLE ForumEntriesLog (
-	c_id				varchar(9) NOT NULL,
+	c_code				varchar(9) NOT NULL,
 	c_year				smallint,
 	c_sem				smallint,
 	f_datetime			timestamp NOT NULL,
@@ -292,14 +292,14 @@ CREATE TABLE ForumEntriesLog (
 	e_delete_id			varchar(9) NOT NULL,
 	e_delete_name		varchar(100) NOT NULL,
 	e_delete_datetime	timestamp NOT NULL,
-	PRIMARY KEY (c_id, c_year, c_sem, f_datetime, e_author_id, e_datetime)
+	PRIMARY KEY (c_code, c_year, c_sem, f_datetime, e_author_id, e_datetime)
 );
 
 -- Replace the formatted f_datetime with the actual f_datetime timestamp in Forums table
 CREATE OR REPLACE FUNCTION replace_f_datetime()
 RETURNS trigger AS $$ 
 BEGIN
-	NEW.f_datetime :=(SELECT f_datetime FROM Forums WHERE TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(NEW.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') AND c_id = NEW.c_id AND c_year = NEW.c_year AND c_sem = NEW.c_sem);
+	NEW.f_datetime :=(SELECT f_datetime FROM Forums WHERE TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(NEW.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') AND c_code = NEW.c_code AND c_year = NEW.c_year AND c_sem = NEW.c_sem);
 RETURN NEW;
 END; $$ LANGUAGE 'plpgsql';
 
@@ -320,7 +320,7 @@ CREATE OR REPLACE FUNCTION bef_delete_forum()
 RETURNS trigger AS $$ 
 BEGIN
 	DELETE FROM ForumEntries
-	WHERE c_id = OLD.c_id
+	WHERE c_code = OLD.c_code
 	AND c_year = OLD.c_year
 	AND c_sem = OLD.c_sem
 	AND f_datetime = OLD.f_datetime;
@@ -343,7 +343,7 @@ BEGIN
 	SELECT f_topic INTO forum_topic
 	FROM Forums
 	WHERE f_datetime = OLD.f_datetime
-	AND c_id = OLD.c_id
+	AND c_code = OLD.c_code
 	AND c_year = OLD.c_year
 	AND c_sem = OLD.c_sem;
 
@@ -356,7 +356,7 @@ BEGIN
 	WHERE u_id = OLD.e_deleted_by;
 
 	INSERT into ForumEntriesLog 
-	VALUES (OLD.c_id, OLD.c_year, OLD.c_sem, OLD.f_datetime, forum_topic, OLD.u_id, author_name, OLD.e_datetime, OLD.e_content, OLD.e_deleted_by, delete_name, NOW());
+	VALUES (OLD.c_code, OLD.c_year, OLD.c_sem, OLD.f_datetime, forum_topic, OLD.u_id, author_name, OLD.e_datetime, OLD.e_content, OLD.e_deleted_by, delete_name, NOW());
 RETURN OLD;
 END; $$ LANGUAGE 'plpgsql';
 
@@ -380,7 +380,7 @@ INSERT INTO Accounts VALUES ('P0000002B', 'John', 'B');
 INSERT INTO Professors VALUES ('P0000001A');
 INSERT INTO Professors VALUES ('P0000002B');
 
--- CourseDetails(c_id, c_name, c_desc) -> c_id
+-- CourseDetails(c_code, c_name, c_desc) -> c_code
 INSERT INTO CourseDetails VALUES ('CS2102', 'Database Systems I', 'The aim of this module is to introduce the fundamental concepts and techniques necessary for the understanding and practice of design and implementation of database applications and of the management of data with relational database management systems. The module covers practical and theoretical aspects of design with entity-relationship model, theory of functional dependencies and normalisation by decomposition in second, third and Boyce-Codd normal forms. The module covers practical and theoretical aspects of programming with SQL data definition and manipulation sublanguages, relational tuple calculus, relational domain calculus and relational algebra.');
 INSERT INTO CourseDetails VALUES ('CS3102', 'Database Systems II', 'This module provides an in-depth study of the concepts and implementation issues related to database management systems. It first covers the physical implementation of relational data model, which includes storage management, access methods, query processing, and optimisation. Then it covers issues and techniques dealing with multi-user application environments, namely, transactions, concurrency control and recovery. The third part covers object-database systems that are useful extension of relational databases to deal with complex data types. The last part covers database technologies required for modern decision support systems, including data warehousing, data mining and knowledge discovery and on-line analytical processing.');
 INSERT INTO CourseDetails VALUES ('CS4102', 'Database Systems III', 'This module studies the management of data in a distributed environment. It covers the fundamental principles of distributed data management and includes distribution design, data integration, distributed query processing and optimization, distributed transaction management, and replication. It will also look at how these techniques can be adapted to support database management in emerging technologies (e.g., parallel systems, peer-to-peer systems, cloud computing).');
@@ -395,7 +395,7 @@ INSERT INTO CourseDetails VALUES ('CS2030', 'Programming Methodology II', 'This 
 INSERT INTO CourseDetails VALUES ('CS4215', 'Programming Language implementation', 'This module provides the students with theoretical knowledge and practical skill in the implementation of programming languages. It discusses implementation aspects of fundamental programming paradigms (imperative, functional and object-oriented), and of basic programming language concepts such as binding, scope, parameter-passing mechanisms and types. It introduces the language processing techniques of interpretation and compilation and virtual machines. The lectures are accompanied by lab sessions which will focus on language processing tools, and take the student through a sequence of programming language implementations. This modules also covers automatic memory management, dynamic linking and just-in-time compilation, as features of modern execution systems.');
 INSERT INTO CourseDetails VALUES ('CS2100', 'Computer Organizations', 'The objective of this module is to familiarise students with the fundamentals of computing devices. Through this module students will understand the basics of data representation, and how the various parts of a computer work, separately and with each other. This allows students to understand the issues in computing devices, and how these issues affect the implementation of solutions. Topics covered include data representation systems, combinational and sequential circuit design techniques, assembly language, processor execution cycles, pipelining, memory hierarchy and input/output systems.');
 
--- CourseYearSem(c_id, c_year, c_sem, c_capacity) -> c_id, c_year, c_sem
+-- CourseYearSem(c_code, c_year, c_sem, c_capacity) -> c_code, c_year, c_sem
 INSERT INTO CourseYearSem VALUES ('CS2102', 2018, 1, 100);
 INSERT INTO CourseYearSem VALUES ('CS2102', 2019, 1, 200);
 INSERT INTO CourseYearSem VALUES ('CS3102', 2019, 1, 200);
@@ -411,7 +411,7 @@ INSERT INTO CourseYearSem VALUES ('CS2030', 2019, 1, 200);
 INSERT INTO CourseYearSem VALUES ('CS4215', 2019, 1, 200);
 INSERT INTO CourseYearSem VALUES ('CS2100', 2019, 1, 200);
 
--- Manages(p_id, c_id) -> p_id, c_id
+-- Manages(p_id, c_code) -> p_id, c_code
 INSERT INTO Manages VALUES ('P0000001A','CS2102', 2018, 1);
 INSERT INTO Manages VALUES ('P0000001A','CS2102', 2019, 1);
 INSERT INTO Manages VALUES ('P0000001A','CS2100', 2019, 1);
@@ -428,7 +428,7 @@ INSERT INTO Students VALUES ('A0000004D', 3,'SOC');
 INSERT INTO Students VALUES ('A0000005E', 3,'FOE');
 INSERT INTO Students VALUES ('A0000006F', 4,'SOC');
 
--- CourseGroups (c_id, c_year, c_sem, g_num, g_capacity) --> c_id, c_year, c_sem, g_num
+-- CourseGroups (c_code, c_year, c_sem, g_num, g_capacity) --> c_code, c_year, c_sem, g_num
 INSERT INTO CourseGroups VAlUES ('CS2102', 2018, 1, 999, 999);
 INSERT INTO CourseGroups VAlUES ('CS2102', 2019, 1, 1, 5);
 INSERT INTO CourseGroups VAlUES ('CS2102', 2019, 1, 2, 5);
@@ -436,7 +436,7 @@ INSERT INTO CourseGroups VAlUES ('CS2102', 2019, 1, 3, 5);
 INSERT INTO CourseGroups VAlUES ('CS2102', 2019, 1, 4, 5);
 INSERT INTO CourseGroups VAlUES ('CS2100', 2019, 1, 1, 5);
 
--- Enrollments (s_id, c_id, c_year, c_sem, req_type, req_datetime, p_id, req_status) --> s_id, c_id, c_year, c_sem, req_datetime
+-- Enrollments (s_id, c_code, c_year, c_sem, req_type, req_datetime, p_id, req_status) --> s_id, c_code, c_year, c_sem, req_datetime
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', FALSE); 
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000006F', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
@@ -453,7 +453,7 @@ INSERT INTO Enrollments VALUES ('A0000001A', 'CS2030', 2019, 1, 0, NOW(), 'P0000
 INSERT INTO Enrollments VALUES ('A0000001A', 'BM5125', 2019, 1, 0, NOW(), NULL, FALSE); 
 INSERT INTO Enrollments VALUES ('A0000004D', 'CS4215', 2019, 1, 0, NOW(), 'P0000001A', TRUE); 
 
--- StudentGroups (c_id, c_year, c_sem, g_num, s_id) --> c_id, c_year, c_sem, g_num, s_id
+-- StudentGroups (c_code, c_year, c_sem, g_num, s_id) --> c_code, c_year, c_sem, g_num, s_id
 INSERT INTO StudentGroups VAlUES ('CS2102', 2018, 1, 999, 'A0000006F');
 INSERT INTO StudentGroups VAlUES ('CS2102', 2019, 1, 4, 'A0000001A');
 INSERT INTO StudentGroups VAlUES ('CS2100', 2019, 1, 2, 'A0000001A');
