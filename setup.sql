@@ -78,7 +78,9 @@ CREATE OR REPLACE FUNCTION f_is_student_enrolled() RETURNS TRIGGER AS $$
 	BEGIN
 		IF NEW.s_id = (SELECT s_id FROM CourseEnrollments
 			WHERE s_id = NEW.s_id
-			AND c_id = NEW.c_id) THEN
+			AND c_id = NEW.c_id
+			AND c_year = NEW.c_year
+			AND c_sem = NEW.c_sem) THEN
 				RETURN NEW;
 		END IF;
 		
