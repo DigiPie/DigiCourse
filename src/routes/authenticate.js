@@ -51,7 +51,7 @@ router.get('/login', function (req, res, next) {
 router.get('/logout', function (req, res, next) {
   // If user is already logged out, redirect to login page
   if (req.user) {
-    req.flash('info', 'Logged out of ' + req.user.u_id);
+    req.flash('info', 'Logged out of ' + req.user.u_username);
 	  req.logout();
   }
 

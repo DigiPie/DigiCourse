@@ -16,12 +16,14 @@ router.get('/', function(req, res, next) {
     
     // Checks whether the user is an approved TA of the course or a professor managing the course (to allow deletion of forum entries).
     var check_forum_privilege = 
-    'SELECT u_id, CASE'
+    'SELECT u_username, CASE'
     + ' WHEN' 
     + ' ( SELECT COUNT(*)' 
     + '   FROM Enrollments' 
     + '   WHERE s_id = $1' 
-    + '   AND c_id = $2' 
+    + '   AND c_code = $2' 
+    + '   AND c_year = $3'
+    + '   AND c_sem = $4'
     + '   AND req_type = 0' 
     + '   AND req_status = \'TRUE\''
     + ' ) = 1 THEN \'Teaching\''
@@ -29,22 +31,26 @@ router.get('/', function(req, res, next) {
     + ' ( SELECT COUNT(*)' 
     + '   FROM Manages' 
     + '   WHERE p_id = $1'
-    + '   AND c_id = $2'
+    + '   AND c_code = $2'
+    + '   AND c_year = $3'
+    + '   AND c_sem = $4'
     + ' ) = 1 THEN \'Professor\''
-    + ' ELSE \'null\''
-    + ' END AS u_type'
-    + ' FROM Accounts'
-    + ' WHERE u_id = $1';   
+	+ ' ELSE \'null\''
+	+ ' END AS u_type'
+	+ ' FROM Accounts'
+    + ' WHERE u_username = $1';
 	
     var show_entries = 
-    'SELECT fe.u_id, u_name, TO_CHAR(e_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted, e_content'
+    'SELECT fe.u_username, u_name, TO_CHAR(e_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted, e_content'
     + ' FROM ForumEntries fe JOIN Accounts a'
-    + ' ON fe.u_id = a.u_id'
-    + ' WHERE c_id = $1' 
+    + ' ON fe.u_username = a.u_username'
+    + ' WHERE c_code = $1'
+    + ' AND c_year = $3'
+    + ' AND c_sem = $4'
     + ' AND TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $2'
     + ' ORDER BY e_datetime';
 
-	pool.query(check_forum_privilege, [req.user.u_id, req.cid], (err, result) => {
+	pool.query(check_forum_privilege, [req.user.u_username, req.cid, req.year, req.sem], (err, result) => {
         var f_delete_privilege = false; // Students (non-teaching assistant) cannot delete any forum entries.
 
         if (result.rows.length == 1) {
@@ -53,7 +59,7 @@ router.get('/', function(req, res, next) {
             }
         }
 
-        pool.query(show_entries, [req.cid, req.f_datetime], (err, entries) => {
+        pool.query(show_entries, [req.cid, req.f_datetime, req.year, req.sem], (err, entries) => {
             res.render('entries', {
                 isCourse: req.isCourse,
                 username: req.user.u_name,
@@ -83,7 +89,7 @@ router.post('/post', function(req, res, next) {
         res.status(500).redirect('back');
     
     } else {
-        var insert_new_entry = `INSERT INTO ForumEntries VAlUES ('${req.cid}', '${req.f_datetime}', '${req.user.u_id}', NOW(), '${req.body.e_content}')`;
+        var insert_new_entry = `INSERT INTO ForumEntries VAlUES ('${req.cid}', '${req.year}', '${req.sem}', '${req.f_datetime}', '${req.user.u_username}', NOW(), '${req.body.e_content}')`;
 
         pool.query(insert_new_entry, (err, data) => {
             if (err) {
@@ -106,19 +112,25 @@ router.post('/delete/:e_author/:e_datetime', function(req, res, next) {
     'UPDATE ForumEntries' 
     + ' SET e_deleted_by = $1'
     + ' WHERE TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $2'
-    + ' AND u_id = $3'
+    + ' AND u_username = $3'
     + ' AND TO_CHAR(e_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $4'
-    + ' AND c_id = $5'
+    + ' AND c_code = $5'
+    + ' AND c_year = $6'
+    + ' AND c_sem = $7'
     + ' AND'
-    + ' ( c_id IN'
-    + '   ( SELECT m.c_id'
+    + ' ( c_code IN'
+    + '   ( SELECT m.c_code'
     + '     FROM Manages m'
     + '     WHERE p_id = $1'
+    + '     AND c_year = $6'
+    + '     AND c_sem = $7'
     + '   )'
-    + ' OR c_id IN'
-    + '    ( SELECT e.c_id'
+    + ' OR c_code IN'
+    + '    ( SELECT e.c_code'
     + '      FROM Enrollments e'
     + '      WHERE s_id = $1'
+    + '      AND c_year = $6'
+    + '      AND c_sem = $7'
     + '      AND req_type = 0'
     + '      AND req_status = \'TRUE\''
     + '    )'
@@ -127,18 +139,20 @@ router.post('/delete/:e_author/:e_datetime', function(req, res, next) {
     var delete_entry =
     'DELETE FROM ForumEntries'
     + ' WHERE TO_CHAR(e_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $1'
-    + ' AND u_id = $2'
-    + ' AND c_id = $3'
+    + ' AND u_username = $2'
+    + ' AND c_code = $3'
+    + ' AND c_year = $5'
+    + ' AND c_sem = $6'
     + ' AND TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $4';
 
-    pool.query(update_deleted_by, [req.user.u_id, req.f_datetime, req.params.e_author, req.params.e_datetime, req.cid], (err, result) => {
+    pool.query(update_deleted_by, [req.user.u_username, req.f_datetime, req.params.e_author, req.params.e_datetime, req.cid, req.year, req.sem], (err, result) => {
 
         if (err || result.rowCount == 0) {
             req.flash('delFail', 'Unable to delete entry. Please try again.');
             res.status(500).redirect('back');
         
         } else {
-            pool.query(delete_entry, [req.params.e_datetime, req.params.e_author, req.cid, req.f_datetime], (err, data) => {
+            pool.query(delete_entry, [req.params.e_datetime, req.params.e_author, req.cid, req.f_datetime, req.year, req.sem], (err, data) => {
                 if (err || data.rowCount == 0) {
                     req.flash('delFail', 'Unable to delete entry. Please try again.');
                     res.status(500).redirect('back');

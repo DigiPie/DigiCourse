@@ -19,12 +19,14 @@ router.get('/', function(req, res, next) {
 
     // Checks whether the user is an approved TA of the course or a professor managing the course (to allow access to all forums in the course).
     var check_forum_privilege = 
-    'SELECT u_id, CASE'
+    'SELECT u_username, CASE'
     + ' WHEN' 
     + ' ( SELECT COUNT(*)' 
     + '   FROM Enrollments' 
     + '   WHERE s_id = $1' 
-    + '   AND c_id = $2' 
+    + '   AND c_code = $2' 
+    + '   AND c_year = $3'
+    + '   AND c_sem = $4'
     + '   AND req_type = 0' 
     + '   AND req_status = \'TRUE\''
     + ' ) = 1 THEN \'Teaching\''
@@ -32,14 +34,16 @@ router.get('/', function(req, res, next) {
     + ' ( SELECT COUNT(*)' 
     + '   FROM Manages' 
     + '   WHERE p_id = $1'
-    + '   AND c_id = $2'
+    + '   AND c_code = $2'
+    + '   AND c_year = $3'
+    + '   AND c_sem = $4'
     + ' ) = 1 THEN \'Professor\''
 	+ ' ELSE \'null\''
 	+ ' END AS u_type'
 	+ ' FROM Accounts'
-    + ' WHERE u_id = $1';
+    + ' WHERE u_username = $1';
         
-    pool.query(check_forum_privilege, [req.user.u_id, req.cid], (err, result) => {
+    pool.query(check_forum_privilege, [req.user.u_username, req.cid, req.year, req.sem], (err, result) => {
         if (result.rows.length != 1) {
             req.flash('error','Login is required.');
             return res.redirect('/login');
@@ -52,7 +56,9 @@ router.get('/', function(req, res, next) {
                 show_forums = 
                 `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM Forums 
-                WHERE c_id =\'${req.cid}\'
+                WHERE c_code =\'${req.cid}\'
+                AND c_year =\'${req.year}\'
+                AND c_sem =\'${req.sem}\'
                 ORDER BY f_datetime`;
             
             } else {
@@ -61,13 +67,19 @@ router.get('/', function(req, res, next) {
                 `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM 
                 ( StudentGroups sg JOIN ForumsGroups fg
-                  ON sg.c_id = fg.c_id
+                  ON sg.c_code = fg.c_code
+                  AND sg.c_year = fg.c_year
+                  AND sg.c_sem = fg.c_sem
                   AND sg.g_num = fg.g_num
                 ) JOIN Forums f
                 ON f.f_datetime = fg.f_datetime
-                AND f.c_id = fg.c_id 
-                WHERE fg.c_id =\'${req.cid}\'
-                AND sg.s_id =\'${req.user.u_id}\'
+                AND f.c_code = fg.c_code
+                AND f.c_year = fg.c_year
+                AND f.c_sem = fg.c_sem
+                WHERE fg.c_code =\'${req.cid}\'
+                AND fg.c_year =\'${req.year}\'
+                AND fg.c_sem =\'${req.sem}\'
+                AND sg.s_id =\'${req.user.u_username}\'
                 ORDER BY f.f_datetime`;
             }
 
@@ -93,7 +105,7 @@ router.post('/create', function(req, res, next) {
         return;
     }
 
-    var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_id}', '${req.cid}', NOW(), '${req.body.f_topic}')`;
+    var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_username}', '${req.cid}', '${req.year}', '${req.sem}', NOW(), '${req.body.f_topic}')`;
 
     pool.query(insert_new_forum, (err, data) => {
         if (err) {
@@ -114,19 +126,25 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
     'UPDATE ForumEntries' 
     + ' SET e_deleted_by = $1'
     + ' WHERE TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $2'
-    + ' AND c_id = $3'
-    + ' AND c_id IN'
-    + ' ( SELECT m.c_id'
+    + ' AND c_code = $3'
+    + ' AND c_year = $4'
+    + ' AND c_sem = $5'
+    + ' AND c_code IN'
+    + ' ( SELECT m.c_code'
     + '   FROM Manages m'
     + '   WHERE m.p_id = $1'
+    + '   AND m.c_year = $4'
+    + '   AND m.c_sem = $5'
     + ' )';
     
     var delete_forum =
     'DELETE FROM Forums'
     + ' WHERE TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $1'
-    + ' AND c_id = $2';
+    + ' AND c_code = $2'
+    + ' AND c_year = $3'
+    + ' AND c_sem = $4';
 
-    pool.query(update_deleted_by, [req.user.u_id, req.params.f_datetime, req.cid], (err, result) => {
+    pool.query(update_deleted_by, [req.user.u_username, req.params.f_datetime, req.cid, req.year, req.sem], (err, result) => {
         if (err) {
             // Unable to update 'e_deleted_by' col of entries tied to this forum, do not proceed to delete.
             req.flash('delFail', 'Unable to delete forum. Please try again.');
@@ -134,7 +152,7 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
 
         } else {
             // Successfully updated 'e_deleted_by' col of entries tied to the forum, proceed to delete.
-            pool.query(delete_forum, [req.params.f_datetime, req.cid], (err, data) => {
+            pool.query(delete_forum, [req.params.f_datetime, req.cid, req.year, req.sem], (err, data) => {
                 if (err) {
                     req.flash('delFail', 'Unable to delete forum. Please try again.');
                     res.status(500).redirect('back');
