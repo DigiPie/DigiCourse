@@ -31,7 +31,20 @@ router.post('/', function(req, res, next) {
     }
 
 	 // Prepare SQL Statement
-	var sql_query = "SELECT * FROM Courses WHERE LOWER(c_name) LIKE LOWER($1) OR LOWER(c_code) LIKE LOWER($1)";
+	var sql_query = `
+		WITH CurrentSemCourses AS (
+			SELECT c_code, c_year, c_sem, c_capacity
+			FROM CourseYearSem NATURAL JOIN (
+				SELECT c_year, c_sem 
+				FROM CourseYearSem
+				GROUP BY c_year, c_sem
+				ORDER BY c_year DESC, c_sem DESC
+				LIMIT 1 
+				) AS yearsem
+		)
+		SELECT * FROM CurrentSemCourses NATURAL JOIN CourseDetails
+		WHERE LOWER(c_name) LIKE LOWER($1) OR LOWER(c_code) LIKE LOWER($1)
+	`;
 
 	// Query
 	pool.query(sql_query, ['%' + req.body.searchBox + '%'], (err, data) => {
