@@ -37,7 +37,7 @@ router.get('/', function(req, res, next) {
                 isCourse: req.isCourse, 
                 username: req.user.u_name,
                 accountType: req.user.u_type,
-                uid: req.user.u_id, 
+                uid: req.user.u_username, 
                 cid: req.cid,
                 data: req.data,
                 datarows: data.rows,

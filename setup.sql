@@ -17,13 +17,13 @@ DROP TABLE IF EXISTS ForumEntriesLog CASCADE;
 DROP TABLE IF EXISTS ForumsGroups CASCADE;
 
 CREATE TABLE Accounts (
-	u_id  		varchar(9) PRIMARY KEY,
+	u_username  		varchar(9) PRIMARY KEY,
 	u_name 		varchar(100) NOT NULL,
 	passwd   	varchar(64) NOT NULL
 );
 
 CREATE TABLE Professors (
-	p_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_id)
+	p_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_username)
 );
 
 CREATE TABLE CourseDetails (
@@ -44,7 +44,7 @@ CREATE TABLE CourseYearSem (
 );
 
 CREATE TABLE Students (
-	s_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_id),
+	s_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_username),
 	yr_study 	integer NOT NULL,
 	major		varchar(100) NOT NULL,
 	CHECK (yr_study > 0 AND yr_study < 10)
@@ -161,7 +161,7 @@ CREATE OR REPLACE FUNCTION f_insert_course_enrollments() RETURNS TRIGGER AS $$
 
 		SELECT u_name INTO user_name
 		FROM Accounts
-		WHERE u_id = NEW.s_id;
+		WHERE u_username = NEW.s_id;
 
 		INSERT INTO CourseEnrollments
 		VALUES (NEW.c_code, NEW.c_year, NEW.c_sem, course_name, NEW.s_id, user_name, NEW.req_type);
@@ -181,7 +181,7 @@ CREATE TABLE CourseManages (
 	c_name		varchar(200),
 	c_year		smallint,
 	c_sem		smallint,
-	p_id		varchar(9) REFERENCES Accounts (u_id),
+	p_id		varchar(9) REFERENCES Accounts (u_username),
 	u_name		varchar(100),
 	PRIMARY KEY (c_code, c_year, c_sem, p_id),
 	FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE
@@ -198,7 +198,7 @@ CREATE OR REPLACE FUNCTION f_insert_course_manages() RETURNS TRIGGER AS $$
 
 		SELECT u_name INTO user_name
 		FROM Accounts
-		WHERE u_id = NEW.p_id;
+		WHERE u_username = NEW.p_id;
 
 		INSERT INTO CourseManages
 		VALUES (NEW.c_code, course_name, NEW.c_year, NEW.c_sem, NEW.p_id, user_name);
@@ -249,22 +249,22 @@ CREATE TABLE ForumEntries (
 	c_year			smallint,
 	c_sem			smallint,
 	f_datetime		timestamp NOT NULL,
-	u_id			varchar(9) REFERENCES Accounts (u_id),
+	u_username			varchar(9) REFERENCES Accounts (u_username),
 	e_datetime		timestamp NOT NULL,
 	e_content		varchar(1000) NOT NULL,
 	e_deleted_by	varchar(9) DEFAULT NULL,
-	PRIMARY KEY (c_code, c_year, c_sem, f_datetime, u_id, e_datetime),
-	FOREIGN KEY (e_deleted_by) REFERENCES Accounts (u_id),
+	PRIMARY KEY (c_code, c_year, c_sem, f_datetime, u_username, e_datetime),
+	FOREIGN KEY (e_deleted_by) REFERENCES Accounts (u_username),
 	FOREIGN KEY (c_code, c_year, c_sem, f_datetime) REFERENCES Forums(c_code, c_year, c_sem, f_datetime) ON DELETE CASCADE
 	
 	/* Primary key rationale:
 	c_code, c_year, c_sem, f_datetime (to identify the forum).
-	u_id and e_datetime (to identify an entry).
+	u_username and e_datetime (to identify an entry).
 	
 	1) Multiple entries can be posted at the same time by different users.
 	2) The same user can post multiple entries within a forum.
 	3) A normal user cannot possibly post multiple entries at the same time within a forum.
-	Hence both u_id and e_datetime have to be used to identify an entry within a forum.
+	Hence both u_username and e_datetime have to be used to identify an entry within a forum.
 	*/
 );
 
@@ -349,14 +349,14 @@ BEGIN
 
 	SELECT u_name INTO author_name
 	FROM Accounts
-	WHERE u_id = OLD.u_id;
+	WHERE u_username = OLD.u_username;
 
 	SELECT u_name INTO delete_name
 	FROM Accounts
-	WHERE u_id = OLD.e_deleted_by;
+	WHERE u_username = OLD.e_deleted_by;
 
 	INSERT into ForumEntriesLog 
-	VALUES (OLD.c_code, OLD.c_year, OLD.c_sem, OLD.f_datetime, forum_topic, OLD.u_id, author_name, OLD.e_datetime, OLD.e_content, OLD.e_deleted_by, delete_name, NOW());
+	VALUES (OLD.c_code, OLD.c_year, OLD.c_sem, OLD.f_datetime, forum_topic, OLD.u_username, author_name, OLD.e_datetime, OLD.e_content, OLD.e_deleted_by, delete_name, NOW());
 RETURN OLD;
 END; $$ LANGUAGE 'plpgsql';
 
@@ -366,7 +366,7 @@ ON ForumEntries
 FOR EACH ROW
 EXECUTE PROCEDURE bef_delete_entries();
 
--- Accounts(u_id, passwd) -> u_id
+-- Accounts(u_username, passwd) -> u_username
 INSERT INTO Accounts VALUES ('A0000001A', 'Leslie Cole', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
 INSERT INTO Accounts VALUES ('A0000002B', 'Myra Morgan', 'B');
 INSERT INTO Accounts VALUES ('A0000003C', 'Raymond Benson', 'C');

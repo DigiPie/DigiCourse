@@ -42,14 +42,14 @@ router.get('/:cid', function(req, res, next) {
 		year = cdata.rows[0].c_year;
 		sem = cdata.rows[0].c_sem;
 
-		pool.query(sql_query, [req.user.u_id, req.params.cid], (err, data) => {
+		pool.query(sql_query, [req.user.u_username, req.params.cid], (err, data) => {
 			courseName = data.rows;
 
 			res.render('course', {
 				isCourse: true, 
 				username: req.user.u_name,
 				accountType: req.user.u_type, 
-				uid: req.user.u_id,
+				uid: req.user.u_username,
 				cid: req.params.cid,
 				data: data.rows,
 			});

@@ -19,7 +19,7 @@ router.get('/', function(req, res, next) {
 
     // Checks whether the user is an approved TA of the course or a professor managing the course (to allow access to all forums in the course).
     var check_forum_privilege = 
-    'SELECT u_id, CASE'
+    'SELECT u_username, CASE'
     + ' WHEN' 
     + ' ( SELECT COUNT(*)' 
     + '   FROM Enrollments' 
@@ -41,9 +41,9 @@ router.get('/', function(req, res, next) {
 	+ ' ELSE \'null\''
 	+ ' END AS u_type'
 	+ ' FROM Accounts'
-    + ' WHERE u_id = $1';
+    + ' WHERE u_username = $1';
         
-    pool.query(check_forum_privilege, [req.user.u_id, req.cid, req.year, req.sem], (err, result) => {
+    pool.query(check_forum_privilege, [req.user.u_username, req.cid, req.year, req.sem], (err, result) => {
         if (result.rows.length != 1) {
             req.flash('error','Login is required.');
             return res.redirect('/login');
@@ -79,7 +79,7 @@ router.get('/', function(req, res, next) {
                 WHERE fg.c_code =\'${req.cid}\'
                 AND fg.c_year =\'${req.year}\'
                 AND fg.c_sem =\'${req.sem}\'
-                AND sg.s_id =\'${req.user.u_id}\'
+                AND sg.s_id =\'${req.user.u_username}\'
                 ORDER BY f.f_datetime`;
             }
 
@@ -105,7 +105,7 @@ router.post('/create', function(req, res, next) {
         return;
     }
 
-    var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_id}', '${req.cid}', '${req.year}', '${req.sem}', NOW(), '${req.body.f_topic}')`;
+    var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_username}', '${req.cid}', '${req.year}', '${req.sem}', NOW(), '${req.body.f_topic}')`;
 
     pool.query(insert_new_forum, (err, data) => {
         if (err) {
@@ -144,7 +144,7 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
     + ' AND c_year = $3'
     + ' AND c_sem = $4';
 
-    pool.query(update_deleted_by, [req.user.u_id, req.params.f_datetime, req.cid, req.year, req.sem], (err, result) => {
+    pool.query(update_deleted_by, [req.user.u_username, req.params.f_datetime, req.cid, req.year, req.sem], (err, result) => {
         if (err) {
             // Unable to update 'e_deleted_by' col of entries tied to this forum, do not proceed to delete.
             req.flash('delFail', 'Unable to delete forum. Please try again.');

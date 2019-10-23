@@ -17,18 +17,18 @@ router.get('/', function(req, res, next) {
 	// Prepare SQL Statement
 	var sql_query;
 	if (req.user.u_type == 'Professor') {
-		sql_query = 'SELECT C.c_code, C.c_name, S.s_id, u_name, E.req_type, TO_CHAR(E.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') AS req_datetime , E.req_status, E.p_id AS approver FROM Enrollments E NATURAL JOIN Courses C NATURAL JOIN Students S JOIN Accounts ON s.s_id = u_id WHERE EXISTS (SELECT 1 FROM Manages M WHERE M.c_code = E.c_code AND M.p_id = $1) ORDER BY E.req_status, approver DESC';
+		sql_query = 'SELECT C.c_code, C.c_name, S.s_id, u_name, E.req_type, TO_CHAR(E.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') AS req_datetime , E.req_status, E.p_id AS approver FROM Enrollments E NATURAL JOIN Courses C NATURAL JOIN Students S JOIN Accounts ON s.s_id = u_username WHERE EXISTS (SELECT 1 FROM Manages M WHERE M.c_code = E.c_code AND M.p_id = $1) ORDER BY E.req_status, approver DESC';
 	} else {
-		sql_query = 'SELECT C.c_code, C.c_name, S.s_id, u_name, E.req_type, TO_CHAR(E.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') AS req_datetime, E.req_status, E.p_id AS approver FROM Enrollments E NATURAL JOIN Courses C NATURAL JOIN Students S JOIN Accounts ON s.s_id = u_id WHERE s_id = $1 ORDER BY E.req_status, approver DESC';
+		sql_query = 'SELECT C.c_code, C.c_name, S.s_id, u_name, E.req_type, TO_CHAR(E.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') AS req_datetime, E.req_status, E.p_id AS approver FROM Enrollments E NATURAL JOIN Courses C NATURAL JOIN Students S JOIN Accounts ON s.s_id = u_username WHERE s_id = $1 ORDER BY E.req_status, approver DESC';
 	}
 
 	// Query
-	pool.query(sql_query, [req.user.u_id] , (err, data) => {
+	pool.query(sql_query, [req.user.u_username] , (err, data) => {
 		res.render('applicationStatus', { 
 			isCourse: false, 
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
-			uid: req.user.u_id,
+			uid: req.user.u_username,
 			datarows: data.rows,
 			dataNum: data.rowCount
 		});

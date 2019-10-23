@@ -30,12 +30,12 @@ router.get('/', function(req, res, next) {
 			// SELECT C.c_code FROM Courses C WHERE NOT EXISTS (SELECT 1 FROM Enrollments E WHERE E.c_code = C.c_code AND E.req_status=True AND E.s_id = 'A0000001A');
 
 	// Query
-	pool.query(sql_query, [req.user.u_id], (err, data) => {
+	pool.query(sql_query, [req.user.u_username], (err, data) => {
 		res.render('applicationRequest', {
 			isCourse: false, 
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
-			uid: req.user.u_id,
+			uid: req.user.u_username,
 			datarows: data.rows,
 			dataNum: data.rowCount
 		});
@@ -49,12 +49,12 @@ router.post('/', function(req, res, next) {
 		var sql_query = "SELECT C.c_code, C.c_name, (SELECT COUNT(*)=1 FROM Enrollments E WHERE E.c_code = C.c_code AND E.req_status=True AND E.p_id IS NOT NULL AND E.s_id = $1) AS enrolled FROM Courses C, Students S WHERE S.s_id = $1 AND (LOWER(c_name) LIKE LOWER($2) OR LOWER(c_code) LIKE LOWER($2)) ORDER BY enrolled";
 
 		// Query
-		pool.query(sql_query, [req.user.u_id, "%" + req.body.searchBox + "%"], (err, data) => {
+		pool.query(sql_query, [req.user.u_username, "%" + req.body.searchBox + "%"], (err, data) => {
 			res.render('applicationRequest', {
 				isCourse: false, 
 				username: req.user.u_name,
 				accountType: req.user.u_type, 
-				uid: req.user.u_id,
+				uid: req.user.u_username,
 				datarows: data.rows,
 				dataNum: data.rowCount
 			});
@@ -73,7 +73,7 @@ router.post('/', function(req, res, next) {
 		var sql_query = "INSERT INTO Enrollments VALUES ($1, $2, $3, NOW(), NULL, False)";
 
 		// Query
-		pool.query(sql_query, [req.user.u_id, cid, type], (err, data) => {
+		pool.query(sql_query, [req.user.u_username, cid, type], (err, data) => {
 			if (err) {
 				req.flash('error', 'Error. Please try again');
 				res.status(err.status || 500).redirect('back');

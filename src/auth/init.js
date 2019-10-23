@@ -13,8 +13,8 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 });
 
-function findUser (u_id, callback) {
-	pool.query(sql_query.query.select_user, [u_id], (err, data) => {
+function findUser (u_username, callback) {
+	pool.query(sql_query.query.select_user, [u_username], (err, data) => {
 		if(err) {
 			console.error("Unable to connect to database");
 			return callback(null);
@@ -25,7 +25,7 @@ function findUser (u_id, callback) {
 			return callback(null);
 		} else if(data.rows.length == 1) {
 			return callback(null, {
-        u_id: data.rows[0].u_id,
+        u_username: data.rows[0].u_username,
         u_name: data.rows[0].u_name,
         u_type: data.rows[0].u_type,
         passwd_hash: data.rows[0].passwd,
@@ -37,17 +37,17 @@ function findUser (u_id, callback) {
 }
 
 passport.serializeUser(function (user, cb) {
-  cb(null, user.u_id);
+  cb(null, user.u_username);
 })
 
-passport.deserializeUser(function (u_id, cb) {
-  findUser(u_id, cb);
+passport.deserializeUser(function (u_username, cb) {
+  findUser(u_username, cb);
 })
 
 function initPassport () {
   passport.use(new LocalStrategy(
-    (u_id, passwd, done) => {
-      findUser(u_id, (err, user) => {
+    (u_username, passwd, done) => {
+      findUser(u_username, (err, user) => {
         if (err) {
           return done(err);
         }

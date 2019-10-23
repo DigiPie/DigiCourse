@@ -23,12 +23,12 @@ router.get('/', function(req, res, next) {
 	}
 
 	// Query
-	pool.query(sql_query, [req.user.u_id] , (err, data) => {
+	pool.query(sql_query, [req.user.u_username] , (err, data) => {
 		res.render('dashboard', { 
 			isCourse: false, 
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
-			uid: req.user.u_id,
+			uid: req.user.u_username,
 			datarows: data.rows 
 		});
 	});

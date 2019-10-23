@@ -69,12 +69,12 @@
                       <tbody>
                         <% for (var i = 0; i < entries.length; i++) { %>
                         <tr>
-                          <td><%= entries[i].u_id %></td>
+                          <td><%= entries[i].u_username %></td>
                           <td><%= entries[i].u_name %></td>
                           <td><%= entries[i].e_content %></td>
                           <td><%= entries[i].formatted %></td>
                           <% if (f_delete_privilege == true) { %>
-                          <td><button type="submit" formaction="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/entries/delete/<%= entries[i].u_id %>/<%= entries[i].formatted %>" class="btn btn-primary">Delete</button></td>
+                          <td><button type="submit" formaction="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/entries/delete/<%= entries[i].u_username %>/<%= entries[i].formatted %>" class="btn btn-primary">Delete</button></td>
                           <% } %>
                         </tr>
                         <% } %>

@@ -24,7 +24,7 @@ router.post('/', function(req, res, next) {
 			isCourse: false, 
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
-			uid: req.user.u_id,
+			uid: req.user.u_username,
 			dataNum: 0,
 			searchPhrase: req.body.searchBox
 		});
@@ -39,7 +39,7 @@ router.post('/', function(req, res, next) {
 			isCourse: false, 
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
-			uid: req.user.u_id,
+			uid: req.user.u_username,
 			datarows: data.rows,
 			dataNum: data.rowCount,
 			searchPhrase: req.body.searchBox
