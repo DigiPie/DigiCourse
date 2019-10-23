@@ -211,13 +211,6 @@ CREATE TRIGGER insert_course_manages
 BEFORE INSERT OR UPDATE ON Manages
 FOR EACH ROW EXECUTE PROCEDURE f_insert_course_manages();
 
-CREATE OR REPLACE VIEW CourseTeachingStaff AS (
-	SELECT c_code, c_name, p_id as t_id, u_name as name, 'Professor' as role FROM CourseManages
-	UNION
-	SELECT c_code, c_name, s_id as t_id, u_name as name, 'Teaching Assistant' as role FROM CourseEnrollments 
-	WHERE req_type = 0
-); 
-
 CREATE TABLE student_info (
 	matric  varchar(9) PRIMARY KEY,
 	name    varchar(255) NOT NULL,
