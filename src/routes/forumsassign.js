@@ -30,14 +30,14 @@ router.get('/', function(req, res, next) {
     + '   AND f.c_year = $2'
     + '   AND f.c_sem = $3'
     + '   GROUP BY f.f_datetime, f.f_topic'
+    + '   HAVING COUNT(g_num) <'
+    + '       ( SELECT COUNT(*)'
+	+ '         FROM CourseGroups'
+    + '         WHERE c_id = $1'
+    + '         AND c_year = $2'
+    + '         AND c_sem = $3'
+    + '       )'
     + ' ) afg'
-    + ' WHERE afg.c <'
-	+ ' ( SELECT COUNT(*)'
-	+ '   FROM CourseGroups'
-    + '   WHERE c_id = $1'
-    + '   AND c_year = $2'
-    + '   AND c_sem = $3'
-    + ' )'
     + ' ORDER BY afg.f_datetime'; 
 
     // For each forum, retrieve a list of group numbers that haven't been assigned to the forum.
