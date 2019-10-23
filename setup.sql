@@ -438,6 +438,7 @@ INSERT INTO CourseGroups VAlUES ('CS2100', 2019, 1, 1, 5);
 
 -- Enrollments (s_id, c_id, c_year, c_sem, req_type, req_datetime, p_id, req_status) --> s_id, c_id, c_year, c_sem, req_datetime
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', FALSE); 
+INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000006F', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2019, 1, 1, NOW()); 
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2019, 1, 1, NOW()); 
