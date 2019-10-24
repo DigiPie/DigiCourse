@@ -31,8 +31,8 @@ router.get('/', async function(req, res, next) {
     }
 
     // Prepare SQL Statement
-    var sql_query1 = "SELECT * FROM Courses WHERE c_id = $1";
-    var sql_query2 = "SELECT * FROM CourseTeachingStaff WHERE c_id = $1";
+    var sql_query1 = "SELECT * FROM Courses WHERE c_code = $1";
+    var sql_query2 = "SELECT * FROM CourseTeachingStaff WHERE c_code = $1";
     
     // Query
     try {
@@ -43,7 +43,7 @@ router.get('/', async function(req, res, next) {
             isCourse: req.isCourse,
             username: req.user.u_name,
             accountType: req.user.u_type,
-            uid: req.user.u_id, 
+            uid: req.user.u_username, 
             cid: req.cid,
             data: req.data,
             courseData: data1.rows,

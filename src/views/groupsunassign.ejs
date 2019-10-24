@@ -69,7 +69,7 @@
                         <% for (var i = 0; i < datarows.length; i++) { %>
                         <tr>
                           <td class="min"><input type="checkbox" name="row[<%= i %>][selected]" ></td>
-                          <input type="hidden" name='row[<%= i %>][c_id]' value="<%= cid %>">
+                          <input type="hidden" name='row[<%= i %>][c_code]' value="<%= cid %>">
                           <td><input type="hidden" name='row[<%= i %>][s_id]' value="<%= datarows[i].s_id %>"><%= datarows[i].s_id %></td>
                           <td><%= datarows[i].u_name %></td>
                           <td><input type="hidden" name='row[<%= i %>][g_num]' value="<%= datarows[i].g_num %>"><%= datarows[i].g_num %></td>

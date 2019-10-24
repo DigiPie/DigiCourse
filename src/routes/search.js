@@ -24,14 +24,14 @@ router.post('/', function(req, res, next) {
 			isCourse: false, 
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
-			uid: req.user.u_id,
+			uid: req.user.u_username,
 			dataNum: 0,
 			searchPhrase: req.body.searchBox
 		});
     }
 
 	 // Prepare SQL Statement
-	var sql_query = "SELECT * FROM Courses WHERE LOWER(c_name) LIKE LOWER($1) OR LOWER(c_id) LIKE LOWER($1)";
+	var sql_query = "SELECT * FROM Courses WHERE LOWER(c_name) LIKE LOWER($1) OR LOWER(c_code) LIKE LOWER($1)";
 
 	// Query
 	pool.query(sql_query, ['%' + req.body.searchBox + '%'], (err, data) => {
@@ -39,7 +39,7 @@ router.post('/', function(req, res, next) {
 			isCourse: false, 
 			username: req.user.u_name,
 			accountType: req.user.u_type, 
-			uid: req.user.u_id,
+			uid: req.user.u_username,
 			datarows: data.rows,
 			dataNum: data.rowCount,
 			searchPhrase: req.body.searchBox

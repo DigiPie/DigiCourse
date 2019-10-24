@@ -80,9 +80,9 @@
                       <% for(var i=0; i < datarows.length; i++) { %>
                     <form action="/applicationRequest" method="post">
                       <tr>
-                        <input type="hidden" class="input-normal" name="c_id" value="<%= datarows[i].c_id %>"/>
+                        <input type="hidden" class="input-normal" name="c_code" value="<%= datarows[i].c_code %>"/>
                         <th scope="col"><%= i+1 %></th>
-                        <th scope="col"><%= datarows[i].c_id %></th>
+                        <th scope="col"><%= datarows[i].c_code %></th>
                         <th scope="col"><%= datarows[i].c_name %></th>
                         <th scope="col">
                           <% if (datarows[i].enrolled) { %>
