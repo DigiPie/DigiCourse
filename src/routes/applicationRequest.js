@@ -6,6 +6,8 @@ const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
 });
 
+var results;
+
 /**** Routing ****/
 router.get('/', function(req, res, next) {
 	// Authentication
@@ -149,7 +151,7 @@ router.post('/', function(req, res, next) {
 		FROM CourseYearSem
 		GROUP BY c_year, c_sem
 		ORDER BY c_year DESC, c_sem ASC
-		LIMIT 1`
+		LIMIT 1`;
 
 		// Query
 		pool.query(current_year_sem_query, (err1, cdata) => {

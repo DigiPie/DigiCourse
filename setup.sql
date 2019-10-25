@@ -1,4 +1,12 @@
 -- This file will be executed each time the project is deployed to Heroku
+DROP TRIGGER IF EXISTS is_student_enrolled ON StudentGroups;
+DROP TRIGGER IF EXISTS check_prof ON Enrollments;
+DROP TRIGGER IF EXISTS insert_course_enrollments ON Enrollments;
+DROP TRIGGER IF EXISTS bef_insert_enrollments ON Enrollments;
+DROP TRIGGER IF EXISTS insert_entry ON ForumEntries;
+DROP TRIGGER IF EXISTS insert_forum_group ON ForumsGroups;
+DROP TRIGGER IF EXISTS delete_forum ON Forums;
+DROP TRIGGER IF EXISTS delete_entries ON ForumEntries;
 DROP TABLE IF EXISTS StudentGroups CASCADE;
 DROP TABLE IF EXISTS CourseGroups CASCADE;
 DROP TABLE IF EXISTS CourseManages CASCADE;
@@ -176,44 +184,34 @@ FOR EACH ROW
 WHEN (NEW.req_status) 
 EXECUTE PROCEDURE f_insert_course_enrollments();
 
--- check if row can be inserted
 CREATE OR REPLACE FUNCTION f_before_insert_enrollments() RETURNS TRIGGER AS $$ 
-	DECLARE 
-		allowed	boolean;
 	BEGIN
+		IF (SELECT count(*)
+			FROM CourseYearSem
+			WHERE c_code = NEW.c_code 
+			AND c_year = NEW.c_year
+			AND c_sem = NEW.c_sem) <> 1 THEN
+			RAISE NOTICE 'Trigger course not offered in this semester';
+			RETURN NULL;
+		END IF;
 
 		-- if it is a TA application, verify that it can be applied
 		IF NEW.req_type <> 1 THEN
-			WITH CurrentSemCourses AS (
-				SELECT c_code, c_name, c_year, c_sem, c_capacity
-				FROM CourseDetails NATURAL JOIN CourseYearSem NATURAL JOIN (
-					SELECT c_year, c_sem 
-					FROM CourseYearSem
-					GROUP BY c_year, c_sem
-					ORDER BY c_year DESC, c_sem DESC
-					LIMIT 1 
-				) AS yearsem
-			)	
-			SELECT COUNT(*)=1 INTO allowed FROM Enrollments E 	-- all courses that user can be TA
-			WHERE E.s_id=NEW.s_id AND E.c_code=NEW.c_code AND E.req_type=1 AND E.p_id IS NOT NULL AND E.req_status=True
-				AND NOT EXISTS (				-- exclude all courses where user TA request is pending or rejected
-					SELECT 1 FROM Enrollments E2
-					WHERE E2.s_id=E.s_id AND E2.req_type=0 AND E2.c_code=E.c_code AND E2.req_status = FALSE
-				) AND NOT EXISTS (				-- exclude all courses that are not offered this semester
-					SELECT 1 FROM CurrentSemCourses C
-					WHERE E.c_code=C.c_code AND E.c_year=C.c_year AND E.c_sem=C.c_sem
-				);
-
-			IF allowed THEN 
+			IF (SELECT COUNT(*) FROM Enrollments E 	-- check if student has enrolled before as student
+				WHERE E.s_id = NEW.s_id 
+				AND E.c_code = NEW.c_code 
+				AND E.req_type = 1 
+				AND E.c_year < NEW.c_year
+				AND E.p_id IS NOT NULL 
+				AND E.req_status=True) = 1 THEN
 				RETURN NEW;
 			END IF;
 			
 			RAISE NOTICE 'Trigger invalid enrollment insertion';
 			RETURN NULL;
-		ELSE 
-			-- not TA application, just insert
-			RETURN NEW;
 		END IF;
+
+		RETURN NEW;
 	END;
 $$ LANGUAGE plpgsql;
 
