@@ -6,8 +6,6 @@ const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
 });
 
-var results;
-
 /**** Routing ****/
 router.get('/', function(req, res, next) {
 	// Authentication
