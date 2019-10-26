@@ -46,7 +46,8 @@ router.get('/', function(req, res, next) {
 			WHERE NOT EXISTS (						
 				SELECT 1 FROM Enrollments E
 				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1
-					AND ((E.p_id IS NOT NULL AND E.req_status=True) OR (E.p_id IS NULL AND E.req_status=False))
+					AND ((E.p_id IS NOT NULL AND E.req_status=True) 
+						OR (E.p_id IS NULL AND E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))
 			)
 			UNION
 			SELECT c_code, c_year, c_sem, True AS canbe_ta
@@ -100,7 +101,8 @@ router.post('/', function(req, res, next) {
 			WHERE NOT EXISTS (						
 				SELECT 1 FROM Enrollments E
 				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1
-					AND ((E.p_id IS NOT NULL AND E.req_status=True) OR (E.p_id IS NULL AND E.req_status=False))
+					AND ((E.p_id IS NOT NULL AND E.req_status=True) 
+						OR (E.p_id IS NULL AND E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))
 			)
 			UNION
 			SELECT c_code, c_year, c_sem, True AS canbe_ta
