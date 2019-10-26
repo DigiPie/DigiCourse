@@ -54,7 +54,7 @@ router.get('/', function(req, res, next) {
             if (result.rows[0].u_type == 'Teaching' || result.rows[0].u_type == 'Professor') {
                 // Approved teaching assistants and the professor(s) managing the course are able to view all forums. 
                 show_forums = 
-                `SELECT f_topic, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
+                `SELECT f_topic, p_id, TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM Forums 
                 WHERE c_code =\'${req.cid}\'
                 AND c_year =\'${req.year}\'
@@ -64,7 +64,7 @@ router.get('/', function(req, res, next) {
             } else {
                 // Students can only view the forums that are assigned to the group they belong in.
                 show_forums = 
-                `SELECT f_topic, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
+                `SELECT f_topic, p_id, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM 
                 ( StudentGroups sg JOIN ForumsGroups fg
                   ON sg.c_code = fg.c_code
@@ -73,6 +73,7 @@ router.get('/', function(req, res, next) {
                   AND sg.g_num = fg.g_num
                 ) JOIN Forums f
                 ON f.f_datetime = fg.f_datetime
+                AND f.p_id = fg.p_id
                 AND f.c_code = fg.c_code
                 AND f.c_year = fg.c_year
                 AND f.c_sem = fg.c_sem
@@ -119,7 +120,7 @@ router.post('/create', function(req, res, next) {
     });
 });
 
-router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
+router.post('/delete/:f_topic/:f_datetime/:p_id', function(req, res, next) {
     // Before deleting, update 'e_deleted_by' of all entries tied to this forum for audit trail purpose.
     // Update 'e_deleted_by' of all entries tied to this forum only if the user is a managing professor of the course.
     var update_deleted_by =
@@ -129,6 +130,7 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
     + ' AND c_code = $3'
     + ' AND c_year = $4'
     + ' AND c_sem = $5'
+    + ' AND p_id = $6'
     + ' AND c_code IN'
     + ' ( SELECT m.c_code'
     + '   FROM Manages m'
@@ -142,9 +144,10 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
     + ' WHERE TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $1'
     + ' AND c_code = $2'
     + ' AND c_year = $3'
-    + ' AND c_sem = $4';
+    + ' AND c_sem = $4'
+    + ' AND p_id = $5';
 
-    pool.query(update_deleted_by, [req.user.u_username, req.params.f_datetime, req.cid, req.year, req.sem], (err, result) => {
+    pool.query(update_deleted_by, [req.user.u_username, req.params.f_datetime, req.cid, req.year, req.sem, req.params.p_id], (err, result) => {
         if (err) {
             // Unable to update 'e_deleted_by' col of entries tied to this forum, do not proceed to delete.
             req.flash('delFail', 'Unable to delete forum. Please try again.');
@@ -152,7 +155,7 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
 
         } else {
             // Successfully updated 'e_deleted_by' col of entries tied to the forum, proceed to delete.
-            pool.query(delete_forum, [req.params.f_datetime, req.cid, req.year, req.sem], (err, data) => {
+            pool.query(delete_forum, [req.params.f_datetime, req.cid, req.year, req.sem, req.params.p_id], (err, data) => {
                 if (err) {
                     req.flash('delFail', 'Unable to delete forum. Please try again.');
                     res.status(500).redirect('back');
@@ -167,9 +170,10 @@ router.post('/delete/:f_topic/:f_datetime', function(req, res, next) {
 });
 
 // Child routing for forum entries.
-router.use('/:f_topic/:f_datetime/entries', function(req, res, next) {
+router.use('/:f_topic/:f_datetime/:p_id/entries', function(req, res, next) {
     req.f_topic = req.params.f_topic;
     req.f_datetime = req.params.f_datetime;
+    req.p_id = req.params.p_id;
 	next()
 }, entries);
 

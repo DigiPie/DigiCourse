@@ -55,7 +55,7 @@
                 <form id="html_form" action="/course/<%= cid %>/forum/create" role="form" method="post">
                   <div class="form-group">
                     <label for="f_topic">Topic:</label>
-                    <input type="text" maxlength="100" class="form-control" id="f_topic" name="f_topic" placeholder="Enter topic name">
+                    <input type="text" maxlength="100" class="form-control" name="f_topic" placeholder="Enter topic name">
                   </div>
                   <button type="submit" class="btn btn-primary">Create forum</button>
                 </form>
@@ -91,10 +91,10 @@
                       <tbody>
                         <% for (var i = 0; i < forums.length; i++) { %>
                         <tr>
-                          <td><a href="/course/<%= cid %>/forum/<%= forums[i].f_topic %>/<%= forums[i].formatted %>/entries"><%= forums[i].f_topic %></a></td>
+                          <td><a href="/course/<%= cid %>/forum/<%= forums[i].f_topic %>/<%= forums[i].formatted %>/<%= forums[i].p_id %>/entries"><%= forums[i].f_topic %></a></td>
                           <td><%= forums[i].formatted %></td>
                           <% if (accountType == 'Professor') { %>
-                          <td><button type="submit" formaction="/course/<%= cid %>/forum/delete/<%= forums[i].f_topic %>/<%= forums[i].formatted %>" class="btn btn-primary">Delete</button></td>
+                          <td><button type="submit" formaction="/course/<%= cid %>/forum/delete/<%= forums[i].f_topic %>/<%= forums[i].formatted %>/<%= forums[i].p_id %>" class="btn btn-primary">Delete</button></td>
                           <% } %>
                         </tr>
                         <% } %>

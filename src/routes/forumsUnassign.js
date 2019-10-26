@@ -17,11 +17,12 @@ router.get('/', function(req, res, next) {
 
     // Retrieves a list of forums that has been assigned to groups (assigned to at least 1 group).
     var get_forums_for_unassign =
-    'SELECT distinct f.f_topic, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
+    'SELECT distinct f.f_topic, f.p_id, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM ForumsGroups fg JOIN Forums f'
     + ' ON fg.c_code = f.c_code'
     + ' AND fg.c_year = f.c_year'
     + ' AND fg.c_sem = f.c_sem'
+    + ' AND fg.p_id = f.p_id'
     + ' AND fg.f_datetime = f.f_datetime'
     + ' WHERE fg.c_code = $1'
     + ' AND fg.c_year = $2'
@@ -29,7 +30,7 @@ router.get('/', function(req, res, next) {
 
     // For each forum, retrieve a list of group numbers that are assigned to the forum.
     var get_groups_for_unassign = 
-    ' SELECT fg.g_num, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
+    ' SELECT fg.g_num, fg.p_id, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM ForumsGroups fg'
     + ' WHERE fg.c_code = $1'
     + ' AND fg.c_year = $2'
@@ -69,6 +70,7 @@ router.post('/', function(req, res, next) {
         WHERE c_code = '${req.cid}'
         AND c_year = '${req.year}'
         AND c_sem = '${req.sem}'
+        AND p_id = '${selected_rows[i].p_id}'
         AND TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = '${selected_rows[i].f_datetime}'
         AND g_num = '${selected_rows[i].g_num}'; `;
     }
