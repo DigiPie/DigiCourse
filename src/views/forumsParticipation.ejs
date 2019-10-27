@@ -38,19 +38,19 @@
               <div class="col-12 py-5">
                 <% if (accountType == 'Professor') { %>
                 <div class="topnav">
-				  <a href="/course/<%= cid %>/forum">Create forum</a>
+				          <a href="/course/<%= cid %>/forum">Create forum</a>
                   <a href="/course/<%= cid %>/forum/assign">Assign forum</a>
-				  <a href="/course/<%= cid %>/forum/unassign">Unassign forum</a>
-				  <a class="active" href="#">Participation</a>
+				          <a href="/course/<%= cid %>/forum/unassign">Unassign forum</a>
+				          <a class="active" href="#">Participation</a>
                 </div>
                 <br>
                 <% } %>
                 <div class="topnav">
-                  <div class="title">Overall top student participation for <%= cid %> forums</div>
+                  <div class="title">Overall top forum participation (Students)</div>
                 </div>
                 <br>
-                <% if (participation.length == 0) { %>
-                <h4>There is currently no student participation for forums in this module.</h4>
+                <% if (students.length == 0) { %>
+                <h4>There is currently no forum participation from students in this course.</h4>
                 <% } else { %>
                 <form id="html_form" role="form" method="post">
                   <table class="table">
@@ -58,25 +58,58 @@
                         <tr>
                           <th scope="col">User ID:</th>
                           <th scope="col">Name:</th>
-						  <th scope="col">Total no. of entries posted:</th>
-						  <th scope="col">Most participated forum:</th>
-						  <th scope="col">No. of entries posted:</th>
+                          <th scope="col">Total no. of entries posted:</th>
+                          <th scope="col">Most participated forum:</th>
+                          <th scope="col">No. of entries posted:</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <% for (var i = 0; i < participation.length; i++) { %>
+                        <% for (var i = 0; i < students.length; i++) { %>
                         <tr>
-						  <td><%= participation[i].u_username %></td>
-						  <td><%= participation[i].u_name %></td>
-						  <td><%= participation[i].total_entries %></td>
-						  <td><%= participation[i].most_participated_forum %></td>
-						  <td><%= participation[i].num_of_entries %></td>
+                          <td><%= students[i].u_username %></td>
+                          <td><%= students[i].u_name %></td>
+                          <td><%= students[i].total_entries %></td>
+                          <td><%= students[i].most_participated_forum %></td>
+                          <td><%= students[i].num_of_entries %></td>
                         </tr>
                         <% } %>
                       </tbody>
                     </table>
                 </form>
                 <% } %>
+                <br>
+                <div class="topnav">
+                    <div class="title">Overall top forum participation (Teaching assistants)</div>
+                  </div>
+                  <br>
+                  <% if (teaching.length == 0) { %>
+                  <h4>There is currently no forum participation from teaching assistants in this course.</h4>
+                  <% } else { %>
+                  <form id="html_form" role="form" method="post">
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">User ID:</th>
+                            <th scope="col">Name:</th>
+                            <th scope="col">Total no. of entries posted:</th>
+                            <th scope="col">Most participated forum:</th>
+                            <th scope="col">No. of entries posted:</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% for (var i = 0; i < teaching.length; i++) { %>
+                          <tr>
+                            <td><%= teaching[i].u_username %></td>
+                            <td><%= teaching[i].u_name %></td>
+                            <td><%= teaching[i].total_entries %></td>
+                            <td><%= teaching[i].most_participated_forum %></td>
+                            <td><%= teaching[i].num_of_entries %></td>
+                          </tr>
+                          <% } %>
+                        </tbody>
+                      </table>
+                  </form>
+                  <% } %>
               </div>
             </div>
             <!-- put your stuff here -->
