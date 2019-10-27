@@ -441,6 +441,7 @@ INSERT INTO CourseDetails VALUES ('EE5555', 'Electrical Engineering V', 'This mo
 INSERT INTO CourseDetails VALUES ('EE6666', 'Electrical Engineering VI', 'This module introduces first year electrical engineering students to what engineers do and to the engineers thought process. This is the first of a two-part module: Engineering Principles and Practice (EPP) I and II. Real engineering systems will be used to show how engineers use different disciplines of engineering to make things work. Through grasping engineering fundamentals, students learn how engineering systems work and fail (EPP I). Through learning where systems get energy and how they are controlled, students learn how multi-disciplinary concepts are tied together (EPP II). Students will also learn basic design, experimentation and evaluation of engineering systems.');
 INSERT INTO CourseDetails VALUES ('EE7777', 'Electrical Engineering VII', 'This module introduces first year electrical engineering students to what engineers do and to the engineers thought process. This is the first of a two-part module: Engineering Principles and Practice (EPP) I and II. Real engineering systems will be used to show how engineers use different disciplines of engineering to make things work. Through grasping engineering fundamentals, students learn how engineering systems work and fail (EPP I). Through learning where systems get energy and how they are controlled, students learn how multi-disciplinary concepts are tied together (EPP II). Students will also learn basic design, experimentation and evaluation of engineering systems.');
 INSERT INTO CourseDetails VALUES ('EE8888', 'Electrical Engineering VIII', 'This module introduces first year electrical engineering students to what engineers do and to the engineers thought process. This is the first of a two-part module: Engineering Principles and Practice (EPP) I and II. Real engineering systems will be used to show how engineers use different disciplines of engineering to make things work. Through grasping engineering fundamentals, students learn how engineering systems work and fail (EPP I). Through learning where systems get energy and how they are controlled, students learn how multi-disciplinary concepts are tied together (EPP II). Students will also learn basic design, experimentation and evaluation of engineering systems.');
+INSERT INTO CourseDetails VALUES ('EE9999', 'Electrical Engineering V', 'This module introduces first year electrical engineering students to what engineers do and to the engineers thought process. This is the first of a two-part module: Engineering Principles and Practice (EPP) I and II. Real engineering systems will be used to show how engineers use different disciplines of engineering to make things work. Through grasping engineering fundamentals, students learn how engineering systems work and fail (EPP I). Through learning where systems get energy and how they are controlled, students learn how multi-disciplinary concepts are tied together (EPP II). Students will also learn basic design, experimentation and evaluation of engineering systems.');
 
 -- CourseYearSem(c_code, c_year, c_sem, c_capacity) -> c_code, c_year, c_sem
 INSERT INTO CourseYearSem VALUES ('CS2102', 2018, 1, 100);
@@ -486,6 +487,9 @@ INSERT INTO CourseYearSem VALUES ('EE6666', 2019, 1, 200);
 INSERT INTO CourseYearSem VALUES ('EE7777', 2018, 1, 200);
 INSERT INTO CourseYearSem VALUES ('EE8888', 2018, 1, 200);
 INSERT INTO CourseYearSem VALUES ('EE8888', 2019, 1, 200);
+INSERT INTO CourseYearSem VALUES ('EE9999', 2017, 1, 200);
+INSERT INTO CourseYearSem VALUES ('EE9999', 2018, 1, 200);
+INSERT INTO CourseYearSem VALUES ('EE9999', 2019, 1, 200);
 
 -- Manages(p_id, c_code) -> p_id, c_code
 INSERT INTO Manages VALUES ('P0000001A','CS2102', 2018, 1);
@@ -521,6 +525,9 @@ INSERT INTO Manages VALUES ('P0000001A','EE6666', 2019, 1);
 INSERT INTO Manages VALUES ('P0000001A','EE7777', 2018, 1);
 INSERT INTO Manages VALUES ('P0000001A','EE8888', 2018, 1);
 INSERT INTO Manages VALUES ('P0000001A','EE8888', 2019, 1);
+INSERT INTO Manages VALUES ('P0000001A','EE9999', 2017, 1);
+INSERT INTO Manages VALUES ('P0000001A','EE9999', 2018, 1);
+INSERT INTO Manages VALUES ('P0000001A','EE9999', 2019, 1);
 
 -- Students(s_id, s_name, yr_study, major) -> s_id
 INSERT INTO Students VALUES ('A0000001A', 1, 'SOC');
@@ -570,6 +577,8 @@ INSERT INTO Enrollments VALUES ('A0000001A', 'EE1111', 2019, 1, 0, NOW(), NULL, 
 INSERT INTO Enrollments VALUES ('A0000001A', 'EE2222', 2019, 1, 0, NOW(), NULL, FALSE); 
 INSERT INTO Enrollments VALUES ('A0000001A', 'EE3333', 2019, 1, 0, NOW(), 'P0000001A', FALSE);
 INSERT INTO Enrollments VALUES ('A0000001A', 'EE8888', 2018, 1, 1, NOW(), NULL, FALSE);
+INSERT INTO Enrollments VALUES ('A0000001A', 'EE9999', 2017, 1, 1, NOW(), 'P0000001A', TRUE);
+INSERT INTO Enrollments VALUES ('A0000001A', 'EE9999', 2018, 1, 0, NOW(), 'P0000001A', FALSE);
 
 -- StudentGroups (c_code, c_year, c_sem, g_num, s_id) --> c_code, c_year, c_sem, g_num, s_id
 INSERT INTO StudentGroups VAlUES ('CS2102', 2018, 1, 999, 'A0000006F');

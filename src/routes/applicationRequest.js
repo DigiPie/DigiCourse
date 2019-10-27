@@ -47,19 +47,18 @@ router.get('/', function(req, res, next) {
 				SELECT 1 FROM Enrollments E
 				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1
 					AND ((E.p_id IS NOT NULL AND E.req_status=True) 
-						OR (E.p_id IS NULL AND E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))
+						OR (E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))
 			)
 			UNION
-			SELECT c_code, c_year, c_sem, True AS canbe_ta
-			FROM Enrollments F						
-			WHERE F.s_id=$1 AND F.req_type=1 AND F.p_id IS NOT NULL AND F.req_status=True
-				AND NOT EXISTS (					
-					SELECT 1 FROM CurrentSemCourses C
-					WHERE F.c_code=C.c_code AND F.c_year=C.c_year AND F.c_sem=C.c_sem
-				)
-				AND NOT EXISTS (					
-					SELECT 1 FROM Enrollments E2
-					WHERE E2.s_id=F.s_id AND E2.req_type=0 AND E2.c_code=F.c_code AND E2.req_status = FALSE
+			SELECT c_code, c_year, c_sem, True AS canbe_ta 
+			FROM Enrollments E
+			WHERE E.s_id=$1 AND E.req_type=1 AND E.p_id IS NOT NULL AND E.req_status=True
+				AND NOT EXISTS (
+					SELECT 1 FROM CurrentSemCourses C JOIN Enrollments F 
+						ON C.c_code = F.c_code AND C.c_year=F.c_year AND C.c_sem=F.c_sem 	
+					WHERE E.s_id=F.s_id AND E.c_code=F.c_code 
+						AND ((F.req_type=0) 				
+							OR (F.req_type=1 AND F.p_id IS NOT NULL AND F.req_status=True))
 				)
 		)
 		SELECT c_code, c_name, canbe_ta 
@@ -102,19 +101,18 @@ router.post('/', function(req, res, next) {
 				SELECT 1 FROM Enrollments E
 				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1
 					AND ((E.p_id IS NOT NULL AND E.req_status=True) 
-						OR (E.p_id IS NULL AND E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))
+						OR (E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))
 			)
 			UNION
-			SELECT c_code, c_year, c_sem, True AS canbe_ta
-			FROM Enrollments F						
-			WHERE F.s_id=$1 AND F.req_type=1 AND F.p_id IS NOT NULL AND F.req_status=True
-				AND NOT EXISTS (					
-					SELECT 1 FROM CurrentSemCourses C
-					WHERE F.c_code=C.c_code AND F.c_year=C.c_year AND F.c_sem=C.c_sem
-				)
-				AND NOT EXISTS (					
-					SELECT 1 FROM Enrollments E2
-					WHERE E2.s_id=F.s_id AND E2.req_type=0 AND E2.c_code=F.c_code AND E2.req_status = FALSE
+			SELECT c_code, c_year, c_sem, True AS canbe_ta 
+			FROM Enrollments E
+			WHERE E.s_id=$1 AND E.req_type=1 AND E.p_id IS NOT NULL AND E.req_status=True
+				AND NOT EXISTS (
+					SELECT 1 FROM CurrentSemCourses C JOIN Enrollments F 
+						ON C.c_code = F.c_code AND C.c_year=F.c_year AND C.c_sem=F.c_sem 	
+					WHERE E.s_id=F.s_id AND E.c_code=F.c_code 
+						AND ((F.req_type=0) 				
+							OR (F.req_type=1 AND F.p_id IS NOT NULL AND F.req_status=True))
 				)
 		)
 		SELECT c_code, c_name, canbe_ta 
