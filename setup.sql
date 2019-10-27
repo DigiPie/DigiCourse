@@ -462,17 +462,18 @@ INSERT INTO Enrollments VALUES ('A0000004D', 'CS4215', 2019, 1, 0, NOW(), 'P0000
 INSERT INTO StudentGroups VAlUES ('CS2102', 2018, 1, 999, 'A0000006F');
 INSERT INTO StudentGroups VAlUES ('CS2102', 2019, 1, 4, 'A0000001A');
 INSERT INTO StudentGroups VAlUES ('CS2100', 2019, 1, 2, 'A0000001A');
+INSERT INTO StudentGroups VAlUES ('CS2100', 2019, 1, 2, 'A0000002B');
 
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-08-23 16:30:00', 'Assignment 0');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-09-01 13:30:30', 'Form project groups');
-INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-10-13 21:30:30', 'Lecture Queries');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-10-13 22:30:30', 'Assignment 2');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, '2019-10-13 21:30:30', 'Lecture Queries');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, NOW(), 'Project Queries');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, NOW() - INTERVAL '10 min', 'Consultation');
 
-INSERT INTO ForumEntries VALUES ('CS2102', 2018, 1, 'P0000001A', '2018-10-13 21:30:30', 'A0000001A', NOW(), 'Can you provide more examples on the usage of triggers?');
-INSERT INTO ForumEntries VALUES ('CS2102', 2018, 1, 'P0000001A', '2018-10-13 21:30:30', 'A0000002B', NOW(), 'Will we be tested on all topics for finals?');
-INSERT INTO ForumEntries VALUES ('CS2102', 2018, 1, 'P0000001A', '2018-10-13 22:30:30', 'A0000002B', NOW(), 'When will the marks be released?');
+INSERT INTO ForumsGroups VAlUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 2);
+INSERT INTO ForumsGroups VAlUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 4);
 
-INSERT INTO ForumsGroups VAlUES ('CS2102', 2018, 1, 'P0000001A', '2018-08-23 16:30:00', 999);
-INSERT INTO ForumsGroups VAlUES ('CS2102', 2018, 1, 'P0000001A', '2018-10-13 21:30:30', 999);
+INSERT INTO ForumEntries VALUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 'A0000001A', NOW(), 'Can you provide more examples on the usage of triggers?');
+INSERT INTO ForumEntries VALUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 'A0000002B', NOW(), 'Will we be tested on all topics for finals?');
+INSERT INTO ForumEntries VALUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 'A0000002B', NOW(), 'When will the marks be released?');

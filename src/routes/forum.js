@@ -4,6 +4,7 @@ var router = express.Router({mergeParams: true})
 const entries = require('./entries');
 const forumsAssign = require('./forumsAssign');
 const forumsUnassign = require('./forumsUnassign');
+const forumsParticipation = require('./forumsParticipation');
 const { Pool } = require('pg')
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
@@ -186,5 +187,11 @@ router.use('/assign', function(req, res, next) {
 router.use('/unassign', function(req, res, next) {
 	next()
 }, forumsUnassign);
+
+// Child routing for forum unassign.
+router.use('/participation', function(req, res, next) {
+	next()
+}, forumsParticipation);
+
 
 module.exports = router;
