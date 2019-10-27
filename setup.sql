@@ -336,7 +336,54 @@ CREATE TABLE ForumEntriesLog (
 	PRIMARY KEY (c_code, c_year, c_sem, f_creator, f_datetime, e_author_id, e_datetime)
 );
 
--- Replace the formatted f_datetime with the actual f_datetime timestamp in Forums table
+-- Check whether the user is part of a group that has access to the forum before allowing an entry to be posted.
+CREATE OR REPLACE FUNCTION check_forum_group_permission()
+RETURNS trigger AS $$ 
+BEGIN
+	NEW.f_datetime :=(SELECT f_datetime FROM Forums WHERE TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(NEW.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') AND p_id = NEW.p_id AND c_code = NEW.c_code AND c_year = NEW.c_year AND c_sem = NEW.c_sem);
+
+	IF (SELECT count(*)
+		FROM StudentGroups sg JOIN ForumsGroups fg
+		ON sg.c_code = fg.c_code
+        AND sg.c_year = fg.c_year
+        AND sg.c_sem = fg.c_sem
+        AND sg.g_num = fg.g_num
+		WHERE sg.c_code = NEW.c_code 
+		AND sg.c_year = NEW.c_year
+		AND sg.c_sem = NEW.c_sem
+		AND sg.s_id = NEW.u_username
+		AND fg.f_datetime = NEW.f_datetime
+		AND fg.p_id = NEW.p_id) = 1 THEN
+		RETURN NEW;
+	ELSIF (SELECT count(*)
+		FROM Manages m
+		WHERE m.p_id = NEW.u_username
+    	AND m.c_code = NEW.c_code
+    	AND m.c_year = NEW.c_year
+    	AND m.c_sem = NEW.c_sem) = 1 THEN
+		RETURN NEW;
+	ELSIF (SELECT count(*)
+		FROM Enrollments e
+		WHERE e.s_id = NEW.u_username
+		AND e.c_code = NEW.c_code
+    	AND e.c_year = NEW.c_year
+    	AND e.c_sem = NEW.c_sem
+		AND e.req_type = 0
+		AND e.req_status = True) = 1 THEN
+		RETURN NEW;
+	ELSE
+		RAISE NOTICE 'Trigger user cannot access this forum'; 
+		RETURN NULL;
+	END IF;
+END; $$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER insert_entry
+BEFORE INSERT
+ON ForumEntries
+FOR EACH ROW
+EXECUTE PROCEDURE check_forum_group_permission();
+
+-- Replace the formatted f_datetime with the actual f_datetime timestamp referenced in Forums table.
 CREATE OR REPLACE FUNCTION replace_f_datetime()
 RETURNS trigger AS $$ 
 BEGIN
@@ -344,19 +391,13 @@ BEGIN
 RETURN NEW;
 END; $$ LANGUAGE 'plpgsql';
 
-CREATE TRIGGER insert_entry
-BEFORE INSERT
-ON ForumEntries
-FOR EACH ROW
-EXECUTE PROCEDURE replace_f_datetime();
-
 CREATE TRIGGER insert_forum_group
 BEFORE INSERT
 ON ForumsGroups
 FOR EACH ROW
 EXECUTE PROCEDURE replace_f_datetime();
 
--- Establish audit trail for deleted forum entries by using triggers to insert into 'ForumEntriesLog' table
+-- Establish audit trail for deleted forum entries by using triggers to insert into 'ForumEntriesLog' table.
 CREATE OR REPLACE FUNCTION bef_delete_forum()
 RETURNS trigger AS $$ 
 BEGIN
@@ -554,8 +595,8 @@ INSERT INTO CourseGroups VAlUES ('CS2100', 2019, 1, 1, 5);
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', FALSE); 
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000006F', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
-INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2019, 1, 1, NOW()); 
-INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2019, 1, 1, NOW()); 
+INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2019, 1, 1, NOW(), 'P0000001A', TRUE); 
+INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2019, 1, 1, NOW(), 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000003C', 'CS2102', 2019, 1, 1, NOW()); 
 INSERT INTO Enrollments VALUES ('A0000004D', 'CS2102', 2018, 1, 1, NOW(), 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000004D', 'CS2102', 2019, 1, 0, NOW()); 
@@ -590,17 +631,21 @@ INSERT INTO StudentGroups VAlUES ('CS2102', 2018, 1, 999, 'A0000006F');
 INSERT INTO StudentGroups VAlUES ('CS2102', 2019, 1, 4, 'A0000001A');
 INSERT INTO StudentGroups VAlUES ('CS2100', 2019, 1, 2, 'A0000001A');
 INSERT INTO StudentGroups VAlUES ('CS2100', 2019, 1, 2, 'A0000002B');
+INSERT INTO StudentGroups VAlUES ('CS2102', 2019, 1, 4, 'A0000002B');
 
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-08-23 16:30:00', 'Assignment 0');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-09-01 13:30:30', 'Form project groups');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2018, 1, '2018-10-13 22:30:30', 'Assignment 2');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, '2019-09-01 13:30:30', 'Form project groups');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, '2019-10-13 21:30:30', 'Lecture Queries');
-INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, NOW(), 'Project Queries');
 INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, NOW() - INTERVAL '10 min', 'Consultation');
+INSERT INTO Forums VALUES ('P0000001A', 'CS2102', 2019, 1, NOW(), 'Project Queries');
 
-INSERT INTO ForumsGroups VAlUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 2);
+INSERT INTO ForumsGroups VAlUES ('CS2102', 2019, 1, 'P0000001A', '2019-09-01 13:30:30', 4);
 INSERT INTO ForumsGroups VAlUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 4);
 
+INSERT INTO ForumEntries VALUES ('CS2102', 2019, 1, 'P0000001A', '2019-09-01 13:30:30', 'A0000001A', '2019-09-01 13:35:00', 'I have a group with 3 members now, looking for 1 more member. Please email me at meme@gmail.com');
 INSERT INTO ForumEntries VALUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 'A0000001A', NOW(), 'Can you provide more examples on the usage of triggers?');
 INSERT INTO ForumEntries VALUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 'A0000002B', NOW(), 'Will we be tested on all topics for finals?');
 INSERT INTO ForumEntries VALUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 'A0000002B', NOW(), 'When will the marks be released?');
+INSERT INTO ForumEntries VALUES ('CS2102', 2019, 1, 'P0000001A', '2019-10-13 21:30:30', 'A0000006F', NOW(), 'fail to insert as student cannot access this forum');

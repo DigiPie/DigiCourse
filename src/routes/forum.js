@@ -65,7 +65,7 @@ router.get('/', function(req, res, next) {
             } else {
                 // Students can only view the forums that are assigned to the group they belong in.
                 show_forums = 
-                `SELECT f_topic, p_id, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
+                `SELECT f.f_topic, f.p_id, TO_CHAR(f.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') formatted
                 FROM 
                 ( StudentGroups sg JOIN ForumsGroups fg
                   ON sg.c_code = fg.c_code
