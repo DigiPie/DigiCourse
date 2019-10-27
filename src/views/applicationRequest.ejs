@@ -85,7 +85,7 @@
                         <th scope="col"><%= datarows[i].c_code %></th>
                         <th scope="col"><%= datarows[i].c_name %></th>
                         <th scope="col">
-                          <% if (datarows[i].enrolled) { %>
+                          <% if (datarows[i].canbe_ta) { %>
                             <button type="submit" name="TA_req" value="0" class="btn-link">TA Request</button>
                           <% } else { %>
                             <button type="submit" name="C_req" value="1" class="btn-link">Course Request</button>
