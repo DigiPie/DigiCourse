@@ -47,6 +47,7 @@ router.get('/', function(req, res, next) {
     + ' WHERE c_code = $1'
     + ' AND c_year = $3'
     + ' AND c_sem = $4'
+    + ' AND p_id = $5'
     + ' AND TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $2'
     + ' ORDER BY e_datetime';
 
@@ -59,7 +60,7 @@ router.get('/', function(req, res, next) {
             }
         }
 
-        pool.query(show_entries, [req.cid, req.f_datetime, req.year, req.sem], (err, entries) => {
+        pool.query(show_entries, [req.cid, req.f_datetime, req.year, req.sem, req.p_id], (err, entries) => {
             res.render('entries', {
                 isCourse: req.isCourse,
                 username: req.user.u_name,
@@ -68,6 +69,7 @@ router.get('/', function(req, res, next) {
                 data: req.data,
                 f_topic: req.f_topic,
                 f_datetime: req.f_datetime,
+                p_id : req.p_id,
                 f_delete_privilege: f_delete_privilege,
                 entries: entries.rows
             });
@@ -79,7 +81,7 @@ router.post('/post', function(req, res, next) {
     // Blank forum entry is not allowed.
     if (req.body.e_content == '') {
         req.flash('error', 'Please enter content for the new forum entry.');
-        res.redirect(`/course/${req.cid}/forum/${req.f_topic}/${req.f_datetime}/entries`);
+        res.redirect(`/course/${req.cid}/forum/${req.f_topic}/${req.f_datetime}/${req.p_id}/entries`);
         return;
     }
 
@@ -89,7 +91,7 @@ router.post('/post', function(req, res, next) {
         res.status(500).redirect('back');
     
     } else {
-        var insert_new_entry = `INSERT INTO ForumEntries VAlUES ('${req.cid}', '${req.year}', '${req.sem}', '${req.f_datetime}', '${req.user.u_username}', NOW(), '${req.body.e_content}')`;
+        var insert_new_entry = `INSERT INTO ForumEntries VAlUES ('${req.cid}', '${req.year}', '${req.sem}', '${req.p_id}', '${req.f_datetime}', '${req.user.u_username}', NOW(), '${req.body.e_content}')`;
 
         pool.query(insert_new_entry, (err, data) => {
             if (err) {
@@ -117,6 +119,7 @@ router.post('/delete/:e_author/:e_datetime', function(req, res, next) {
     + ' AND c_code = $5'
     + ' AND c_year = $6'
     + ' AND c_sem = $7'
+    + ' AND p_id = $8'
     + ' AND'
     + ' ( c_code IN'
     + '   ( SELECT m.c_code'
@@ -143,22 +146,23 @@ router.post('/delete/:e_author/:e_datetime', function(req, res, next) {
     + ' AND c_code = $3'
     + ' AND c_year = $5'
     + ' AND c_sem = $6'
+    + ' AND p_id = $7'
     + ' AND TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = $4';
 
-    pool.query(update_deleted_by, [req.user.u_username, req.f_datetime, req.params.e_author, req.params.e_datetime, req.cid, req.year, req.sem], (err, result) => {
+    pool.query(update_deleted_by, [req.user.u_username, req.f_datetime, req.params.e_author, req.params.e_datetime, req.cid, req.year, req.sem, req.p_id], (err, result) => {
 
         if (err || result.rowCount == 0) {
             req.flash('delFail', 'Unable to delete entry. Please try again.');
             res.status(500).redirect('back');
         
         } else {
-            pool.query(delete_entry, [req.params.e_datetime, req.params.e_author, req.cid, req.f_datetime, req.year, req.sem], (err, data) => {
+            pool.query(delete_entry, [req.params.e_datetime, req.params.e_author, req.cid, req.f_datetime, req.year, req.sem, req.p_id], (err, data) => {
                 if (err || data.rowCount == 0) {
                     req.flash('delFail', 'Unable to delete entry. Please try again.');
                     res.status(500).redirect('back');
 
                 } else {
-                    req.flash('delSuccess', `Successfully deleted entry posted by ${req.params.e_author} on ${req.params.e_datetime}.`);
+                    req.flash('delSuccess', `Successfully deleted entry posted on ${req.params.e_datetime} by ${req.params.e_author}.`);
                     res.status(200).redirect('back');
                 }
             });

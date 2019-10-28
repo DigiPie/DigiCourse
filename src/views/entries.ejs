@@ -74,7 +74,7 @@
                           <td><%= entries[i].e_content %></td>
                           <td><%= entries[i].formatted %></td>
                           <% if (f_delete_privilege == true) { %>
-                          <td><button type="submit" formaction="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/entries/delete/<%= entries[i].u_username %>/<%= entries[i].formatted %>" class="btn btn-primary">Delete</button></td>
+                          <td><button type="submit" formaction="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/<%= p_id %>/entries/delete/<%= entries[i].u_username %>/<%= entries[i].formatted %>" class="btn btn-primary">Delete</button></td>
                           <% } %>
                         </tr>
                         <% } %>
@@ -95,7 +95,7 @@
                     <%= messages.success %>
                 </div>
                 <% } %>
-                <form id="html_form" action="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/entries/post" role="form" method="post">
+                <form id="html_form" action="/course/<%= cid %>/forum/<%= f_topic %>/<%= f_datetime %>/<%= p_id %>/entries/post" role="form" method="post">
                     <div class="form-group">
                         <label for="e_content">Content:</label>
                         <textarea id="e_content" name="e_content" class="form-control" maxlength="1000" placeholder="Enter content" rows="7"></textarea>

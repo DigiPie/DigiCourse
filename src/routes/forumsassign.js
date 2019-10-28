@@ -18,18 +18,19 @@ router.get('/', function(req, res, next) {
 
     // Retrieves a list of forums that can still be assigned to groups (hasn't been fully assigned to all groups).
     var get_forums_for_assign =
-    'SELECT afg.f_topic, TO_CHAR(afg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
+    'SELECT afg.f_topic, afg.p_id, TO_CHAR(afg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM' 
-	+ ' ( SELECT COUNT(g_num) c, f.f_datetime, f.f_topic'
+	+ ' ( SELECT COUNT(g_num) c, f.p_id, f.f_datetime, f.f_topic'
     + '   FROM ForumsGroups fg RIGHT JOIN Forums f'
     + '   ON fg.c_code = f.c_code'
     + '   AND fg.c_year = f.c_year'
     + '   AND fg.c_sem = f.c_sem'
+    + '   AND fg.p_id = f.p_id'
     + '   AND fg.f_datetime = f.f_datetime'
     + '   WHERE f.c_code = $1'
     + '   AND f.c_year = $2'
     + '   AND f.c_sem = $3'
-    + '   GROUP BY f.f_datetime, f.f_topic'
+    + '   GROUP BY f.f_datetime, f.p_id, f.f_topic'
     + '   HAVING COUNT(g_num) <'
     + '       ( SELECT COUNT(*)'
 	+ '         FROM CourseGroups'
@@ -42,7 +43,7 @@ router.get('/', function(req, res, next) {
 
     // For each forum, retrieve a list of group numbers that haven't been assigned to the forum.
     var get_groups_for_assign = 
-    'SELECT g_num, TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
+    'SELECT g_num, p_id, TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM CourseGroups cg, Forums f'
     + ' WHERE cg.c_code = f.c_code'
     + ' AND cg.c_year = f.c_year'
@@ -51,7 +52,7 @@ router.get('/', function(req, res, next) {
     + ' AND f.c_year = $2'
     + ' AND f.c_sem = $3'
     + ' EXCEPT'
-    + ' SELECT fg.g_num, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') fdt'
+    + ' SELECT fg.g_num, fg.p_id, TO_CHAR(fg.f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') fdt'
     + ' FROM ForumsGroups fg'
     + ' WHERE fg.c_code = $1'
     + ' AND fg.c_year = $2'
@@ -90,7 +91,7 @@ router.post('/', function(req, res, next) {
         selected_rows[i].c_sem = req.sem;
     }
 
-    const column_set = new pgp.helpers.ColumnSet(['f_datetime', 'g_num', 'c_code', 'c_year', 'c_sem'], {table: 'forumsgroups'});
+    const column_set = new pgp.helpers.ColumnSet(['p_id', 'f_datetime', 'g_num', 'c_code', 'c_year', 'c_sem'], {table: 'forumsgroups'});
     const assign_forums_to_groups = pgp.helpers.insert(selected_rows, column_set);
 
     pool.query(assign_forums_to_groups, (err, data) => {
