@@ -401,13 +401,30 @@ EXECUTE PROCEDURE replace_f_datetime();
 CREATE OR REPLACE FUNCTION bef_delete_forum()
 RETURNS trigger AS $$ 
 BEGIN
-	DELETE FROM ForumEntries
-	WHERE c_code = OLD.c_code
-	AND c_year = OLD.c_year
-	AND c_sem = OLD.c_sem
-	AND p_id = OLD.p_id
-	AND f_datetime = OLD.f_datetime;
-RETURN OLD;
+	-- Only the professor managing the course can delete forum --> delete all entries in the forum
+	IF (SELECT count(*)
+		FROM Manages m
+		WHERE m.p_id = (SELECT distinct e_deleted_by 
+						FROM ForumEntries fe
+						WHERE fe.f_datetime = OLD.f_datetime 
+						AND fe.p_id = OLD.p_id
+						AND fe.c_code = OLD.c_code
+						AND fe.c_year = OLD.c_year
+						AND fe.c_sem = OLD.c_sem)
+    	AND m.c_code = OLD.c_code
+    	AND m.c_year = OLD.c_year
+    	AND m.c_sem = OLD.c_sem) = 1 
+	THEN
+		DELETE FROM ForumEntries
+		WHERE c_code = OLD.c_code
+		AND c_year = OLD.c_year
+		AND c_sem = OLD.c_sem
+		AND p_id = OLD.p_id
+		AND f_datetime = OLD.f_datetime;
+		RETURN OLD;
+	ELSE
+		RETURN NULL;
+	END IF;
 END; $$ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER delete_forum
