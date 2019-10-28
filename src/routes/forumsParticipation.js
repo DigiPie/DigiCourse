@@ -41,8 +41,8 @@ router.get('/', function(req, res, next) {
     + '   ORDER BY num_of_entries desc'
     + ' )' 
     
-    + ' SELECT epf.u_username, epf.u_name, te.total_entries, epf.f_topic as most_Participated_forum, epf.num_of_entries'
-    + ' from entriesPerForum epf LEFT JOIN '
+    + ' SELECT epf.u_username, epf.u_name, te.total_entries, string_agg(epf.f_topic, \', \') AS most_participated_forums, epf.num_of_entries'
+    + ' FROM entriesPerForum epf LEFT JOIN '
     + ' ( SELECT u_username, COUNT(u_username) as total_entries, rank() over (order by COUNT(u_username) desc)'
     + '   FROM ForumEntries'
     + '   WHERE c_code = $1'
@@ -58,6 +58,7 @@ router.get('/', function(req, res, next) {
     + '   AND epf.num_of_entries < epf2.num_of_entries'
     + ' )'
     + ' AND te.rank <= 5'
+    + ' GROUP BY epf.u_username, epf.u_name, te.total_entries, epf.num_of_entries'
     + ' ORDER BY te.total_entries desc';
 
     // Retrieve a list of teaching assistants who holds the rank of the top 5 forum participation.
@@ -87,7 +88,7 @@ router.get('/', function(req, res, next) {
     + '   ORDER BY num_of_entries desc'
     + ' )' 
     
-    + ' SELECT epf.u_username, epf.u_name, te.total_entries, epf.f_topic as most_Participated_forum, epf.num_of_entries'
+    + ' SELECT epf.u_username, epf.u_name, te.total_entries, string_agg(epf.f_topic, \', \') AS most_participated_forums, epf.num_of_entries'
     + ' from entriesPerForum epf LEFT JOIN '
     + ' ( SELECT u_username, COUNT(u_username) as total_entries, rank() over (order by COUNT(u_username) desc)'
     + '   FROM ForumEntries'
@@ -104,6 +105,7 @@ router.get('/', function(req, res, next) {
     + '   AND epf.num_of_entries < epf2.num_of_entries'
     + ' )'
     + ' AND te.rank <= 5'
+    + ' GROUP BY epf.u_username, epf.u_name, te.total_entries, epf.num_of_entries'
     + ' ORDER BY te.total_entries desc';
     
 	pool.query(get_top_student_participants, [req.cid, req.year, req.sem], (err, students) => {
