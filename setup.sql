@@ -343,11 +343,7 @@ BEGIN
 	NEW.f_datetime :=(SELECT f_datetime FROM Forums WHERE TO_CHAR(f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(NEW.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') AND p_id = NEW.p_id AND c_code = NEW.c_code AND c_year = NEW.c_year AND c_sem = NEW.c_sem);
 
 	IF (SELECT count(*)
-		FROM StudentGroups sg JOIN ForumsGroups fg
-		ON sg.c_code = fg.c_code
-        AND sg.c_year = fg.c_year
-        AND sg.c_sem = fg.c_sem
-        AND sg.g_num = fg.g_num
+		FROM StudentGroups sg NATURAL JOIN ForumsGroups fg
 		WHERE sg.c_code = NEW.c_code 
 		AND sg.c_year = NEW.c_year
 		AND sg.c_sem = NEW.c_sem
@@ -440,25 +436,60 @@ DECLARE
 	delete_name		varchar(100);
 	forum_topic		varchar(100);
 BEGIN
-	SELECT f_topic INTO forum_topic
-	FROM Forums
-	WHERE f_datetime = OLD.f_datetime
-	AND p_id = OLD.p_id
-	AND c_code = OLD.c_code
-	AND c_year = OLD.c_year
-	AND c_sem = OLD.c_sem;
+	-- The professor managing the course can delete entries in the forum.
+	IF (SELECT count(*)
+		FROM Manages m
+		WHERE m.p_id = (SELECT distinct e_deleted_by 
+						FROM ForumEntries fe
+						WHERE fe.f_datetime = OLD.f_datetime 
+						AND fe.p_id = OLD.p_id
+						AND fe.c_code = OLD.c_code
+						AND fe.c_year = OLD.c_year
+						AND fe.c_sem = OLD.c_sem)
+    	AND m.c_code = OLD.c_code
+    	AND m.c_year = OLD.c_year
+    	AND m.c_sem = OLD.c_sem) = 1
 
-	SELECT u_name INTO author_name
-	FROM Accounts
-	WHERE u_username = OLD.u_username;
+	-- The teaching assistants in the course can delete entries in the forum.
+	ELSIF (SELECT count(*)
+		FROM Enrollments e
+		WHERE e.s_id = (SELECT distinct e_deleted_by 
+						FROM ForumEntries fe
+						WHERE fe.f_datetime = OLD.f_datetime 
+						AND fe.p_id = OLD.p_id
+						AND fe.c_code = OLD.c_code
+						AND fe.c_year = OLD.c_year
+						AND fe.c_sem = OLD.c_sem)
+    	AND e.c_code = OLD.c_code
+    	AND e.c_year = OLD.c_year
+    	AND e.c_sem = OLD.c_sem
+		AND e.req_type = 0
+		AND e.req_status = True) = 1 
 
-	SELECT u_name INTO delete_name
-	FROM Accounts
-	WHERE u_username = OLD.e_deleted_by;
+	-- Proceed to add entry into ForumEntriesLog table before deleting it.
+	THEN
+		SELECT f_topic INTO forum_topic
+		FROM Forums
+		WHERE f_datetime = OLD.f_datetime
+		AND p_id = OLD.p_id
+		AND c_code = OLD.c_code
+		AND c_year = OLD.c_year
+		AND c_sem = OLD.c_sem;
 
-	INSERT into ForumEntriesLog 
-	VALUES (OLD.c_code, OLD.c_year, OLD.c_sem, OLD.p_id, OLD.f_datetime, forum_topic, OLD.u_username, author_name, OLD.e_datetime, OLD.e_content, OLD.e_deleted_by, delete_name, NOW());
-RETURN OLD;
+		SELECT u_name INTO author_name
+		FROM Accounts
+		WHERE u_username = OLD.u_username;
+
+		SELECT u_name INTO delete_name
+		FROM Accounts
+		WHERE u_username = OLD.e_deleted_by;
+
+		INSERT into ForumEntriesLog 
+		VALUES (OLD.c_code, OLD.c_year, OLD.c_sem, OLD.p_id, OLD.f_datetime, forum_topic, OLD.u_username, author_name, OLD.e_datetime, OLD.e_content, OLD.e_deleted_by, delete_name, NOW());
+		RETURN OLD;
+	ELSE
+		RETURN NULL;
+	END IF;
 END; $$ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER delete_entries
