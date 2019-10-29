@@ -59,6 +59,12 @@ router.post('/', function(req, res, next) {
         return;
     }
 
+    if (req.body.g_capacity == '' || isNaN(req.body.g_capacity) || req.body.g_capacity <= 0) {
+        req.flash('error', `Please enter a valid group capacity > 0`);
+        res.redirect('back');
+        return;
+    }
+
     var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.body.c_code}', '${req.year}', '${req.sem}', '${req.body.g_num}', '${req.body.g_capacity}')`;
 
 	pool.query(sql_query, (err, data) => {
