@@ -100,14 +100,26 @@ CREATE TABLE StudentGroups (
     CHECK (g_num > 0)
 );
 
--- Check if the professor accepting is managing this course
+-- Check if the student is enrolled in this course
+-- and there is sufficient capacity
 CREATE OR REPLACE FUNCTION f_is_student_enrolled() RETURNS TRIGGER AS $$ 
     BEGIN
         IF NEW.s_id = (SELECT s_id FROM CourseEnrollments
-            WHERE s_id = NEW.s_id
-            AND c_code = NEW.c_code
-            AND c_year = NEW.c_year
-            AND c_sem = NEW.c_sem) THEN
+                WHERE s_id = NEW.s_id
+                AND c_code = NEW.c_code
+                AND c_year = NEW.c_year
+                AND c_sem = NEW.c_sem) 
+            AND (SELECT COUNT(*) FROM StudentGroups
+                WHERE c_code = NEW.c_code
+                AND c_year = NEW.c_year
+                AND c_sem = NEW.c_sem
+                AND g_num = NEW.g_num) 
+                < (SELECT g_capacity FROM CourseGroups
+                WHERE c_code = NEW.c_code
+                AND c_year = NEW.c_year
+                AND c_sem = NEW.c_sem
+                AND g_num = NEW.g_num)
+            THEN
                 RETURN NEW;
         END IF;
         

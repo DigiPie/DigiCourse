@@ -74,25 +74,56 @@ router.post('/', function(req, res, next) {
         return;
     }
     
+    var sids = [];
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].selected;
         selected_rows[i].g_num = req.body.g_num;
         selected_rows[i].c_year = req.year;
         selected_rows[i].c_sem = req.sem;
+        sids.push(selected_rows[i].s_id);
     }
+    sids = sids.join(', ');
+
+    const check_sql =
+        `SELECT * FROM
+        (SELECT g_capacity FROM CourseGroups
+        WHERE c_code = '${req.cid}' 
+        AND g_num = '${req.body.g_num}'
+        AND c_year = '${req.year}'
+        AND c_sem = '${req.sem}') cg,
+        (SELECT count(*) enrolled FROM StudentGroups
+        WHERE c_code = '${req.cid}' 
+        AND g_num = '${req.body.g_num}'
+        AND c_year = '${req.year}'
+        AND c_sem = '${req.sem}') sg`
 
     const column_set = new pgp.helpers.ColumnSet(['c_code', 'c_year', 'c_sem', 's_id', 'g_num'], {table: 'studentgroups'});
     const insert_sql = pgp.helpers.insert(selected_rows, column_set);
 
-    pool.query(insert_sql, (err, data) => {
+    pool.query(check_sql, (err, cdata) => {
         if (err) {
             res.render('error', {
                 err_msg: "Something went wrong during insertion, try again later.",
                 err_status: err.status || 500
             });
         } else {
-            res.status(200).redirect('back');
-        }
+            if ((parseInt(cdata.rows[0].enrolled) + parseInt(selected_rows.length)) > cdata.rows[0].g_capacity) {
+                req.flash('error', `Group capacity has met, please select another group.`);
+                res.status(400).redirect('back');
+                return;
+            }
+        } 
+        pool.query(insert_sql, (err, data) => {
+            if (err) {
+                res.render('error', {
+                    err_msg: "Something went wrong during insertion, try again later.",
+                    err_status: err.status || 500
+                });
+            } else {
+                req.flash('success', `Successfully assigned ${sids} to group ${req.body.g_num}.`);
+                res.status(200).redirect('back');
+            }
+        });
 	});
     
 });
