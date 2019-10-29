@@ -35,8 +35,7 @@ button:not(:disabled),
 .t-header {
   display: flex;
   height: 65px;
-  /*background: #fbfcfd;*/
-  background: #C98986;
+  background: #343a40;
   z-index: 100; }
   @media (max-width: 991.98px) {
     .t-header {
@@ -45,12 +44,11 @@ button:not(:disabled),
   .t-header .t-header-brand-wrapper {
     display: flex;
     align-items: center;
-    height: 65px;
+    min-height: 65px;
     width: 17rem;
     min-width: 17rem;
     max-width: 17rem;
-    /*background: #fff;*/
-    background: #C98986;
+    background: #343a40;
     z-index: 100;
     padding-left: 18px; }
     .t-header .t-header-brand-wrapper a {
@@ -60,8 +58,9 @@ button:not(:disabled),
       font-weight: 500;
       font-size: 1.25rem; }
       .t-header .t-header-brand-wrapper a .logo {
-        max-width: 100%;
-        width: 80px; }
+        max-width: 90%;
+        width: 64px;
+      }
       .t-header .t-header-brand-wrapper a .logo-mini {
         display: none;
         max-width: 100%;
