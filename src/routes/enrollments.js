@@ -29,7 +29,6 @@ router.get('/', function(req, res, next) {
 
     pool.query(capacity_query, (err, cdata) => {
         current_capacity = cdata.rows[0].c_capacity;
-        var new_capacity = increase_count == undefined ? current_capacity + 10 : increase_count; 
         increase_count = undefined;
 
         pool.query(sql_query, (err, data) => {
@@ -42,7 +41,6 @@ router.get('/', function(req, res, next) {
                 data: req.data,
                 datarows: data.rows,
                 capacity: current_capacity,
-                new_capacity: new_capacity 
             });
         });  
     });
@@ -67,7 +65,7 @@ router.post('/increase', function(req, res, next) {
     + ` WHERE c_code = '${req.params.cid}' AND c_year = '${req.year}' AND c_sem = '${req.sem}'`;
 
     pool.query(check_capacity_sql, (err, cdata) => {
-        if (req.body.c_capacity < cdata.rows[0].count) {
+        if (parseInt(req.body.c_capacity) < parseInt(cdata.rows[0].count)) {
             req.flash('error', `Please enter a capacity bigger than or equal to ${cdata.rows[0].count}`);
             res.status(400).redirect('back');
             return;
