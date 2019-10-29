@@ -49,8 +49,6 @@ router.get('/', function(req, res, next) {
     
 });
 
-const account_uid = 'P0000001A';
-
 router.post('/increase', function(req, res, next) {
     if (req.body.c_capacity.length == 0) {
         req.flash('error', `Please enter a capacity`);
@@ -93,7 +91,7 @@ router.post('/accept', function(req, res, next) {
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].accepted;
         selected_rows[i].req_status = true;
-        selected_rows[i].p_id = account_uid;
+        selected_rows[i].p_id = req.user.u_username;
         sids.push(selected_rows[i].s_id);
 
         if (selected_rows[i].req_type == 0) {
@@ -187,7 +185,7 @@ router.post('/reject', function(req, res, next) {
     for(var i=0; i<selected_rows.length; i++) {
         delete selected_rows[i].accepted;
         selected_rows[i].req_status = false;
-        selected_rows[i].p_id = account_uid;
+        selected_rows[i].p_id = req.user.u_username;
         sids.push(selected_rows[i].s_id);
     }
 
