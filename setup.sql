@@ -1,4 +1,5 @@
 -- This file will be executed each time the project is deployed to Heroku
+DROP TRIGGER IF EXISTS check_course_capacity ON CourseYearSem;
 DROP TRIGGER IF EXISTS is_student_enrolled ON StudentGroups;
 DROP TRIGGER IF EXISTS check_prof ON Enrollments;
 DROP TRIGGER IF EXISTS insert_course_enrollments ON Enrollments;
@@ -50,6 +51,26 @@ CREATE TABLE CourseYearSem (
 	CHECK (c_sem > 0 AND c_sem < 5),
 	CHECK (c_capacity > 0)
 );
+
+-- Check if the new capacity is bigger than or equal to the number of students enrolled in this course
+CREATE OR REPLACE FUNCTION f_check_course_capacity() RETURNS TRIGGER AS $$ 
+	BEGIN
+		IF NEW.c_capacity >= (SELECT COUNT(*) FROM CourseEnrollments
+			WHERE c_code = NEW.c_code
+			AND c_year = NEW.c_year
+			AND c_sem = NEW.c_sem
+			AND req_type = 1) THEN
+				RETURN NEW;
+		END IF;
+		
+		RAISE NOTICE 'Trigger capacity is lesser than the number of students enrolled in this course';
+		RETURN NULL;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_course_capacity
+BEFORE INSERT OR UPDATE ON CourseYearSem
+FOR EACH ROW EXECUTE PROCEDURE f_check_course_capacity();
 
 CREATE TABLE Students (
 	s_id  		varchar(9) PRIMARY KEY REFERENCES Accounts (u_username),

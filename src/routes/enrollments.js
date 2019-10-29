@@ -56,22 +56,35 @@ router.post('/increase', function(req, res, next) {
         return;
     }
 
+    const check_capacity_sql = `SELECT COUNT(*) count FROM CourseEnrollments
+    WHERE c_code = '${req.params.cid}'
+    AND c_year = '${req.year}' 
+    AND c_sem = '${req.sem}'
+    AND req_type = 1`
+
     const column_set = new pgp.helpers.ColumnSet(['?c_code', 'c_capacity'], {table: 'courseyearsem'});
     const update_sql = pgp.helpers.update({c_code: req.params.cid, c_capacity: req.body.c_capacity}, column_set) 
     + ` WHERE c_code = '${req.params.cid}' AND c_year = '${req.year}' AND c_sem = '${req.sem}'`;
 
-	pool.query(update_sql, (err, data) => {
-        if (err) {
-            res.status(err.status || 500);
-            res.render('error', {
-                message: "Something went wrong during the update, try again later.",
-                error: err
-            });
-        } else {
-            req.flash('success', `Successfully increased the capacity to ${req.body.c_capacity}.`);
-            res.status(200).redirect('back');
+    pool.query(check_capacity_sql, (err, cdata) => {
+        if (req.body.c_capacity < cdata.rows[0].count) {
+            req.flash('error', `Please enter a capacity bigger than or equal to ${cdata.rows[0].count}`);
+            res.status(400).redirect('back');
+            return;
         }
-	});
+        pool.query(update_sql, (err, data) => {
+            if (err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: "Something went wrong during the update, try again later.",
+                    error: err
+                });
+            } else {
+                req.flash('success', `Successfully increased the capacity to ${req.body.c_capacity}.`);
+                res.status(200).redirect('back');
+            }
+        });
+    });
 });
 
 // POST
