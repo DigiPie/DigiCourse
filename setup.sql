@@ -1,9 +1,7 @@
 -- This file will be executed each time the project is deployed to Heroku
 DROP TRIGGER IF EXISTS check_course_capacity ON CourseYearSem;
 DROP TRIGGER IF EXISTS is_student_enrolled ON StudentGroups;
-DROP TRIGGER IF EXISTS check_prof ON Enrollments;
-DROP TRIGGER IF EXISTS insert_course_enrollments ON Enrollments;
-DROP TRIGGER IF EXISTS bef_insert_enrollments ON Enrollments;
+DROP TRIGGER IF EXISTS is_valid_enrollment ON Enrollments;
 DROP TRIGGER IF EXISTS insert_entry ON ForumEntries;
 DROP TRIGGER IF EXISTS insert_forum_group ON ForumsGroups;
 DROP TRIGGER IF EXISTS delete_forum ON Forums;
@@ -42,9 +40,9 @@ CREATE TABLE CourseDetails (
 );
 
 CREATE TABLE CourseYearSem (
-	c_code  		varchar(9) REFERENCES CourseDetails (c_code),
-	c_year		smallint,
-	c_sem		smallint,
+	c_code      varchar(9) REFERENCES CourseDetails (c_code),
+	c_year      smallint,
+	c_sem       smallint,
 	c_capacity  smallint NOT NULL,
 	PRIMARY KEY (c_code, c_year, c_sem),
 	CHECK (c_year > 1905),
@@ -146,27 +144,86 @@ CREATE TABLE Enrollments (
 	CHECK (req_type = 1 OR req_type = 0)
 );
 
--- Check if the professor accepting is managing this course
-CREATE OR REPLACE FUNCTION f_check_prof() RETURNS TRIGGER AS $$ 
-	BEGIN
-		IF NEW.p_id IS NULL THEN 
-			RETURN NEW;
-		ELSIF NEW.p_id = (SELECT p_id FROM Manages
-			WHERE p_id = NEW.p_id
-			AND c_code = NEW.c_code
-			AND c_year = NEW.c_year
-			AND c_sem = NEW.c_sem) THEN
-				RETURN NEW;
-		END IF;
-		
-		RAISE NOTICE 'Trigger professor does not manages this course';
-		RETURN NULL;
-	END;
+-- Check if course is offered in this sem
+-- Check if TA was a student in previous sem
+-- Check if the professor accepts/rejects a request is managing this course
+-- Check if the capacity of the course is met for student applying to join this course
+CREATE OR REPLACE FUNCTION f_valid_enrollment() RETURNS TRIGGER AS $$ 
+    DECLARE
+        pid                 varchar(9);
+        current_capacity    integer;
+        total_enrollment    integer;
+        course_name         varchar(200);
+        user_name           varchar(100);
+    BEGIN
+        SELECT c_capacity INTO current_capacity FROM CourseYearSem
+        WHERE c_code = NEW.c_code
+        AND c_year = NEW.c_year
+        AND c_sem = NEW.c_sem;
+        
+        IF current_capacity IS NULL THEN
+            RAISE NOTICE 'Trigger course not offered in this semester.';
+            RETURN NULL;
+        END IF;
+        
+        IF NEW.req_type = 0 AND 
+            (SELECT COUNT(*) FROM Enrollments E
+            WHERE E.s_id = NEW.s_id 
+            AND E.c_code = NEW.c_code 
+            AND E.req_type = 1 
+            AND E.c_year < NEW.c_year
+            AND E.p_id IS NOT NULL 
+            AND E.req_status=True) = 0 THEN
+            RAISE NOTICE 'Trigger TA request invalid, not a student in previous semester.';
+            RETURN NULL;
+        END IF;
+        
+        IF NOT NEW.req_status AND NEW.p_id IS NULL THEN
+            RETURN NEW;
+        END IF;
+        
+        SELECT p_id INTO pid FROM Manages
+        WHERE p_id = NEW.p_id
+        AND c_code = NEW.c_code
+        AND c_year = NEW.c_year
+        AND c_sem = NEW.c_sem;
+        
+        IF pid IS NULL THEN
+            RAISE NOTICE 'Trigger professor does not manages this course.';
+            RETURN NULL;
+        END IF;
+
+        SELECT COUNT(*) INTO total_enrollment FROM CourseEnrollments
+        WHERE c_code = NEW.c_code
+        AND c_year = NEW.c_year
+        AND c_sem = NEW.c_sem
+        AND req_type = 1;
+
+        IF NEW.req_type = 1 AND NEW.req_status AND total_enrollment >= current_capacity THEN
+            RAISE NOTICE 'Trigger capacity has met, increase capacity of the course to enroll more students.';
+            RETURN NULL;
+        END IF;
+        
+        IF NEW.req_status THEN
+            SELECT c_name INTO course_name
+            FROM CourseDetails
+            WHERE c_code = NEW.c_code;
+            
+            SELECT u_name INTO user_name
+            FROM Accounts
+            WHERE u_username = NEW.s_id;
+
+            INSERT INTO CourseEnrollments
+            VALUES (NEW.c_code, NEW.c_year, NEW.c_sem, course_name, NEW.s_id, user_name, NEW.req_type);
+        END IF;
+        
+        RETURN NEW;
+    END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER check_prof
+CREATE TRIGGER is_valid_enrollment
 BEFORE INSERT OR UPDATE ON Enrollments
-FOR EACH ROW EXECUTE PROCEDURE f_check_prof();
+FOR EACH ROW EXECUTE PROCEDURE f_valid_enrollment();
 
 CREATE TABLE CourseEnrollments (
 	c_code		varchar(9),
@@ -178,69 +235,6 @@ CREATE TABLE CourseEnrollments (
 	req_type	integer NOT NULL,
 	FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE
 );
-
-CREATE OR REPLACE FUNCTION f_insert_course_enrollments() RETURNS TRIGGER AS $$ 
-	DECLARE 
-		course_name	varchar(200);
-		user_name	varchar(100);
-	BEGIN
-		SELECT c_name INTO course_name
-		FROM CourseDetails
-		WHERE c_code = NEW.c_code;
-
-		SELECT u_name INTO user_name
-		FROM Accounts
-		WHERE u_username = NEW.s_id;
-
-		INSERT INTO CourseEnrollments
-		VALUES (NEW.c_code, NEW.c_year, NEW.c_sem, course_name, NEW.s_id, user_name, NEW.req_type);
-		
-		RETURN NEW;
-	END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER insert_course_enrollments
-BEFORE INSERT OR UPDATE ON Enrollments
-FOR EACH ROW  
-WHEN (NEW.req_status) 
-EXECUTE PROCEDURE f_insert_course_enrollments();
-
-CREATE OR REPLACE FUNCTION f_before_insert_enrollments() RETURNS TRIGGER AS $$ 
-	BEGIN
-		IF (SELECT count(*)
-			FROM CourseYearSem
-			WHERE c_code = NEW.c_code 
-			AND c_year = NEW.c_year
-			AND c_sem = NEW.c_sem) <> 1 THEN
-			RAISE NOTICE 'Trigger course not offered in this semester';
-			RETURN NULL;
-		END IF;
-
-		-- if it is a TA application, verify that it can be applied
-		IF NEW.req_type <> 1 THEN
-			IF (SELECT COUNT(*) FROM Enrollments E 	-- check if student has enrolled before as student
-				WHERE E.s_id = NEW.s_id 
-				AND E.c_code = NEW.c_code 
-				AND E.req_type = 1 
-				AND E.c_year < NEW.c_year
-				AND E.p_id IS NOT NULL 
-				AND E.req_status=True) = 1 THEN
-				RETURN NEW;
-			END IF;
-			
-			RAISE NOTICE 'Trigger invalid enrollment insertion';
-			RETURN NULL;
-		END IF;
-
-		RETURN NEW;
-	END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER bef_insert_enrollments
-BEFORE INSERT OR UPDATE 
-ON Enrollments
-FOR EACH ROW
-EXECUTE PROCEDURE f_before_insert_enrollments();
 
 CREATE TABLE CourseManages (
 	c_code  		varchar(9),
