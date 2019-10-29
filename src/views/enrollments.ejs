@@ -76,7 +76,7 @@
                           <td><input type="hidden" name='row[<%= i %>][c_code]' value="<%= datarows[i].c_code %>"><%= datarows[i].c_code %></td>
                           <td><input type="hidden" name='row[<%= i %>][req_type]' value="<%= datarows[i].req_type %>"><%= datarows[i].req_type == 1 ? 'Student' : 'Teaching Assistant' %></td>
                           <td><input type="hidden" name='row[<%= i %>][req_datetime]' value="<%= datarows[i].req_datetime %>"><%= datarows[i].req_datetime %></td>
-                          <td><%= datarows[i].p_id ? 'Rejected' : 'nil' %></td>
+                          <td><%= datarows[i].p_id ? 'Rejected' : 'Pending' %></td>
                         </tr>
                         <% } %>
                         <tr>

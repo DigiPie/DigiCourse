@@ -74,11 +74,11 @@ router.post('/increase', function(req, res, next) {
             if (err) {
                 res.status(err.status || 500);
                 res.render('error', {
-                    message: "Something went wrong during the update, try again later.",
+                    message: 'Something went wrong during the update, try again later.',
                     error: err
                 });
             } else {
-                req.flash('success', `Successfully increased the capacity to ${req.body.c_capacity}.`);
+                req.flash('success', `Successfully increased the group's capacity to ${req.body.c_capacity}.`);
                 res.status(200).redirect('back');
             }
         });

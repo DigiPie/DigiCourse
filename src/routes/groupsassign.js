@@ -103,12 +103,12 @@ router.post('/', function(req, res, next) {
     pool.query(check_sql, (err, cdata) => {
         if (err) {
             res.render('error', {
-                err_msg: "Something went wrong during insertion, try again later.",
+                err_msg: 'Something went wrong during insertion, try again later.',
                 err_status: err.status || 500
             });
         } else {
             if ((parseInt(cdata.rows[0].enrolled) + parseInt(selected_rows.length)) > cdata.rows[0].g_capacity) {
-                req.flash('error', `Group capacity has met, please select another group.`);
+                req.flash('error', 'Unable to add student(s) to the group as new group enrollment will exceed group capacity.');
                 res.status(400).redirect('back');
                 return;
             }
@@ -116,7 +116,7 @@ router.post('/', function(req, res, next) {
         pool.query(insert_sql, (err, data) => {
             if (err) {
                 res.render('error', {
-                    err_msg: "Something went wrong during insertion, try again later.",
+                    err_msg: 'Something went wrong during insertion, try again later.',
                     err_status: err.status || 500
                 });
             } else {
