@@ -178,12 +178,12 @@ CREATE OR REPLACE FUNCTION f_valid_enrollment() RETURNS TRIGGER AS $$
             RETURN NULL;
         END IF;
         
-        IF NEW.req_type = 0 AND 
+        IF NEW.req_type = 0 AND NEW.p_id IS NULL AND 
             (SELECT COUNT(*) FROM Enrollments E
             WHERE E.s_id = NEW.s_id 
             AND E.c_code = NEW.c_code 
             AND E.req_type = 1 
-            AND E.c_year < NEW.c_year
+            AND (E.c_year < NEW.c_year OR (E.c_year = NEW.c_year AND E.c_sem < NEW.c_sem))
             AND E.p_id IS NOT NULL 
             AND E.req_status=True) = 0 THEN
             RAISE NOTICE 'Trigger TA request invalid, not a student in previous semester.';
