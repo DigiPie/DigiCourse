@@ -41,6 +41,7 @@
                   <a href="/course/<%= cid %>/forum">Create forum</a>
                   <a class="active" href="#">Assign forum</a>
                   <a href="/course/<%= cid %>/forum/unassign">Unassign forum</a>
+                  <a href="/course/<%= cid %>/forum/participation">Participation</a>
                 </div>
                 <br>
                 <% if (messages.error) {%>
@@ -52,6 +53,9 @@
                       <%= messages.success %>
                     </div>
                 <% } %>
+                <% if (forums.length == 0) { %>
+                  <h4>All forums have been assigned to all groups.</h4>
+                <% } else { %>
                 <form id="html_form" role="form" method="post">
                     <% var count = 0; %>
                     <% for (var x = 0; x < forums.length; x++) { %>
@@ -69,8 +73,9 @@
                         <tbody>
                             <% for (var i = 0; i < forumGroups.length; i++) { %>
                             <tr>
-                                <% if (forumGroups[i].formatted == forums[x].formatted) { %>
+                                <% if (forumGroups[i].formatted == forums[x].formatted && forumGroups[i].p_id == forums[x].p_id) { %>
                                     <td class="min"><input type="checkbox" name="row[<%= count %>][selected]" ></td>
+                                    <input type="hidden" name='row[<%= count %>][p_id]' value="<%= forums[x].p_id %>">
                                     <input type="hidden" name='row[<%= count %>][f_datetime]' value="<%= forums[x].formatted %>">
                                     <td><input type="hidden" name='row[<%= count %>][g_num]' value="<%= forumGroups[i].g_num %>"><%= forumGroups[i].g_num %></td>
                                 <% } %>
@@ -83,6 +88,7 @@
                     </table>
                     <% } %>
                 </form>
+                <% } %>
                 <% } %>
                 <br>
               </div>
