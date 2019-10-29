@@ -38,19 +38,26 @@
     </li>
     <% if (accountType == 'Professor') {%>
       <li>
-          <a href="/course/<%= cid %>/enrollments">
-            <span class="link-title">Enrollment</span>
-            <i class="mdi mdi-google-classroom link-icon"></i>
-          </a>
-        </li>
-      <% } %> 
+        <a href="/course/<%= cid %>/enrollments">
+          <span class="link-title">Enrollment</span>
+          <i class="mdi mdi-google-classroom link-icon"></i>
+        </a>
+      </li>
+    <% } %> 
     <li>
       <a href="/course/<%= cid %>/forum">
         <span class="link-title">Forum</span>
         <i class="mdi mdi-forum link-icon"></i>
       </a>
     </li>
-    <% } %> 
+    <% } else if (accountType != 'Professor') { %>
+    <li>
+      <a href="/applicationRequest">
+        <span class="link-title">Join module</span>
+        <i class="mdi mdi-google-classroom link-icon"></i>
+      </a>
+    </li>
+    <% } %>
   </ul>
   <% } %>
   <!-- End of side bar menu -->
