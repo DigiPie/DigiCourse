@@ -109,22 +109,26 @@ CREATE OR REPLACE FUNCTION f_is_student_enrolled() RETURNS TRIGGER AS $$
                 AND c_code = NEW.c_code
                 AND c_year = NEW.c_year
                 AND c_sem = NEW.c_sem) 
-            AND (SELECT COUNT(*) FROM StudentGroups
-                WHERE c_code = NEW.c_code
-                AND c_year = NEW.c_year
-                AND c_sem = NEW.c_sem
-                AND g_num = NEW.g_num) 
-                < (SELECT g_capacity FROM CourseGroups
-                WHERE c_code = NEW.c_code
-                AND c_year = NEW.c_year
-                AND c_sem = NEW.c_sem
-                AND g_num = NEW.g_num)
             THEN
+                IF (SELECT COUNT(*) FROM StudentGroups
+                    WHERE c_code = NEW.c_code
+                    AND c_year = NEW.c_year
+                    AND c_sem = NEW.c_sem
+                    AND g_num = NEW.g_num) 
+                    < (SELECT g_capacity FROM CourseGroups
+                    WHERE c_code = NEW.c_code
+                    AND c_year = NEW.c_year
+                    AND c_sem = NEW.c_sem
+                    AND g_num = NEW.g_num) THEN
                 RETURN NEW;
+            ELSE 
+                RAISE NOTICE 'Trigger capacity < number of students in the specified groups.';
+                RETURN NULL;
+            END IF;
+        ELSE 
+            RAISE NOTICE 'Trigger student is not enrolled in this course.';
+            RETURN NULL;
         END IF;
-        
-        RAISE NOTICE 'Trigger student is not enrolled in this course';
-        RETURN NULL;
     END;
 $$ LANGUAGE plpgsql;
 
