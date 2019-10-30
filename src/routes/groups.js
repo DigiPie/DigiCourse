@@ -1,5 +1,5 @@
-var express = require('express');
-var router = express.Router({mergeParams: true});
+let express = require('express');
+let router = express.Router({mergeParams: true});
 const { Pool } = require('pg')
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
@@ -7,9 +7,10 @@ const pool = new Pool({
 
 const groupscreate = require('./groupscreate');
 const groupsassign = require('./groupsassign');
+const groupsupdate = require('./groupsupdate');
 const groupsunassign = require('./groupsunassign');
 
-var courseName;
+let courseName;
 
 router.get('/', function(req, res, next) {
     // Authentication
@@ -20,7 +21,7 @@ router.get('/', function(req, res, next) {
     
     courseName = req.data;
 
-    var sql_query = `SELECT c.s_id, c.u_name, s.g_num, c.req_type
+    let sql_query = `SELECT c.s_id, c.u_name, s.g_num, c.req_type
             FROM CourseEnrollments c
             LEFT OUTER JOIN StudentGroups s
             ON c.c_code = s.c_code
@@ -50,6 +51,10 @@ router.use('/create', function(req, res, next) {
 router.use('/assign', function(req, res, next) {
 	next()
 }, groupsassign);
+
+router.use('/update', function(req, res, next) {
+	next()
+}, groupsupdate);
 
 router.use('/unassign', function(req, res, next) {
 	next()
