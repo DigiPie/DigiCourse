@@ -53,23 +53,27 @@
                       <%= messages.success %>
                     </div>
                   <% } %>
-                <form id="html_form" action="/course/<%= cid %>/groups/create" role="form" method="post">
-                  <div class="form-group">
-                    <label for="g_num">Group number</label>
-                    <input type="number" class="form-control" id="g_num" name="g_num" placeholder="Enter group number">
-                  </div>
-                  <div class="form-group">
-                    <label for="g_capacity">Group capacity</label>
-                    <input type="number" class="form-control" id="g_capacity" name="g_capacity" value="4">
-                  </div>
+                <% if (datarows.length == 0) { %>
+                  <h4>There are no groups in this module.</h4>
+                <% } else { %>
+                <form id="html_form" action="/course/<%= cid %>/groups/update" role="form" method="post">
+                  <label for="g_num">Group to update</label>
+                  <select class="g_num" data-style="btn-info" name="g_num">
+                    <optgroup label="Select group number">
+                      <% groups.forEach(function(row){ %>
+                      <option value="<%= row.g_num %>"><%= row.g_num %></option>
+                      <% }) %>
+                    </optgroup>
+                  </select>
+                  <br />
+                  <label for="g_capacity">New group capacity</label><br />
+                  <input type="number" class="form-control" id="g_capacity" name="g_capacity">
+                  <br />
                   <input type="hidden" name='c_code' value="<%= cid %>">
-                  <button type="submit" class="btn btn-primary">Create group</button>
+                  <button type="submit" class="btn btn-primary">Update group</button>
                 </form>
                 <br>
                 </br>
-                <% if (datarows.length == 0) { %>
-                <h4>There are no groups in this module.</h4>
-                <% } else { %>
                 <form id="html_form" role="form" method="post">
                   <table class="table">
                       <thead>
