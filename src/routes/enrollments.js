@@ -66,7 +66,7 @@ router.post('/increase', function(req, res, next) {
 
     pool.query(check_capacity_sql, (err, cdata) => {
         if (parseInt(req.body.c_capacity) < parseInt(cdata.rows[0].count)) {
-            req.flash('error', `Please enter a capacity bigger than or equal to ${cdata.rows[0].count}`);
+            req.flash('error', `Please enter a valid capacity. Capacity must be at least equal to number of students already enrolled in the course: ${cdata.rows[0].count}.`);
             res.status(400).redirect('back');
             return;
         }
@@ -78,7 +78,7 @@ router.post('/increase', function(req, res, next) {
                     error: err
                 });
             } else {
-                req.flash('success', `Successfully increased the group's capacity to ${req.body.c_capacity}.`);
+                req.flash('success', `Successfully changed the course capacity to ${req.body.c_capacity}.`);
                 res.status(200).redirect('back');
             }
         });

@@ -54,13 +54,13 @@ router.get('/', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
     if (req.body.g_num == '' || isNaN(req.body.g_num) || req.body.g_num <= 0) {
-        req.flash('error', `Please enter a valid group number`);
+        req.flash('error', 'Please enter a valid group number.');
         res.redirect('back');
         return;
     }
 
     if (req.body.g_capacity == '' || isNaN(req.body.g_capacity) || req.body.g_capacity <= 0) {
-        req.flash('error', `Please enter a valid group capacity > 0`);
+        req.flash('error', 'Please enter a valid gorup capacity. Minimum group capacity is 1.');
         res.redirect('back');
         return;
     }
