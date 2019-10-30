@@ -17,6 +17,7 @@ require('dotenv').config();
  */
 let authRouter = require('./routes/authenticate');
 
+let accountRouter = require('./routes/account');
 let applicationRequestRouter = require('./routes/applicationRequest');
 let applicationStatusRouter = require('./routes/applicationStatus');
 let courseRouter = require('./routes/course');
@@ -54,6 +55,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 /*
  * Routing
  */ 
+app.use('/account', accountRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/course', courseRouter);
 app.use('/search', searchRouter);
