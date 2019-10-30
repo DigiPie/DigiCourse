@@ -48,9 +48,9 @@
                 <form id="html_form" role="form" method="post">
                   <div class="form-group">
                     <label for="c_capacity">Course current capacity: <%= capacity %><br>Enter new course capacity</label>
-                    <input type="number" class="form-control" id="c_capacity" name="c_capacity" value="<%= new_capacity %>">
+                    <input type="number" class="form-control" id="c_capacity" name="c_capacity" placeholder="Enter new capacity">
                   </div>
-                  <button type="submit" formaction="/course/<%= cid %>/enrollments/increase" class="btn btn-primary" >Submit</button>
+                  <button type="submit" formaction="/course/<%= cid %>/enrollments/increase" class="btn btn-primary" >Change</button>
                 </form>
                 <br>
                 <% if (datarows.length == 0) { %>
@@ -76,7 +76,7 @@
                           <td><input type="hidden" name='row[<%= i %>][c_code]' value="<%= datarows[i].c_code %>"><%= datarows[i].c_code %></td>
                           <td><input type="hidden" name='row[<%= i %>][req_type]' value="<%= datarows[i].req_type %>"><%= datarows[i].req_type == 1 ? 'Student' : 'Teaching Assistant' %></td>
                           <td><input type="hidden" name='row[<%= i %>][req_datetime]' value="<%= datarows[i].req_datetime %>"><%= datarows[i].req_datetime %></td>
-                          <td><%= datarows[i].p_id ? 'Rejected' : 'nil' %></td>
+                          <td><%= datarows[i].p_id ? 'Rejected' : 'Pending' %></td>
                         </tr>
                         <% } %>
                         <tr>
