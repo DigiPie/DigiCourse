@@ -14,7 +14,7 @@ var increase_count;
 router.get('/', function(req, res, next) {
     // Authentication
 	if (!req.user) {
-		req.flash('error','Login is required to access dashboard');
+		req.flash('error',`Login is required to access: '${req.originalUrl}'`);
 		return res.redirect('/login');
     }
     
