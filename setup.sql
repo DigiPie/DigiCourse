@@ -512,7 +512,7 @@ INSERT INTO Accounts VALUES ('A0000005E', 'Patrick Bowers',
 INSERT INTO Accounts VALUES ('A0000006F', 'Brooklyn DontShow', 
     '$2b$10$3nSOWrxZrZ6vvv5gE1zZjejHxUWSt48vBdRfr9LH5eWNiM68vI/Oi'); -- ChickenRiceTheBest
 INSERT INTO Accounts VALUES ('P0000001A', 'Adi',    
-    '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.'); -- DatabaseSystem
+    '$2b$10$PZtiJLgnJSdPU.RiraxSFulahGSVuTSShcSAqAQLbjiZivhwqzxHm'); -- CS2102CS2102
 INSERT INTO Accounts VALUES ('P0000002B', 'John',
     '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.'); -- DatabaseSystem
 
