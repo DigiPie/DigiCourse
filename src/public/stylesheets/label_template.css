@@ -65,7 +65,7 @@ button:not(:disabled),
       .t-header .t-header-brand-wrapper a .logo-mini {
         display: none;
         max-width: 100%;
-        width: 35px; }
+        width: 60px; }
       .t-header .t-header-brand-wrapper a p {
         color: inherit;
         font-size: inherit;
@@ -73,10 +73,10 @@ button:not(:disabled),
         margin-bottom: 0; }
     @media (max-width: 991.98px) {
       .t-header .t-header-brand-wrapper {
-        padding-left: 0;
+        padding-left: 10px;
         justify-content: center; }
         .t-header .t-header-brand-wrapper a .logo-mini {
-          width: 25px; } }
+          width: 60px; } }
   .t-header .t-header-content-wrapper {
     display: flex;
     align-items: center;
@@ -161,6 +161,7 @@ button:not(:disabled),
     .t-header .t-header-toggler i {
       font-size: 1.375rem; }
     .t-header .t-header-toggler.t-header-mobile-toggler {
+      color: #E6EBE0;
       margin-left: 0;
       margin-right: 15px; }
   .t-header.fixed-top {
@@ -556,7 +557,7 @@ footer {
   .t-header {
     width: 100vw; }
     .t-header .t-header-brand-wrapper {
-      background: #fbfcfd;
+      background: #343a40;
       width: 4rem;
       min-width: 4rem;
       max-width: 4rem; }
