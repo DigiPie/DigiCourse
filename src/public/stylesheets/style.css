@@ -129,6 +129,19 @@ nav > div a.nav-item.nav-link:focus {
   transition:background 0.20s linear;
 }
 
+a, a:visited, a:hover {
+  text-decoration: none;
+  outline: none;
+}
+
+a h4, a:visited h4, a:hover h4 {
+  text-decoration: none;
+  -webkit-transition: color .3s ease-in-out;
+  -moz-transition: color .3s ease-in-out;
+  -o-transition: color .3s ease-in-out;
+  transition: color .3s ease-in-out;
+}
+
 .tab-content {
   background: #fdfdfd;
   line-height: 25px;

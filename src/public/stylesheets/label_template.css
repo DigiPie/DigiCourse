@@ -34,7 +34,7 @@ button:not(:disabled),
 /* Header */
 .t-header {
   display: flex;
-  height: 65px;
+  height: 75px;
   background: #343a40;
   z-index: 100; }
   @media (max-width: 991.98px) {
@@ -44,14 +44,15 @@ button:not(:disabled),
   .t-header .t-header-brand-wrapper {
     display: flex;
     align-items: center;
-    min-height: 65px;
+    min-height: 75px;
     width: 17rem;
     min-width: 17rem;
     max-width: 17rem;
     background: #343a40;
     z-index: 100;
-    padding-left: 18px; }
+    padding: 18px; }
     .t-header .t-header-brand-wrapper a {
+      text-decoration: none;
       display: flex;
       align-items: center;
       color: #f3f5f6;
@@ -174,7 +175,7 @@ button:not(:disabled),
   z-index: 100; }
 
 .header-fixed .sidebar {
-  padding-top: 65px; }
+  padding-top: 75px; }
   .header-fixed .sidebar .t-header-brand-wrapper {
     position: fixed;
     left: 0;
@@ -518,7 +519,7 @@ footer {
       width: 100%;
       min-height: 100vh;
       padding: 1.5rem 2.5rem calc(90px + 1.5rem);
-      margin-top: 65px; }
+      margin-top: 75px; }
       .page-body .page-content-wrapper .page-content-wrapper-inner {
         max-width: 1140px;
         margin-left: auto;
@@ -526,7 +527,7 @@ footer {
         .page-body .page-content-wrapper .page-content-wrapper-inner .viewport-header {
           position: -webkit-sticky;
           position: sticky;
-          top: 65px;
+          top: 75px;
           background: #fbfcfd;
           z-index: 99; }
           .page-body .page-content-wrapper .page-content-wrapper-inner .viewport-header .breadcrumb {
