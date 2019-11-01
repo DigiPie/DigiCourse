@@ -23,12 +23,7 @@
         <div class="row">
             <div class="col-sm-6 col-md-6 col-lg-6 mx-auto mt-5 p-5 bg-light border-prompt rounded">
                 <img class="logo-mid mx-auto my-4" src="images/logo.png" />
-                <div class="alert alert-warning">
-                    Student: A0000001A<br />
-                    Password: DatabaseSystem<br />
-                    Professor: P0000001A<br />
-                    Password: DatabaseSystem
-                </div>
+                <h2 class="mb-5">DigiCourse</h2>
                 <% if (messages.info) {%>
                 <div class="alert alert-info">
                     <%= messages.info %>
@@ -44,14 +39,14 @@
                         <div class="form-label-group">
                             <input type="text" id="username" class="form-control" placeholder="User ID"
                                 required="required" autofocus="autofocus" name="username"
-                                pattern="[A-Za-z][A-Za-z0-9_]{2,14}" value='A0000001A'>
+                                pattern="[A-Za-z][A-Za-z0-9_]{2,14}">
                             <label for="username" class="mt-2">User ID</label>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="form-label-group">
                             <input type="password" id="password" class="form-control" placeholder="Password"
-                                required="required" name="password" value="DatabaseSystem">
+                                required="required" name="password">
                             <label for="password" class="mt-2">Password</label>
                         </div>
                     </div>

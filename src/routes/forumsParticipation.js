@@ -14,7 +14,7 @@ router.get('/', function(req, res, next) {
 		return res.redirect('/login');
     }
 
-    // Retrieve a list of students (not TA) who holds the rank of the top 5 forum participation.
+    // Retrieve a list of students (not TA) who holds one of the top 5 ranking positions in forum participation.
     var get_top_student_participants =
 	'WITH entriesPerForum AS '
     + ' ( SELECT u_username, u_name, f_topic, COUNT(u_username) as num_of_entries'
@@ -41,25 +41,29 @@ router.get('/', function(req, res, next) {
     + '   ORDER BY num_of_entries desc'
     + ' )' 
     
-    + ' SELECT epf.u_username, epf.u_name, te.total_entries, string_agg(epf.f_topic, \', \') AS most_participated_forums, epf.num_of_entries'
-    + ' FROM entriesPerForum epf LEFT JOIN '
-    + ' ( SELECT u_username, COUNT(u_username) as total_entries, rank() over (order by COUNT(u_username) desc)'
-    + '   FROM ForumEntries'
-    + '   WHERE c_code = $1'
-    + '   AND c_year = $2'
-    + '   AND c_sem = $3'
-    + '   GROUP BY u_username'
-    + ' ) te'
-    + ' ON epf.u_username = te.u_username'
-    + ' WHERE NOT EXISTS'
-    + ' ( SELECT *'
-    + '   FROM entriesPerForum epf2'
-    + '   WHERE epf.u_username = epf2.u_username'
-    + '   AND epf.num_of_entries < epf2.num_of_entries'
-    + ' )'
-    + ' AND te.rank <= 5'
-    + ' GROUP BY epf.u_username, epf.u_name, te.total_entries, epf.num_of_entries'
-    + ' ORDER BY te.total_entries desc';
+    + ' SELECT ranked.*'
+    + ' FROM'
+    + ' ( SELECT epf.u_username, epf.u_name, te.total_entries, string_agg(epf.f_topic, \', \') AS most_participated_forums, epf.num_of_entries, DENSE_RANK() over (order by te.total_entries desc) as ranking'
+    + '   FROM entriesPerForum epf LEFT JOIN '
+    + '   ( SELECT u_username, COUNT(u_username) as total_entries'
+    + '     FROM ForumEntries'
+    + '     WHERE c_code = $1'
+    + '     AND c_year = $2'
+    + '     AND c_sem = $3'
+    + '     GROUP BY u_username'
+    + '   ) te'
+    + '   ON epf.u_username = te.u_username'
+    + '   WHERE NOT EXISTS'
+    + '   ( SELECT *'
+    + '     FROM entriesPerForum epf2'
+    + '     WHERE epf.u_username = epf2.u_username'
+    + '     AND epf.num_of_entries < epf2.num_of_entries'
+    + '   )'
+    + '   GROUP BY epf.u_username, epf.u_name, te.total_entries, epf.num_of_entries'
+    + ' ) ranked'
+    + ' WHERE ranked.ranking <= 5'
+    + ' GROUP BY ranked.u_username, ranked.u_name, ranked.total_entries, ranked.most_participated_forums, ranked.num_of_entries, ranked.ranking'
+    + ' ORDER BY ranked.ranking';
 
     // Retrieve a list of teaching assistants who holds the rank of the top 5 forum participation.
     var get_top_teaching_participants =
@@ -88,25 +92,30 @@ router.get('/', function(req, res, next) {
     + '   ORDER BY num_of_entries desc'
     + ' )' 
     
-    + ' SELECT epf.u_username, epf.u_name, te.total_entries, string_agg(epf.f_topic, \', \') AS most_participated_forums, epf.num_of_entries'
-    + ' from entriesPerForum epf LEFT JOIN '
-    + ' ( SELECT u_username, COUNT(u_username) as total_entries, rank() over (order by COUNT(u_username) desc)'
-    + '   FROM ForumEntries'
-    + '   WHERE c_code = $1'
-    + '   AND c_year = $2'
-    + '   AND c_sem = $3'
-    + '   GROUP BY u_username'
-    + ' ) te'
-    + ' ON epf.u_username = te.u_username'
-    + ' WHERE NOT EXISTS'
-    + ' ( SELECT *'
-    + '   FROM entriesPerForum epf2'
-    + '   WHERE epf.u_username = epf2.u_username'
-    + '   AND epf.num_of_entries < epf2.num_of_entries'
-    + ' )'
-    + ' AND te.rank <= 5'
-    + ' GROUP BY epf.u_username, epf.u_name, te.total_entries, epf.num_of_entries'
-    + ' ORDER BY te.total_entries desc';
+    + ' SELECT ranked.*'
+    + ' FROM'
+    + ' ( SELECT epf.u_username, epf.u_name, te.total_entries, string_agg(epf.f_topic, \', \') AS most_participated_forums, epf.num_of_entries, DENSE_RANK() over (order by te.total_entries desc) as ranking'
+    + '   FROM entriesPerForum epf LEFT JOIN '
+    + '   ( SELECT u_username, COUNT(u_username) as total_entries'
+    + '     FROM ForumEntries'
+    + '     WHERE c_code = $1'
+    + '     AND c_year = $2'
+    + '     AND c_sem = $3'
+    + '     GROUP BY u_username'
+    + '   ) te'
+    + '   ON epf.u_username = te.u_username'
+    + '   WHERE NOT EXISTS'
+    + '   ( SELECT *'
+    + '     FROM entriesPerForum epf2'
+    + '     WHERE epf.u_username = epf2.u_username'
+    + '     AND epf.num_of_entries < epf2.num_of_entries'
+    + '   )'
+    + '   GROUP BY epf.u_username, epf.u_name, te.total_entries, epf.num_of_entries'
+    + ' ) ranked'
+    + ' WHERE ranked.ranking <= 5'
+    + ' GROUP BY ranked.u_username, ranked.u_name, ranked.total_entries, ranked.most_participated_forums, ranked.num_of_entries, ranked.ranking'
+    + ' ORDER BY ranked.ranking';
+
     
 	pool.query(get_top_student_participants, [req.cid, req.year, req.sem], (err, students) => {
         pool.query(get_top_teaching_participants, [req.cid, req.year, req.sem], (err, teaching) => {

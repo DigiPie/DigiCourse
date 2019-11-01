@@ -1,8 +1,6 @@
-var express = require('express');
-var sql_query = require('../sql');
-var passport = require('passport');
-var bcrypt = require('bcrypt')
-var router = express.Router();
+let express = require('express');
+let passport = require('passport');
+let router = express.Router();
 
 const { Pool } = require('pg')
 const pool = new Pool({

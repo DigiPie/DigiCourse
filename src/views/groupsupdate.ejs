@@ -36,14 +36,14 @@
           <div class="content-viewport">
             <div class="row">
               <div class="col-12 py-5">
-                <% if (accountType == 'Professor') { %>
                 <div class="topnav">
-                  <a href="/course/<%= cid %>/forum">Create forum</a>
-                  <a class="active" href="#">Assign forum</a>
-                  <a href="/course/<%= cid %>/forum/unassign">Unassign forum</a>
-                  <a href="/course/<%= cid %>/forum/participation">Participation</a>
+                  <a href="/course/<%= cid %>/groups">Student roster</a>
+                  <a href="/course/<%= cid %>/groups/create">Create group</a>
+                  <a href="/course/<%= cid %>/groups/assign">Assign group</a>
+                  <a class="active" href="#">Update group</a>
+                  <a href="/course/<%= cid %>/groups/unassign">Unassign group</a>
                 </div>
-                <br>
+                </br>
                 <% if (messages.error) {%>
                   <div class="alert alert-danger">
                     <%= messages.error %>
@@ -52,45 +52,49 @@
                     <div class="alert alert-success">
                       <%= messages.success %>
                     </div>
-                <% } %>
-                <% if (forums.length == 0) { %>
-                  <h4>There are currently no groups to be assigned.</h4>
+                  <% } %>
+                <% if (datarows.length == 0) { %>
+                  <h4>There are no groups in this module.</h4>
                 <% } else { %>
+                <form id="html_form" action="/course/<%= cid %>/groups/update" role="form" method="post">
+                  <label for="g_num">Group to update</label>
+                  <select class="g_num" data-style="btn-info" name="g_num">
+                    <optgroup label="Select group number">
+                      <% groups.forEach(function(row){ %>
+                      <option value="<%= row.g_num %>"><%= row.g_num %></option>
+                      <% }) %>
+                    </optgroup>
+                  </select>
+                  <br />
+                  <label for="g_capacity">New group capacity</label><br />
+                  <input type="number" class="form-control" id="g_capacity" name="g_capacity">
+                  <br />
+                  <input type="hidden" name='c_code' value="<%= cid %>">
+                  <button type="submit" class="btn btn-primary">Update group</button>
+                </form>
+                <br>
+                </br>
                 <form id="html_form" role="form" method="post">
-                    <% var count = 0; %>
-                    <% for (var x = 0; x < forums.length; x++) { %>
-                    <div class="topnav">
-                        <div class="title"><%= forums[x].f_topic %></div>
-                    </div>
-                    <br>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Group no.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% for (var i = 0; i < forumGroups.length; i++) { %>
-                            <tr>
-                                <% if (forumGroups[i].formatted == forums[x].formatted && forumGroups[i].p_id == forums[x].p_id) { %>
-                                    <td class="min"><input type="checkbox" name="row[<%= count %>][selected]" ></td>
-                                    <input type="hidden" name='row[<%= count %>][p_id]' value="<%= forums[x].p_id %>">
-                                    <input type="hidden" name='row[<%= count %>][f_datetime]' value="<%= forums[x].formatted %>">
-                                    <td><input type="hidden" name='row[<%= count %>][g_num]' value="<%= forumGroups[i].g_num %>"><%= forumGroups[i].g_num %></td>
-                                <% } %>
-                            </tr>
-                            <% count += 1;} %>
-                            <tr>
-                                <td><button type="submit" formaction="/course/<%= cid %>/forum/assign" class="btn btn-primary" >Submit</button></td>
-                            </tr>
-                        </tbody>
+                  <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Group number</th>
+                          <th scope="col">Group capacity</th>
+                          <th scope="col">Number of students assigned</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% for (var i = 0; i < datarows.length; i++) { %>
+                        <tr>
+                          <td><%= datarows[i].g_num %></td>
+                          <td><%= datarows[i].g_capacity %></td>
+                          <td><%= datarows[i].enrolled %></td>
+                        </tr>
+                        <% } %>
+                      </tbody>
                     </table>
-                    <% } %>
                 </form>
                 <% } %>
-                <% } %>
-                <br>
               </div>
             </div>
             <!-- put your stuff here -->
@@ -108,6 +112,6 @@
     <!-- End of Main Content -->
 
     <!-- Additional Javascript -->
-    <script src="javascripts/label_template.js"></script>
+    <script src="/javascripts/label_template.js"></script>
   </body>
 </html>
