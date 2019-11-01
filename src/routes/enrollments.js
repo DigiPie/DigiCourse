@@ -29,7 +29,6 @@ router.get('/', function(req, res, next) {
 
     pool.query(capacity_query, (err, cdata) => {
         current_capacity = cdata.rows[0].c_capacity;
-        var new_capacity = increase_count == undefined ? current_capacity + 10 : increase_count; 
         increase_count = undefined;
 
         pool.query(sql_query, (err, data) => {
@@ -42,14 +41,11 @@ router.get('/', function(req, res, next) {
                 data: req.data,
                 datarows: data.rows,
                 capacity: current_capacity,
-                new_capacity: new_capacity 
             });
         });  
     });
     
 });
-
-const account_uid = 'P0000001A';
 
 router.post('/increase', function(req, res, next) {
     if (req.body.c_capacity.length == 0) {
@@ -58,22 +54,35 @@ router.post('/increase', function(req, res, next) {
         return;
     }
 
+    const check_capacity_sql = `SELECT COUNT(*) count FROM CourseEnrollments
+    WHERE c_code = '${req.params.cid}'
+    AND c_year = '${req.year}' 
+    AND c_sem = '${req.sem}'
+    AND req_type = 1`
+
     const column_set = new pgp.helpers.ColumnSet(['?c_code', 'c_capacity'], {table: 'courseyearsem'});
     const update_sql = pgp.helpers.update({c_code: req.params.cid, c_capacity: req.body.c_capacity}, column_set) 
     + ` WHERE c_code = '${req.params.cid}' AND c_year = '${req.year}' AND c_sem = '${req.sem}'`;
 
-	pool.query(update_sql, (err, data) => {
-        if (err) {
-            res.status(err.status || 500);
-            res.render('error', {
-                message: "Something went wrong during the update, try again later.",
-                error: err
-            });
-        } else {
-            req.flash('success', `Successfully increased the capacity to ${req.body.c_capacity}.`);
-            res.status(200).redirect('back');
+    pool.query(check_capacity_sql, (err, cdata) => {
+        if (parseInt(req.body.c_capacity) < parseInt(cdata.rows[0].count)) {
+            req.flash('error', `Please enter a valid capacity. Capacity must be at least equal to number of students already enrolled in the course: ${cdata.rows[0].count}.`);
+            res.status(400).redirect('back');
+            return;
         }
-	});
+        pool.query(update_sql, (err, data) => {
+            if (err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: 'Something went wrong during the update, try again later.',
+                    error: err
+                });
+            } else {
+                req.flash('success', `Successfully changed the course capacity to ${req.body.c_capacity}.`);
+                res.status(200).redirect('back');
+            }
+        });
+    });
 });
 
 // POST
@@ -93,7 +102,7 @@ router.post('/accept', function(req, res, next) {
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].accepted;
         selected_rows[i].req_status = true;
-        selected_rows[i].p_id = account_uid;
+        selected_rows[i].p_id = req.user.u_username;
         sids.push(selected_rows[i].s_id);
 
         if (selected_rows[i].req_type == 0) {
@@ -187,7 +196,7 @@ router.post('/reject', function(req, res, next) {
     for(var i=0; i<selected_rows.length; i++) {
         delete selected_rows[i].accepted;
         selected_rows[i].req_status = false;
-        selected_rows[i].p_id = account_uid;
+        selected_rows[i].p_id = req.user.u_username;
         sids.push(selected_rows[i].s_id);
     }
 
