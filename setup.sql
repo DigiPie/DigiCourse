@@ -530,14 +530,22 @@ FOR EACH ROW
 EXECUTE PROCEDURE bef_delete_entries();
 
 -- Accounts(u_username, passwd) -> u_username
-INSERT INTO Accounts VALUES ('A0000001A', 'Leslie Cole', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
-INSERT INTO Accounts VALUES ('A0000002B', 'Myra Morgan', 'B');
-INSERT INTO Accounts VALUES ('A0000003C', 'Raymond Benson', 'C');
-INSERT INTO Accounts VALUES ('A0000004D', 'Wendy Kelley', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
-INSERT INTO Accounts VALUES ('A0000005E', 'Patrick Bowers', 'E');
-INSERT INTO Accounts VALUES ('A0000006F', 'Brooklyn DontShow', 'F');
-INSERT INTO Accounts VALUES ('P0000001A', 'Adi', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');
-INSERT INTO Accounts VALUES ('P0000002B', 'John', 'B');
+INSERT INTO Accounts VALUES ('A0000001A', 'Leslie Cole', 
+    '$2b$10$PZtiJLgnJSdPU.RiraxSFulahGSVuTSShcSAqAQLbjiZivhwqzxHm'); -- CS2102CS2102
+INSERT INTO Accounts VALUES ('A0000002B', 'Myra Morgan', 
+    '$2b$10$dE1i3nRqX0.hdGJWzuVQm.izUF3NT8iE83OBEcpjbmobTOskPZ6EW'); -- ApplePie88
+INSERT INTO Accounts VALUES ('A0000003C', 'Raymond Benson', 
+    '$2b$10$BJuZak/SRdEbP5SzKECudulko/b8HFrLq/w1dMhxTJ56vMAocWJpe'); -- CS3103CS3103
+INSERT INTO Accounts VALUES ('A0000004D', 'Wendy Kelley',       
+    '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.'); -- DatabaseSystem
+INSERT INTO Accounts VALUES ('A0000005E', 'Patrick Bowers',
+    '$2b$10$dE1i3nRqX0.hdGJWzuVQm.izUF3NT8iE83OBEcpjbmobTOskPZ6EW'); -- ApplePie88
+INSERT INTO Accounts VALUES ('A0000006F', 'Brooklyn DontShow', 
+    '$2b$10$3nSOWrxZrZ6vvv5gE1zZjejHxUWSt48vBdRfr9LH5eWNiM68vI/Oi'); -- ChickenRiceTheBest
+INSERT INTO Accounts VALUES ('P0000001A', 'Adi',    
+    '$2b$10$PZtiJLgnJSdPU.RiraxSFulahGSVuTSShcSAqAQLbjiZivhwqzxHm'); -- CS2102CS2102
+INSERT INTO Accounts VALUES ('P0000002B', 'John',
+    '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.'); -- DatabaseSystem
 
 -- Professors(p_id) -> p_id
 INSERT INTO Professors VALUES ('P0000001A');

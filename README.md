@@ -34,3 +34,4 @@ Each time a commit is made to the `master` branch, the project is automatically 
 * This project is deployed to Heroku with the help of the Heroku buildpack [subdir-heroku-buildpack](https://github.com/DigiPie/subdir-heroku-buildpack) developed by [Alexey Timanovsky](https://github.com/timanovsky).
 * This project made use of async/await codes for node-postgres by [Francesco Zerbinati](https://gist.github.com/zerbfra/70b155fa00b4e0d6fd1d4e090a039ad4).
 * This project was developed using web template designed by [uxcandy.co](https://www.uxcandy.co/).
+* This project's logo was designed by [freepik - www.freepik.com](https://www.freepik.com/free-photos-vectors/logo)</a>
