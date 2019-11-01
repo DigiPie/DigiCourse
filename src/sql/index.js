@@ -8,7 +8,9 @@ sql.query = {
 				+ ' ELSE \'null\''
 				+ ' END AS u_type'
 				+ ' FROM Accounts'
-				+ ' WHERE u_username = $1'
+				+ ' WHERE u_username = $1',
+	// Update password
+	update_user_passwd: 'UPDATE Accounts SET passwd = $1 WHERE u_username = $2'
 }
 
 module.exports = sql

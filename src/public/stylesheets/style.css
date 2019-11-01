@@ -95,10 +95,6 @@ td.min {
  ***********************************************/
 
 nav > .nav.nav-tabs {
-  /*border: none;
-  color:#fff;
-  background:#C98986;
-  border-radius:0;*/
 }
 
 nav > div a.nav-item.nav-link {
@@ -112,8 +108,6 @@ nav > div a.nav-item.nav-link {
 nav > div a.nav-item.nav-link.active {
   border: none;
   padding: 18px 25px;
-  /*color:#fff;
-  background:#C98986;*/
   border-radius:0;
   border-bottom:5px solid #efb200;
 }
@@ -135,12 +129,23 @@ nav > div a.nav-item.nav-link:focus {
   transition:background 0.20s linear;
 }
 
+a, a:visited, a:hover {
+  text-decoration: none;
+  outline: none;
+}
+
+a h4, a:visited h4, a:hover h4 {
+  text-decoration: none;
+  -webkit-transition: color .3s ease-in-out;
+  -moz-transition: color .3s ease-in-out;
+  -o-transition: color .3s ease-in-out;
+  transition: color .3s ease-in-out;
+}
+
 .tab-content {
   background: #fdfdfd;
   line-height: 25px;
   border: 1px solid #ddd;
-  /*border-top:5px solid #C98986;
-  border-bottom:5px solid #e74c3c;*/
   padding:30px 25px;
   width: 100%;
   min-height: 500px;
