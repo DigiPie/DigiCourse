@@ -25,9 +25,28 @@ router.get('/:cid', function(req, res, next) {
 	//var sql_query = `SELECT * FROM courses WHERE c_code =\'${req.params.cid}\'`;
 	var sql_query;
 	if (req.user.u_type == 'Professor') {
-		sql_query = 'SELECT C.c_code, C.c_name, (SELECT COUNT(*) > 0 FROM CourseManages CM WHERE CM.c_code = C.c_code AND CM.p_id = $1) AS user_can_see FROM CourseDetails C WHERE C.c_code = $2';
+		sql_query = 'SELECT C.c_code, C.c_name,'
+		+ ' ( SELECT COUNT(*) > 0'
+		+ '   FROM CourseManages CM'
+		+ '   WHERE CM.c_code = C.c_code' 
+		+ '   AND CM.p_id = $1'
+		+ '   AND CM.c_year = $3'
+		+ '   AND CM.c_sem = $4'
+		+ ' ) AS user_can_see'
+		+ ' FROM CourseDetails C' 
+		+ ' WHERE C.c_code = $2';
+
 	} else {
-		sql_query = "SELECT C.c_code, C.c_name, (SELECT COUNT(*) > 0 FROM CourseEnrollments CE WHERE CE.c_code = C.c_code AND CE.s_id = $1) AS user_can_see FROM CourseDetails C WHERE C.c_code = $2";
+		sql_query = 'SELECT C.c_code, C.c_name,'
+		+ ' ( SELECT COUNT(*) > 0'
+		+ '   FROM CourseEnrollments CE'
+		+ '   WHERE CE.c_code = C.c_code' 
+		+ '   AND CE.s_id = $1'
+		+ '   AND CE.c_year = $3'
+		+ '   AND CE.c_sem = $4'
+		+ ' ) AS user_can_see'
+		+ ' FROM CourseDetails C' 
+		+ ' WHERE C.c_code = $2';
 	}
 
 	const current_year_sem_query = 
@@ -42,7 +61,7 @@ router.get('/:cid', function(req, res, next) {
 		year = cdata.rows[0].c_year;
 		sem = cdata.rows[0].c_sem;
 
-		pool.query(sql_query, [req.user.u_username, req.params.cid], (err, data) => {
+		pool.query(sql_query, [req.user.u_username, req.params.cid, year, sem], (err, data) => {
 			courseName = data.rows;
 
 			res.render('course', {

@@ -110,7 +110,6 @@ router.post('/create', function(req, res, next) {
     var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_username}', '${req.cid}', '${req.year}', '${req.sem}', NOW(), '${req.body.f_topic}')`;
 
     pool.query(insert_new_forum, (err, data) => {
-        console.log(data);
         if (err || data.rowCount == 0) {
             req.flash('error', 'Error. Please try again.');
             res.status(500).redirect('back');
