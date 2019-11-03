@@ -34,7 +34,7 @@ router.get('/:cid', function(req, res, next) {
 		`SELECT c_year, c_sem
 		FROM CourseYearSem
 		GROUP BY c_year, c_sem
-		ORDER BY c_year DESC, c_sem ASC
+		ORDER BY c_year DESC, c_sem DESC
 		LIMIT 1;`
 
 	// Query
