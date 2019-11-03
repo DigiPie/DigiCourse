@@ -20,38 +20,46 @@ router.get('/', function(req, res, next) {
     }
     
     const sql_query =  
-        `SELECT c.*, cs.enrolled
-        FROM CourseGroups c
+        `SELECT c1.*, cs.enrolled
+        FROM CourseGroups c1
         JOIN (
-            SELECT c.c_code, c.g_num, count(s.c_code) enrolled
+            SELECT c.c_code, c.g_num, c.c_year, c.c_sem, count(s.c_code) enrolled
             FROM CourseGroups c
             LEFT OUTER JOIN StudentGroups s
             ON c.c_code = s.c_code
             AND c.g_num = s.g_num
+            AND c.c_year = s.c_year
+            AND c.c_sem = s.c_sem
             WHERE c.c_year = '${req.year}'
             AND c.c_sem = '${req.sem}'
-            GROUP BY c.c_code, c.g_num
-            ORDER BY g_num) cs
-        ON c.c_code = cs.c_code
-        AND c.g_num = cs.g_num
-        WHERE c.c_code = '${req.cid}'`;
+            GROUP BY c.c_code, c.g_num, c.c_year, c.c_sem) cs
+        ON c1.c_code = cs.c_code
+        AND c1.g_num = cs.g_num
+        AND c1.c_year = cs.c_year
+        AND c1.c_sem = cs.c_sem
+        WHERE c1.c_code = '${req.cid}'
+        ORDER BY c1.g_num`;
 
     const group_list_query =  
-    `SELECT c.g_num
-    FROM CourseGroups c
+    `SELECT c1.g_num
+    FROM CourseGroups c1
     JOIN (
-        SELECT c.c_code, c.g_num, count(s.c_code) enrolled
+        SELECT c.c_code, c.g_num, c.c_year, c.c_sem, count(s.c_code) enrolled
         FROM CourseGroups c
         LEFT OUTER JOIN StudentGroups s
         ON c.c_code = s.c_code
         AND c.g_num = s.g_num
+        AND c.c_year = s.c_year
+        AND c.c_sem = s.c_sem
         WHERE c.c_year = '${req.year}'
         AND c.c_sem = '${req.sem}' 
-        GROUP BY c.c_code, c.g_num
-        ORDER BY g_num) cs
-    ON c.c_code = cs.c_code
-    AND c.g_num = cs.g_num
-    WHERE c.c_code = '${req.cid}'`;
+        GROUP BY c.c_code, c.g_num, c.c_year, c.c_sem) cs
+    ON c1.c_code = cs.c_code
+    AND c1.g_num = cs.g_num
+    AND c1.c_year = cs.c_year
+    AND c1.c_sem = cs.c_sem
+    WHERE c1.c_code = '${req.cid}'
+    ORDER BY c1.g_num`;
 
 	pool.query(sql_query, (err, data) => {
         pool.query(group_list_query, (gerr, gdata) => {
