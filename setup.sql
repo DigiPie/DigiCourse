@@ -416,7 +416,7 @@ RETURNS trigger AS $$
 BEGIN
 	IF EXISTS (SELECT 1
 		FROM Manages m
-		WHERE m.p_id = NEW.u_username
+		WHERE m.p_id = NEW.p_id
         AND m.c_code = NEW.c_code
     	AND m.c_year = NEW.c_year
     	AND m.c_sem = NEW.c_sem) THEN
