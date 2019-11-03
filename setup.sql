@@ -481,8 +481,8 @@ BEGIN
     	AND m.c_year = OLD.c_year
     	AND m.c_sem = OLD.c_sem) = 1
 
-	-- The teaching assistants in the course can delete entries in the forum.
-	ELSIF (SELECT count(*)
+	-- The teaching assistants in the course can also delete entries in the forum.
+	OR (SELECT count(*)
 		FROM Enrollments e
 		WHERE e.s_id = (SELECT distinct e_deleted_by 
 						FROM ForumEntries fe
