@@ -410,6 +410,29 @@ ON ForumEntries
 FOR EACH ROW
 EXECUTE PROCEDURE check_forum_group_permission();
 
+-- Check whether the user is a professor who manages the course, before allowing a new forum to be created.
+CREATE OR REPLACE FUNCTION check_course_forum_permission()
+RETURNS trigger AS $$ 
+BEGIN
+	IF EXISTS (SELECT 1
+		FROM Manages m
+		WHERE m.p_id = NEW.u_username
+        AND m.c_code = NEW.c_code
+    	AND m.c_year = NEW.c_year
+    	AND m.c_sem = NEW.c_sem) THEN
+		RETURN NEW;
+    ELSE
+        RAISE NOTICE 'Trigger user is not a professor managing this course, but attempts to create a forum'; 
+        RETURN NULL;
+    END IF;
+END; $$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER insert_forum
+BEFORE INSERT
+ON Forums
+FOR EACH ROW
+EXECUTE PROCEDURE check_course_forum_permission();
+
 -- Replace the formatted f_datetime with the actual f_datetime timestamp referenced in Forums table.
 CREATE OR REPLACE FUNCTION replace_f_datetime()
 RETURNS trigger AS $$ 
