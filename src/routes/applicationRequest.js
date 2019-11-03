@@ -61,8 +61,10 @@ router.get('/', function(req, res, next) {
 							OR (F.req_type=1 AND F.p_id IS NOT NULL AND F.req_status=True))
 				)
 		)
-		SELECT c_code, c_name, canbe_ta 
-		FROM CourseRequestForUser NATURAL JOIN CourseDetails
+		SELECT cru.c_code, c_name, cru.canbe_ta 
+		FROM CourseRequestForUser cru
+		JOIN CurrentSemCourses csm ON cru.c_code = csm.c_code
+		JOIN CourseDetails cd ON cru.c_code = cd.c_code AND csm.c_code = cd.c_code
 		ORDER BY c_code, canbe_ta`; 
 
 	// Query
