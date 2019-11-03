@@ -48,8 +48,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/increase', function(req, res, next) {
-    if (req.body.c_capacity.length == 0) {
-        req.flash('error', `Please enter a capacity`);
+    if (req.body.c_capacity == '' || isNaN(req.body.c_capacity) || req.body.c_capacity <= 0) {
+        req.flash('error', `Please enter a valid capacity.`);
         res.status(400).redirect('back');
         return;
     }

@@ -23,21 +23,21 @@ router.get('/', function(req, res, next) {
     'SELECT u_username, CASE'
     + ' WHEN' 
     + ' ( SELECT COUNT(*)' 
-    + '   FROM Enrollments' 
-    + '   WHERE s_id = $1' 
-    + '   AND c_code = $2' 
-    + '   AND c_year = $3'
-    + '   AND c_sem = $4'
-    + '   AND req_type = 0' 
-    + '   AND req_status = \'TRUE\''
+    + '   FROM Enrollments e' 
+    + '   WHERE e.s_id = $1' 
+    + '   AND e.c_code = $2' 
+    + '   AND e.c_year = $3'
+    + '   AND e.c_sem = $4'
+    + '   AND e.req_type = 0' 
+    + '   AND e.req_status = \'TRUE\''
     + ' ) = 1 THEN \'Teaching\''
     + ' WHEN' 
     + ' ( SELECT COUNT(*)' 
-    + '   FROM Manages' 
-    + '   WHERE p_id = $1'
-    + '   AND c_code = $2'
-    + '   AND c_year = $3'
-    + '   AND c_sem = $4'
+    + '   FROM Manages m' 
+    + '   WHERE m.p_id = $1'
+    + '   AND m.c_code = $2'
+    + '   AND m.c_year = $3'
+    + '   AND m.c_sem = $4'
     + ' ) = 1 THEN \'Professor\''
 	+ ' ELSE \'null\''
 	+ ' END AS u_type'
@@ -110,9 +110,9 @@ router.post('/create', function(req, res, next) {
     var insert_new_forum = `INSERT INTO Forums VAlUES ('${req.user.u_username}', '${req.cid}', '${req.year}', '${req.sem}', NOW(), '${req.body.f_topic}')`;
 
     pool.query(insert_new_forum, (err, data) => {
-        if (err) {
+        if (err || data.rowCount == 0) {
             req.flash('error', 'Error. Please try again.');
-            res.status(err.status || 500).redirect('back');
+            res.status(500).redirect('back');
 
         } else {
             req.flash('success', `Successfully created forum "${req.body.f_topic}".`);

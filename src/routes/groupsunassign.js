@@ -26,6 +26,8 @@ router.get('/', function(req, res, next) {
             LEFT OUTER JOIN StudentGroups s
             ON c.c_code = s.c_code
             AND c.s_id = s.s_id
+            AND c.c_year = s.c_year
+            AND c.c_sem = s.c_sem
             WHERE c.c_code = \'${req.params.cid}\'
             AND c.c_year = '${req.year}'
             AND c.c_sem = '${req.sem}'
