@@ -8,14 +8,14 @@ from datetime import datetime, timedelta
 
 # global config
 insert_filename = 'insert.sql'
-num_of_prof = 10						# for generating professor account (there will be x prof account)
+num_of_prof = 30						# for generating professor account (there will be x prof account)
 num_of_students = 150					# for generating student account (there will be x student account)
 num_of_courses = 50						# for generating course (there will be x courses)
-num_of_groups = 4						# for generating CourseGroup (each course will have x groups)
+num_of_groups = 5						# for generating CourseGroup (each course will have x groups)
 start_year = 2016						# for generating courseyearsme 
 current_year = 2019						# for generating courseyearsme 
 current_sem = 2							# for generating courseyearsme (either 1 or 2)
-class_capacity = 100					# set upper limit for class sizes (each course will have 20 - x capacity)
+class_capacity = 60						# set upper limit for class sizes (each course will have 20 - x capacity)
 max_prof_per_class = 2					# for generating Manages (each course will have 1-x prof)
 num_of_rejected_students = 3			# for generating enrollment (each course will have 0-x rejected students)
 num_of_pending_students = 3				# for generating enrollment (each course will have 0-x pending students)
