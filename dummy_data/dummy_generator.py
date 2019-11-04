@@ -9,10 +9,10 @@ from datetime import datetime, timedelta
 # global config
 insert_filename = 'insert.sql'
 num_of_prof = 30						# for generating professor account (there will be x prof account)
-num_of_students = 150					# for generating student account (there will be x student account)
-num_of_courses = 50						# for generating course (there will be x courses)
+num_of_students = 500					# for generating student account (there will be x student account)
+num_of_courses = 20						# for generating course (there will be x courses)
 num_of_groups = 5						# for generating CourseGroup (each course will have x groups)
-start_year = 2016						# for generating courseyearsme 
+start_year = 2017						# for generating courseyearsme 
 current_year = 2019						# for generating courseyearsme 
 current_sem = 2							# for generating courseyearsme (either 1 or 2)
 class_capacity = 60						# set upper limit for class sizes (each course will have 20 - x capacity)
@@ -242,11 +242,15 @@ def select_student(studentCourses, requestList, stud_ids, ccode, c_year, c_sem):
 		if stud_id in studentCourses:
 			enrolledCourses = studentCourses[stud_id]
 			if ccode in enrolledCourses:
-				# ensure that the year/sem is different
-				stored_year, stored_sem = enrolledCourses[ccode]
-				if stored_year == c_year and stored_sem == c_sem:
+				# check if current year / sem is greater
+				stud_year, stud_sem = enrolledCourses[ccode]
+				if stud_year < c_year:							# student have enrolled before, ignore
 					stud_id = None
-					continue									# student have enrolled, ignore
+					continue
+				elif stud_year == c_year:
+					if stud_sem < c_sem:						# student have enrolled before, ignore
+						stud_id = None
+						continue
 
 		requestList[stud_id] = 1
 		break													# student have not enrolled / rejected / pending
