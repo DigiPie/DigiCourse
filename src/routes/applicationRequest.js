@@ -51,7 +51,7 @@ router.get('/', function(req, res, next) {
 			)
 			UNION
 			SELECT C.c_code, C.c_year, C.c_sem, True AS canbe_ta
-			FROM CurrentSemCourses C LEFT JOIN Enrollments E
+			FROM CurrentSemCourses C LEFT JOIN (SELECT * FROM Enrollments WHERE s_id = $1) AS E
 				ON C.c_code=E.c_code AND C.c_year=E.c_year AND C.c_sem=E.c_sem		
 			WHERE E.req_type IS NULL 												
 				AND EXISTS (
@@ -104,7 +104,7 @@ router.post('/', function(req, res, next) {
 			)
 			UNION
 			SELECT C.c_code, C.c_year, C.c_sem, True AS canbe_ta
-			FROM CurrentSemCourses C LEFT JOIN Enrollments E
+			FROM CurrentSemCourses C LEFT JOIN (SELECT * FROM Enrollments WHERE s_id = $1) AS E
 				ON C.c_code=E.c_code AND C.c_year=E.c_year AND C.c_sem=E.c_sem		
 			WHERE E.req_type IS NULL 												
 				AND EXISTS (
@@ -146,7 +146,7 @@ router.post('/', function(req, res, next) {
 		SELECT c_year, c_sem
 		FROM CourseYearSem
 		GROUP BY c_year, c_sem
-		ORDER BY c_year DESC, c_sem ASC
+		ORDER BY c_year DESC, c_sem DESC
 		LIMIT 1`;
 
 		// Query
