@@ -219,6 +219,17 @@ CREATE OR REPLACE FUNCTION f_valid_enrollment() RETURNS TRIGGER AS $$
             RAISE NOTICE 'Trigger capacity has met, increase capacity of the course to enroll more students.';
             RETURN NULL;
         END IF;
+
+        IF NEW.req_type = 1 AND 
+            (SELECT COUNT(*) 
+            FROM Enrollments 
+            WHERE s_id = NEW.s_id 
+            AND c_code = NEW.c_code 
+            AND req_status 
+            AND req_type = 1) > 0 THEN
+            RAISE NOTICE 'Trigger student enrolled in this course before.';
+            RETURN NULL;
+        END IF;
         
         IF NEW.req_status THEN
             SELECT c_name INTO course_name
@@ -703,7 +714,6 @@ INSERT INTO CourseGroups VAlUES ('CS2100', 2019, 1, 1, 5);
 
 -- Enrollments (s_id, c_code, c_year, c_sem, req_type, req_datetime, p_id, req_status) --> s_id, c_code, c_year, c_sem, req_datetime
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', FALSE); 
-INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000006F', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2019, 1, 1, NOW(), 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2019, 1, 1, NOW(), 'P0000001A', TRUE); 
