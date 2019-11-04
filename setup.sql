@@ -219,6 +219,17 @@ CREATE OR REPLACE FUNCTION f_valid_enrollment() RETURNS TRIGGER AS $$
             RAISE NOTICE 'Trigger capacity has met, increase capacity of the course to enroll more students.';
             RETURN NULL;
         END IF;
+
+        IF NEW.req_type = 1 AND 
+            (SELECT COUNT(*) 
+            FROM Enrollments 
+            WHERE s_id = NEW.s_id 
+            AND c_code = NEW.c_code 
+            AND req_status 
+            AND req_type = 1) > 0 THEN
+            RAISE NOTICE 'Trigger student enrolled in this course before.';
+            RETURN NULL;
+        END IF;
         
         IF NEW.req_status THEN
             SELECT c_name INTO course_name
@@ -321,7 +332,7 @@ CREATE TABLE ForumEntries (
     f_datetime      timestamp NOT NULL,
     u_username      varchar(9) REFERENCES Accounts (u_username),
     e_datetime      timestamp NOT NULL,
-    e_content       varchar(1000) NOT NULL,
+    e_content       varchar(2000) NOT NULL,
     e_deleted_by    varchar(9) DEFAULT NULL,
     PRIMARY KEY (c_code, c_year, c_sem, p_id, f_datetime, u_username, e_datetime),
     FOREIGN KEY (e_deleted_by) REFERENCES Accounts (u_username),
@@ -360,7 +371,7 @@ CREATE TABLE ForumEntriesLog (
     e_author_id          varchar(9) NOT NULL,
     e_author_name        varchar(100) NOT NULL,
     e_datetime           timestamp NOT NULL,
-    e_content            varchar(1000) NOT NULL,
+    e_content            varchar(2000) NOT NULL,
     e_delete_id          varchar(9) NOT NULL,
     e_delete_name        varchar(100) NOT NULL,
     e_delete_datetime    timestamp NOT NULL,
@@ -493,13 +504,15 @@ BEGIN
 	-- The professor managing the course can delete entries in the forum.
 	IF (SELECT count(*)
 		FROM Manages m
-		WHERE m.p_id = (SELECT distinct e_deleted_by 
+		WHERE m.p_id = (SELECT e_deleted_by 
 						FROM ForumEntries fe
-						WHERE fe.f_datetime = OLD.f_datetime 
+						WHERE TO_CHAR(fe.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(OLD.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') 
 						AND fe.p_id = OLD.p_id
 						AND fe.c_code = OLD.c_code
 						AND fe.c_year = OLD.c_year
-						AND fe.c_sem = OLD.c_sem)
+						AND fe.c_sem = OLD.c_sem
+                        AND fe.u_username = OLD.u_username
+                        AND TO_CHAR(fe.e_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(OLD.e_datetime, 'Dy Mon DD YYYY HH24:MI:SS'))
     	AND m.c_code = OLD.c_code
     	AND m.c_year = OLD.c_year
     	AND m.c_sem = OLD.c_sem) = 1
@@ -507,13 +520,15 @@ BEGIN
 	-- The teaching assistants in the course can also delete entries in the forum.
 	OR (SELECT count(*)
 		FROM Enrollments e
-		WHERE e.s_id = (SELECT distinct e_deleted_by 
+		WHERE e.s_id = (SELECT e_deleted_by 
 						FROM ForumEntries fe
-						WHERE fe.f_datetime = OLD.f_datetime 
+						WHERE TO_CHAR(fe.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(OLD.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') 
 						AND fe.p_id = OLD.p_id
 						AND fe.c_code = OLD.c_code
 						AND fe.c_year = OLD.c_year
-						AND fe.c_sem = OLD.c_sem)
+						AND fe.c_sem = OLD.c_sem
+                        AND fe.u_username = OLD.u_username
+                        AND TO_CHAR(fe.e_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(OLD.e_datetime, 'Dy Mon DD YYYY HH24:MI:SS'))
     	AND e.c_code = OLD.c_code
     	AND e.c_year = OLD.c_year
     	AND e.c_sem = OLD.c_sem
@@ -703,7 +718,6 @@ INSERT INTO CourseGroups VAlUES ('CS2100', 2019, 1, 1, 5);
 
 -- Enrollments (s_id, c_code, c_year, c_sem, req_type, req_datetime, p_id, req_status) --> s_id, c_code, c_year, c_sem, req_datetime
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', FALSE); 
-INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000006F', 'CS2102', 2018, 1, 1, NOW() - interval '1 year', 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000001A', 'CS2102', 2019, 1, 1, NOW(), 'P0000001A', TRUE); 
 INSERT INTO Enrollments VALUES ('A0000002B', 'CS2102', 2019, 1, 1, NOW(), 'P0000001A', TRUE); 

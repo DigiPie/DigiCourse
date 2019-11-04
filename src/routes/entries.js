@@ -86,7 +86,7 @@ router.post('/post', function(req, res, next) {
     }
 
     // Content exceeding character limit of 1000 is not allowed.
-    if (req.body.e_content.length > 1000) {
+    if (req.body.e_content.length > 2000) {
         req.flash('error', 'Error. Character limit exceeded.');
         res.status(500).redirect('back');
     
