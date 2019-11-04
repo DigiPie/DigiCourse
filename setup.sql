@@ -493,13 +493,15 @@ BEGIN
 	-- The professor managing the course can delete entries in the forum.
 	IF (SELECT count(*)
 		FROM Manages m
-		WHERE m.p_id = (SELECT distinct e_deleted_by 
+		WHERE m.p_id = (SELECT e_deleted_by 
 						FROM ForumEntries fe
-						WHERE fe.f_datetime = OLD.f_datetime 
+						WHERE TO_CHAR(fe.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(OLD.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') 
 						AND fe.p_id = OLD.p_id
 						AND fe.c_code = OLD.c_code
 						AND fe.c_year = OLD.c_year
-						AND fe.c_sem = OLD.c_sem)
+						AND fe.c_sem = OLD.c_sem
+                        AND fe.u_username = OLD.u_username
+                        AND TO_CHAR(fe.e_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(OLD.e_datetime, 'Dy Mon DD YYYY HH24:MI:SS'))
     	AND m.c_code = OLD.c_code
     	AND m.c_year = OLD.c_year
     	AND m.c_sem = OLD.c_sem) = 1
@@ -507,13 +509,15 @@ BEGIN
 	-- The teaching assistants in the course can also delete entries in the forum.
 	OR (SELECT count(*)
 		FROM Enrollments e
-		WHERE e.s_id = (SELECT distinct e_deleted_by 
+		WHERE e.s_id = (SELECT e_deleted_by 
 						FROM ForumEntries fe
-						WHERE fe.f_datetime = OLD.f_datetime 
+						WHERE TO_CHAR(fe.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(OLD.f_datetime, 'Dy Mon DD YYYY HH24:MI:SS') 
 						AND fe.p_id = OLD.p_id
 						AND fe.c_code = OLD.c_code
 						AND fe.c_year = OLD.c_year
-						AND fe.c_sem = OLD.c_sem)
+						AND fe.c_sem = OLD.c_sem
+                        AND fe.u_username = OLD.u_username
+                        AND TO_CHAR(fe.e_datetime, 'Dy Mon DD YYYY HH24:MI:SS') = TO_CHAR(OLD.e_datetime, 'Dy Mon DD YYYY HH24:MI:SS'))
     	AND e.c_code = OLD.c_code
     	AND e.c_year = OLD.c_year
     	AND e.c_sem = OLD.c_sem
