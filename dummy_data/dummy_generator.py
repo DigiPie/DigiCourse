@@ -8,16 +8,17 @@ from datetime import datetime, timedelta
 
 # global config
 insert_filename = 'insert.sql'
-num_of_prof = 10						# for generating professor account (there will be x prof account)
-num_of_students = 30					# for generating student account (there will be x student account)
-num_of_courses = 10						# for generating course (there will be x courses)
-num_of_groups = 4						# for generating CourseGroup (each course will have x groups)
-start_year = 2016						# for generating courseyeamsem 
-current_year = 2019						# for generating courseyeamsem 
-class_capacity = 100					# set upper limit for class sizes (each course will have 20 - x capacity)
+num_of_prof = 30						# for generating professor account (there will be x prof account)
+num_of_students = 500					# for generating student account (there will be x student account)
+num_of_courses = 20						# for generating course (there will be x courses)
+num_of_groups = 5						# for generating CourseGroup (each course will have x groups)
+start_year = 2017						# for generating courseyearsme 
+current_year = 2019						# for generating courseyearsme 
+current_sem = 2							# for generating courseyearsme (either 1 or 2)
+class_capacity = 60						# set upper limit for class sizes (each course will have 20 - x capacity)
 max_prof_per_class = 2					# for generating Manages (each course will have 1-x prof)
-num_of_rejected_students = 5			# for generating enrollment (each course will have 0-x rejected students)
-num_of_pending_students = 5				# for generating enrollment (each course will have 0-x pending students)
+num_of_rejected_students = 3			# for generating enrollment (each course will have 0-x rejected students)
+num_of_pending_students = 3				# for generating enrollment (each course will have 0-x pending students)
 num_of_approved_ta = 5					# for generating enrollment (each course will have 0-x approved ta)
 num_of_rejected_ta = 3					# for generating enrollment (each course will have 0-x rejected ta)
 num_of_pending_ta = 2					# for generating enrollment (each course will have 0-x pending ta)
@@ -158,17 +159,39 @@ def insert_courses(num_of_courses, prof_ids):
 		f.write("\n-- Inserting into CourseYearSem" + "\n")
 		for key, value in courses.items():
 			year = start_year
-			# generate random data
+			# generate random data (for courses before current year)
 			num_of_sem = random.randint(1, 2)
-			while (year <= current_year):
+			while (year < current_year):
 				# generate random data
 				capacity = random.randint(20, class_capacity)
-				# write into file
+				# offer semester randomly
+				if num_of_sem == 1:
+					sem_offered = random.randint(1, 2)
+					# write into file
+					f.write("INSERT INTO CourseYearSem VALUES('" + key + "', " + str(year) + ", " + str(sem_offered) + ", " + str(capacity) + ");" + "\n")
+					# save to list
+					allCourses.append([key, year, sem_offered, capacity])
+				else:
+					# write into file
+					for sem in range(num_of_sem):
+						f.write("INSERT INTO CourseYearSem VALUES('" + key + "', " + str(year) + ", " + str(sem+1) + ", " + str(capacity) + ");" + "\n")
+						# save to list
+						allCourses.append([key, year, sem+1, capacity])
+				year += 1
+			# generate random data (for courses in current year)
+			num_of_sem = random.randint(1, 2)
+			capacity = random.randint(20, class_capacity)
+			if num_of_sem == 1:
+				# Write into file (Based on current sem indicated above)
+				f.write("INSERT INTO CourseYearSem VALUES('" + key + "', " + str(year) + ", " + str(current_sem) + ", " + str(capacity) + ");" + "\n")
+				# save to list
+				allCourses.append([key, year, current_sem, capacity])
+			else:
 				for sem in range(num_of_sem):
+					# write into file
 					f.write("INSERT INTO CourseYearSem VALUES('" + key + "', " + str(year) + ", " + str(sem+1) + ", " + str(capacity) + ");" + "\n")
 					# save to list
 					allCourses.append([key, year, sem+1, capacity])
-				year += 1
 
 
 		updatedAllCourses = []
@@ -203,7 +226,7 @@ def insert_courses(num_of_courses, prof_ids):
 	return allCourses
 
 # select student for enrollment
-def select_student(studentCourses, requestList, stud_ids, ccode):
+def select_student(studentCourses, requestList, stud_ids, ccode, c_year, c_sem):
 	# Select student 
 	indexes = list(range(0, len(stud_ids)))
 	stud_id_keys = list(stud_ids.keys())			
@@ -219,15 +242,22 @@ def select_student(studentCourses, requestList, stud_ids, ccode):
 		if stud_id in studentCourses:
 			enrolledCourses = studentCourses[stud_id]
 			if ccode in enrolledCourses:
-				stud_id = None
-				continue										# student have enrolled, ignore
+				# check if current year / sem is greater
+				stud_year, stud_sem = enrolledCourses[ccode]
+				if stud_year < c_year:							# student have enrolled before, ignore
+					stud_id = None
+					continue
+				elif stud_year == c_year:
+					if stud_sem < c_sem:						# student have enrolled before, ignore
+						stud_id = None
+						continue
 
 		requestList[stud_id] = 1
 		break													# student have not enrolled / rejected / pending
 	return stud_id
 
 # select student for ta
-def select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, ccode, course_year, course_sem):
+def select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, ccode, c_year, c_sem):
 	# select student
 	indexes = list(range(0, len(stud_ids)))
 	stud_id_keys = list(stud_ids.keys())
@@ -246,15 +276,16 @@ def select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, ccode, c
 		# check if student is enrolled
 		if stud_id in studentCourses:
 			enrolledCourses = studentCourses[stud_id]
+
 			if ccode in enrolledCourses:
 				# check if current year / sem is greater
 				stud_year, stud_sem = enrolledCourses[ccode]
-				if stud_year < course_year:				# student year is less than course year, can apply as TA
+				if stud_year < c_year:							# student year is less than course year, can apply as TA
 					requestTAlist[stud_id] = 1
 					break
-				elif stud_year == course_year:
-					if stud_sem < course_sem:
-						requestTAlist[stud_id] = 1		# student sem is 1 < 2
+				elif stud_year == c_year:
+					if stud_sem < c_sem:
+						requestTAlist[stud_id] = 1				# student sem is 1 < 2
 						break
 
 		stud_id = None
@@ -267,8 +298,8 @@ def select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, ccode, c
 		stud_ids = dictionary of students id
 '''
 def insert_enrollments(allCourses, stud_ids):
-	studentCourses = {}						# dictionary of students and their courses
-	courseStudents = {}						# dictionary of courses and their students
+	studentCourses = {}						# dictionary of students and their courses {stud_id: {code: year sem}}
+	courseStudents = {}						# dictionary of courses and their students {codeyearsem: {stud_ids: 1}}
 	
 	# Generate course application
 	with open(insert_filename, "a+") as f:
@@ -291,7 +322,7 @@ def insert_enrollments(allCourses, stud_ids):
 			# Insert rejected students
 			for i in range(random.randint(0, num_of_rejected_students)):
 				# Select student
-				stud_id = select_student(studentCourses, requestList, stud_ids, ccode)
+				stud_id = select_student(studentCourses, requestList, stud_ids, ccode, year, sem)
 				# Check if any student found
 				if stud_id == None:
 					break
@@ -302,17 +333,28 @@ def insert_enrollments(allCourses, stud_ids):
 			# Insert students who are successfully enrolled AKA student of the course
 			for slot in range(min(capacity, num_of_students)):
 				# Select student
-				stud_id = select_student(studentCourses, requestList, stud_ids, ccode)
+				stud_id = select_student(studentCourses, requestList, stud_ids, ccode, year, sem)
 				# Check if any student found
 				if stud_id == None:
 					break					# no more students eligible to take class
 				else:
 					# Add Course to Student
 					if stud_id in studentCourses:
-						studentCourses[stud_id][courseYearSem] = (year, sem)
+						if ccode in studentCourses[stud_id]:
+							# Take the latest year / sem
+							stored_year, stored_sem = studentCourses[stud_id][ccode]
+							# compare year
+							if stored_year < year:
+								studentCourses[stud_id][ccode] = (year, sem)
+							elif stored_year == year:
+								# compare semester
+								if stored_sem < sem:
+									studentCourses[stud_id][ccode] = (year, sem)
+						else:
+							studentCourses[stud_id][ccode] = (year, sem)
 					else:
 						studentCourses[stud_id] = {}
-						studentCourses[stud_id][courseYearSem] = (year, sem)
+						studentCourses[stud_id][ccode] = (year, sem)		# put the latest year/sem 
 
 					# Add Student to Course
 					if courseYearSem in courseStudents:
@@ -320,13 +362,14 @@ def insert_enrollments(allCourses, stud_ids):
 					else:
 						courseStudents[courseYearSem] = {}
 						courseStudents[courseYearSem][stud_id] = 1
+
 					# Write into file
 					f.write("INSERT INTO Enrollments VALUES('" + stud_id + "', '" + ccode + "', " + str(year) +  ", " + str(sem) + ", 1, NOW(), '" + approver_pid + "', TRUE);" + "\n")
 
 			# Insert students who are trying to apply to the course
 			for i in range(random.randint(0, num_of_pending_students)):
 				# Select student 
-				stud_id = select_student(studentCourses, requestList, stud_ids, ccode)
+				stud_id = select_student(studentCourses, requestList, stud_ids, ccode, year, sem)
 				# Check if any student found
 				if stud_id == None:
 					break
@@ -357,7 +400,7 @@ def insert_enrollments(allCourses, stud_ids):
 			# Insert students who are rejected as TA
 			for i in range(random.randint(0, num_of_rejected_ta)):
 				# Select student 
-				stud_id = select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, courseYearSem, year, sem)
+				stud_id = select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, ccode, year, sem)
 				# Check if any student found
 				if stud_id == None:
 					break
@@ -368,7 +411,7 @@ def insert_enrollments(allCourses, stud_ids):
 			# Insert students who are successfully TA
 			for i in range(random.randint(0, num_of_approved_ta)):
 				# Select Student
-				stud_id = select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, courseYearSem, year, sem)
+				stud_id = select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, ccode, year, sem)
 				# check if any student is found
 				if stud_id == None:
 					break
@@ -379,7 +422,7 @@ def insert_enrollments(allCourses, stud_ids):
 			# Insert students who are trying to apply to be ta for the course
 			for i in range(random.randint(0, num_of_pending_ta)):
 				# Select student 
-				stud_id = select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, courseYearSem, year, sem)
+				stud_id = select_ta(studentCourses, requestStudList, requestTAlist, stud_ids, ccode, year, sem)
 				# Check if any student found
 				if stud_id == None:
 					break
@@ -515,15 +558,33 @@ def setup_forums(courseGroups, allCourses):
 			# extract list of students
 			if courseYearSem in courseGroups:
 				students = courseGroups[courseYearSem][g_num-1]
-				# for each forum, generate x entries
-				for i in range(0, random.randint(0, num_of_entries)):
-					# Generate data
-					student = students[random.randint(0, len(students)-1)]
-					message = reviews[random.randint(0, len(reviews)-1)]
-					dt = gen_datetime()
-					# Write to file
-					f.write("INSERT INTO ForumEntries VALUES('" + ccode + "', " + str(year) + ", " + str(sem) + ", '" + creator_pid + "', '" + create_dt + "', '" + student + "', '" + dt + "', '" + message + "');" + "\n")
+				# Check if there are any students in the group
+				if students:
+					# for each forum, generate x entries
+					for i in range(0, random.randint(0, num_of_entries)):
+						# Generate data
+						student = students[random.randint(0, len(students)-1)]
+						message = reviews[random.randint(0, len(reviews)-1)]
+						dt = gen_datetime()
+						# Write to file
+						f.write("INSERT INTO ForumEntries VALUES('" + ccode + "', " + str(year) + ", " + str(sem) + ", '" + creator_pid + "', '" + create_dt + "', '" + student + "', '" + dt + "', '" + message + "');" + "\n")
 
+
+'''
+	Output list of students that are taking courses in current year
+'''
+def print_current_students(studentCourses):
+	print("\nList of students taking the following courses in " + str(current_year) + " S" + str(current_sem) + ":")
+	print("*" * 50)
+	for student in studentCourses:						# for each student
+		outputstr = student + " : "
+		for course in studentCourses[student]:			# for each course taken by student
+			year, sem = studentCourses[student][course]
+			if year == current_year and sem == current_sem:
+				outputstr += course + " "
+		print(outputstr)
+
+# Main Function
 if __name__ == "__main__":
 	# Remove insert file if exists
 	if os.path.exists(insert_filename):
@@ -538,7 +599,8 @@ if __name__ == "__main__":
 	courseGroups = assign_students_to_groups(courseStudents, allCourses)		# courseGroups = dictionary of courses where each course has a list of groups where each group has a list of student
 	# randomly create forum for course groups
 	setup_forums(courseGroups, allCourses)
-
+	# Output list of students that are taking current year/sem courses
+	# print_current_students(studentCourses)
 
 	# -- improve on: 
 	# -- the random date generator and insertion, the date order is not in order now

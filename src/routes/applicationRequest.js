@@ -39,31 +39,30 @@ router.get('/', function(req, res, next) {
 				ORDER BY c_year DESC, c_sem DESC
 				LIMIT 1 
 				) AS yearsem
-		), 
+		),
 		CourseRequestForUser AS (
-			SELECT c_code, c_year, c_sem, False AS canbe_ta
+			SELECT C.c_code, C.c_year, C.c_sem, False AS canbe_ta
 			FROM CurrentSemCourses C 				
 			WHERE NOT EXISTS (						
 				SELECT 1 FROM Enrollments E
-				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1
-					AND ((E.p_id IS NOT NULL AND E.req_status=True) 
-						OR (E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))
+				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1				
+					AND ((E.p_id IS NOT NULL AND E.req_status=True) 						
+						OR (E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))  
 			)
 			UNION
-			SELECT c_code, c_year, c_sem, True AS canbe_ta 
-			FROM Enrollments E
-			WHERE E.s_id=$1 AND E.req_type=1 AND E.p_id IS NOT NULL AND E.req_status=True
-				AND NOT EXISTS (
-					SELECT 1 FROM CurrentSemCourses C JOIN Enrollments F 
-						ON C.c_code = F.c_code AND C.c_year=F.c_year AND C.c_sem=F.c_sem 	
-					WHERE E.s_id=F.s_id AND E.c_code=F.c_code 
-						AND ((F.req_type=0) 				
-							OR (F.req_type=1 AND F.p_id IS NOT NULL AND F.req_status=True))
-				)
+			SELECT C.c_code, C.c_year, C.c_sem, True AS canbe_ta
+			FROM CurrentSemCourses C LEFT JOIN (SELECT * FROM Enrollments WHERE s_id = $1) AS E
+				ON C.c_code=E.c_code AND C.c_year=E.c_year AND C.c_sem=E.c_sem		
+			WHERE E.req_type IS NULL 												
+				AND EXISTS (
+					SELECT 1 FROM Enrollments F
+					WHERE F.s_id=$1 AND F.c_code=C.c_code AND F.req_type=1	
+						AND F.p_id IS NOT NULL AND F.req_status=True
+			)
 		)
 		SELECT c_code, c_name, canbe_ta 
 		FROM CourseRequestForUser NATURAL JOIN CourseDetails
-		ORDER BY c_code, canbe_ta`; 
+		ORDER BY c_code, canbe_ta`;
 
 	// Query
 	pool.query(sql_query, [req.user.u_username], (err, data) => {
@@ -93,27 +92,26 @@ router.post('/', function(req, res, next) {
 				ORDER BY c_year DESC, c_sem DESC
 				LIMIT 1 
 				) AS yearsem
-		), 
+		),
 		CourseRequestForUser AS (
-			SELECT c_code, c_year, c_sem, False AS canbe_ta
+			SELECT C.c_code, C.c_year, C.c_sem, False AS canbe_ta
 			FROM CurrentSemCourses C 				
 			WHERE NOT EXISTS (						
 				SELECT 1 FROM Enrollments E
-				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1
-					AND ((E.p_id IS NOT NULL AND E.req_status=True) 
-						OR (E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))
+				WHERE E.s_id=$1 AND E.c_code=C.c_code AND E.req_type=1				
+					AND ((E.p_id IS NOT NULL AND E.req_status=True) 						
+						OR (E.req_status=False AND E.c_year=C.c_year AND E.c_sem=C.c_sem))  
 			)
 			UNION
-			SELECT c_code, c_year, c_sem, True AS canbe_ta 
-			FROM Enrollments E
-			WHERE E.s_id=$1 AND E.req_type=1 AND E.p_id IS NOT NULL AND E.req_status=True
-				AND NOT EXISTS (
-					SELECT 1 FROM CurrentSemCourses C JOIN Enrollments F 
-						ON C.c_code = F.c_code AND C.c_year=F.c_year AND C.c_sem=F.c_sem 	
-					WHERE E.s_id=F.s_id AND E.c_code=F.c_code 
-						AND ((F.req_type=0) 				
-							OR (F.req_type=1 AND F.p_id IS NOT NULL AND F.req_status=True))
-				)
+			SELECT C.c_code, C.c_year, C.c_sem, True AS canbe_ta
+			FROM CurrentSemCourses C LEFT JOIN (SELECT * FROM Enrollments WHERE s_id = $1) AS E
+				ON C.c_code=E.c_code AND C.c_year=E.c_year AND C.c_sem=E.c_sem		
+			WHERE E.req_type IS NULL 												
+				AND EXISTS (
+					SELECT 1 FROM Enrollments F
+					WHERE F.s_id=$1 AND F.c_code=C.c_code AND F.req_type=1	
+						AND F.p_id IS NOT NULL AND F.req_status=True
+			)
 		)
 		SELECT c_code, c_name, canbe_ta 
 		FROM CourseRequestForUser NATURAL JOIN CourseDetails
@@ -148,7 +146,7 @@ router.post('/', function(req, res, next) {
 		SELECT c_year, c_sem
 		FROM CourseYearSem
 		GROUP BY c_year, c_sem
-		ORDER BY c_year DESC, c_sem ASC
+		ORDER BY c_year DESC, c_sem DESC
 		LIMIT 1`;
 
 		// Query
