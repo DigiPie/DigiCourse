@@ -596,7 +596,7 @@ if __name__ == "__main__":
 	# randomly create forum for course groups
 	setup_forums(courseGroups, allCourses)
 	# Output list of students that are taking current year/sem courses
-	print_current_students(studentCourses)
+	# print_current_students(studentCourses)
 
 	# -- improve on: 
 	# -- the random date generator and insertion, the date order is not in order now
