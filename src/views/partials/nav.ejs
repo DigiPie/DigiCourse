@@ -14,7 +14,9 @@
       <!-- Search Bar -->
       <form action="/search" class="t-header-search-box" method="post">
         <div class="input-group">
-          <input type="text" class="form-control" name="searchBox" id="searchBox" placeholder="Search" autocomplete="off">
+          <input type="text" class="form-control" name="searchBox" id="searchBox" 
+              placeholder="Search for a module" autocomplete="off">
+              
           <button class="btn btn-primary" type="submit"><i class="mdi mdi-arrow-right-thick"></i></button>
         </div>
       </form>
@@ -29,7 +31,7 @@
             <div class="dropdown-header">
               <h6 class="dropdown-title">Course Management</h6>
             </div>
-            <div class="dropdown-body">
+            <div class="dropdown-body ml-1">
               <% if (accountType != 'Professor') {%>
               <div class="dropdown-list">
                 <div class="content-wrapper">
