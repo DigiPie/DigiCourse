@@ -515,7 +515,7 @@ footer {
     transition: 0.3s; }
     .page-body .page-content-wrapper {
       position: relative;
-      width: 100%;
+      width: 95%;
       min-height: 100vh;
       padding: 1.5rem 2.5rem calc(90px + 1.5rem);
       margin-top: 75px; }
