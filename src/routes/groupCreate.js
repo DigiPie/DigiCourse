@@ -43,7 +43,7 @@ router.get('/', function(req, res, next) {
     
     
 	pool.query(sql_query, (err, data) => {
-        res.render('groupscreate', {
+        res.render('groupCreate', {
             isCourse: req.isCourse,
             username: req.user.u_name,
             accountType: req.user.u_type,

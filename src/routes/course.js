@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var forum = require('./forum');
 const enrollments = require('./enrollments');
-const groups = require('./groups');
+const group = require('./group');
 const details = require('./courseDetails');
 const { Pool } = require('pg')
 const pool = new Pool({
@@ -103,13 +103,13 @@ router.use('/:cid/enrollments', function(req, res, next) {
 	next()
 }, enrollments);
 
-router.use('/:cid/groups', function(req, res, next) {		
+router.use('/:cid/group', function(req, res, next) {		
 	req.isCourse = true, 
 	req.cid = req.params.cid;
 	req.data = courseName;
 	req.year = year;
 	req.sem = sem;
 	next()
-}, groups);
+}, group);
 
 module.exports = router;

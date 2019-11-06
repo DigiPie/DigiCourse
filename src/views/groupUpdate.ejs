@@ -37,11 +37,11 @@
             <div class="row">
               <div class="col-12 py-5">
                 <div class="topnav">
-                  <a href="/course/<%= cid %>/groups">Student roster</a>
-                  <a href="/course/<%= cid %>/groups/create">Create group</a>
-                  <a href="/course/<%= cid %>/groups/assign">Assign group</a>
+                  <a href="/course/<%= cid %>/group">Student roster</a>
+                  <a href="/course/<%= cid %>/group/create">Create group</a>
+                  <a href="/course/<%= cid %>/group/assign">Assign group</a>
                   <a class="active" href="#">Update group</a>
-                  <a href="/course/<%= cid %>/groups/unassign">Unassign group</a>
+                  <a href="/course/<%= cid %>/group/unassign">Unassign group</a>
                 </div>
                 </br>
                 <% if (messages.error) {%>
@@ -56,7 +56,7 @@
                 <% if (datarows.length == 0) { %>
                   <h4>There are no groups in this module.</h4>
                 <% } else { %>
-                <form id="html_form" action="/course/<%= cid %>/groups/update" role="form" method="post">
+                <form id="html_form" action="/course/<%= cid %>/group/update" role="form" method="post">
                   <label for="g_num">Group to update</label>
                   <select class="g_num" data-style="btn-info" name="g_num">
                     <optgroup label="Select group number">

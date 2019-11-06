@@ -37,47 +37,53 @@
             <div class="row">
               <div class="col-12 py-5">
                 <div class="topnav">
-                  <a href="/course/<%= cid %>/groups">Student roster</a>
-                  <a href="/course/<%= cid %>/groups/create">Create group</a>
-                  <a href="/course/<%= cid %>/groups/assign">Assign group</a>
-                  <a href="/course/<%= cid %>/groups/update">Update group</a>
-                  <a class="active" href="#">Unassign group</a>
+                  <a href="/course/<%= cid %>/group">Student roster</a>
+                  <a href="/course/<%= cid %>/group/create">Create group</a>
+                  <a class="active" href="#">Assign group</a>
+                  <a href="/course/<%= cid %>/group/update">Update group</a>
+                  <a href="/course/<%= cid %>/group/unassign">Unassign group</a>
                 </div>
               </br>
                 <% if (messages.error) {%>
                   <div class="alert alert-danger">
                     <%= messages.error %>
                   </div>
-                  <% } else if (messages.success) { %>
-                    <div class="alert alert-success">
-                      <%= messages.success %>
-                    </div>
-                  <% } %>
+                <% } if (messages.success) { %>
+                  <div class="alert alert-success">
+                    <%= messages.success %>
+                  </div>
+                <% } %>                
                 <% if (datarows.length == 0) { %>
-                <h4>No students have been assigned groups in this module.</h4>
-                  <% } else { %>
+                <h4>All students have been assigned a group or there are no students enrolled in this module.</h4>
+                <% } else { %>
                   <form id="html_form" role="form" method="post">
+                    <label for="g_num">Select group number</label>
+                    <select class="g_num" data-style="btn-info" name="g_num">
+                      <optgroup label="Select group number">
+                        <% groups.forEach(function(row){ %>
+                        <option value="<%= row.g_num %>"><%= row.g_num %></option>
+                        <% }) %>
+                      </optgroup>
+                    </select>
                     <table class="table">
                       <thead>
                         <tr>
                           <th scope="col"></th>
                           <th scope="col">Student ID</th>
                           <th scope="col">Student name</th>
-                          <th scope="col">Group number</th>
                         </tr>
                       </thead>
                       <tbody>
                         <% for (var i = 0; i < datarows.length; i++) { %>
                         <tr>
                           <td class="min"><input type="checkbox" name="row[<%= i %>][selected]" ></td>
-                          <input type="hidden" name='row[<%= i %>][c_code]' value="<%= cid %>">
+                          <input type="hidden" name='row[<%= i %>][c_code]' value="<%= datarows[i].c_code %>">
                           <td><input type="hidden" name='row[<%= i %>][s_id]' value="<%= datarows[i].s_id %>"><%= datarows[i].s_id %></td>
                           <td><%= datarows[i].u_name %></td>
-                          <td><input type="hidden" name='row[<%= i %>][g_num]' value="<%= datarows[i].g_num %>"><%= datarows[i].g_num %></td>
                         </tr>
                         <% } %>
                         <tr>
-                          <td><button type="submit" formaction="/course/<%= cid %>/groups/unassign" class="btn btn-primary" >Submit</button></td>
+                          <td><button type="submit" formaction="/course/<%= cid %>/group/assign" class="btn btn-primary" >Submit</button></td>
                         </tr>
                       </tbody>
                     </table>

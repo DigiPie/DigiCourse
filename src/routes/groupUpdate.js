@@ -63,7 +63,7 @@ router.get('/', function(req, res, next) {
 
 	pool.query(sql_query, (err, data) => {
         pool.query(group_list_query, (gerr, gdata) => {
-            res.render('groupsupdate', {
+            res.render('groupUpdate', {
                 isCourse: req.isCourse,
                 username: req.user.u_name,
                 accountType: req.user.u_type,

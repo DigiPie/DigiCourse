@@ -5,10 +5,10 @@ const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
 });
 
-const groupscreate = require('./groupscreate');
-const groupsassign = require('./groupsassign');
-const groupsupdate = require('./groupsupdate');
-const groupsunassign = require('./groupsunassign');
+const groupCreate = require('./groupCreate');
+const groupAssign = require('./groupAssign');
+const groupUpdate = require('./groupUpdate');
+const groupUnassign = require('./groupUnassign');
 
 let courseName;
 
@@ -34,7 +34,7 @@ router.get('/', function(req, res, next) {
             ORDER BY c.req_type, c.s_id`;
 
 	pool.query(sql_query, (err, data) => {
-        res.render('groups', {
+        res.render('group', {
             isCourse: req.isCourse, 
             username: req.user.u_name,
             accountType: req.user.u_type,
@@ -48,18 +48,18 @@ router.get('/', function(req, res, next) {
 
 router.use('/create', function(req, res, next) {
 	next()
-}, groupscreate);
+}, groupCreate);
 
 router.use('/assign', function(req, res, next) {
 	next()
-}, groupsassign);
+}, groupAssign);
 
 router.use('/update', function(req, res, next) {
 	next()
-}, groupsupdate);
+}, groupUpdate);
 
 router.use('/unassign', function(req, res, next) {
 	next()
-}, groupsunassign);
+}, groupUnassign);
 
 module.exports = router;
