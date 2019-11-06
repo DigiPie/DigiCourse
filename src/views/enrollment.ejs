@@ -35,7 +35,7 @@
         <div class="page-content-wrapper-inner">
           <div class="content-viewport">
             <div class="row">
-              <div class="col-12 py-5">
+              <div class="col-12 py-5 pr-5">
                 <% if (messages.error) {%>
                   <div class="alert alert-danger">
                     <%= messages.error %>
@@ -48,7 +48,7 @@
                 <form id="html_form" role="form" method="post">
                   <div class="form-group">
                     <label for="c_capacity">Current capacity: <b><%= capacity %></b><br>Enter new course capacity</label>
-                    <input type="number" class="form-control w-50" id="c_capacity" 
+                    <input type="number" class="form-control" id="c_capacity" 
                         name="c_capacity" placeholder="New capacity">
                   </div>
                   <button type="submit" formaction="/course/<%= cid %>/enrollment/increase" class="btn btn-primary" >Change</button>
