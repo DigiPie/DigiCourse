@@ -47,14 +47,15 @@
                 <% } %>
                 <form id="html_form" role="form" method="post">
                   <div class="form-group">
-                    <label for="c_capacity">Course current capacity: <%= capacity %><br>Enter new course capacity</label>
-                    <input type="number" class="form-control" id="c_capacity" name="c_capacity" placeholder="Enter new capacity">
+                    <label for="c_capacity">Current capacity: <b><%= capacity %></b><br>Enter new course capacity</label>
+                    <input type="number" class="form-control w-50" id="c_capacity" 
+                        name="c_capacity" placeholder="New capacity">
                   </div>
                   <button type="submit" formaction="/course/<%= cid %>/enrollment/increase" class="btn btn-primary" >Change</button>
                 </form>
                 <br>
                 <% if (datarows.length == 0) { %>
-                <h4>No pending request</h4>
+                <h6>No pending request</h6>
                 <% } else { %>
                 <form id="html_form" role="form" method="post">
                   <table class="table">
