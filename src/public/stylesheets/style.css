@@ -110,20 +110,21 @@ nav > div a.nav-item.nav-link.active {
   padding: 18px 25px;
   border-radius:0;
   border-bottom:5px solid #efb200;
+  background-color: transparent;
 }
 
 nav > div a.nav-item.nav-link.active:after {
   content: "";
   position: relative;
   bottom: -60px;
-  left: -10%;
+  left: -35%;
   border: 15px solid transparent;
   border-top-color: #efb200;
 }
 
 nav > div a.nav-item.nav-link:hover,
 nav > div a.nav-item.nav-link:focus {
-  background: #C5D5E4;
+  background: #efb200;
   color:#fff;
   border-radius:0;
   transition:background 0.20s linear;
