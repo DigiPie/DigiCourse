@@ -119,7 +119,7 @@ router.get('/', function(req, res, next) {
     
 	pool.query(get_top_student_participants, [req.cid, req.year, req.sem], (err, students) => {
         pool.query(get_top_teaching_participants, [req.cid, req.year, req.sem], (err, teaching) => {
-            res.render('forumsParticipation', {
+            res.render('forumParticipation', {
                 isCourse: req.isCourse,
                 username: req.user.u_name,
                 accountType: req.user.u_type, 

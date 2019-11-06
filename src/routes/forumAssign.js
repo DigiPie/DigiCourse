@@ -61,7 +61,7 @@ router.get('/', function(req, res, next) {
     
 	pool.query(get_forums_for_assign, [req.cid, req.year, req.sem], (err, forums) => {
         pool.query(get_groups_for_assign, [req.cid, req.year, req.sem], (err, result) => {
-            res.render('forumsAssign', {
+            res.render('forumAssign', {
                 isCourse: req.isCourse,
                 username: req.user.u_name,
                 accountType: req.user.u_type, 
