@@ -32,7 +32,7 @@ router.get('/', function(req, res, next) {
         increase_count = undefined;
 
         pool.query(sql_query, (err, data) => {
-            res.render('enrollments', {
+            res.render('enrollment', {
                 isCourse: req.isCourse, 
                 username: req.user.u_name,
                 accountType: req.user.u_type,

@@ -50,7 +50,7 @@
                     <label for="c_capacity">Course current capacity: <%= capacity %><br>Enter new course capacity</label>
                     <input type="number" class="form-control" id="c_capacity" name="c_capacity" placeholder="Enter new capacity">
                   </div>
-                  <button type="submit" formaction="/course/<%= cid %>/enrollments/increase" class="btn btn-primary" >Change</button>
+                  <button type="submit" formaction="/course/<%= cid %>/enrollment/increase" class="btn btn-primary" >Change</button>
                 </form>
                 <br>
                 <% if (datarows.length == 0) { %>
@@ -80,8 +80,8 @@
                         </tr>
                         <% } %>
                         <tr>
-                          <td><button type="submit" formaction="/course/<%= cid %>/enrollments/accept" class="btn btn-primary" >Accept</button></td>
-                          <td><button type="submit" formaction="/course/<%= cid %>/enrollments/reject" class="btn btn-primary" >Reject</button></td>
+                          <td><button type="submit" formaction="/course/<%= cid %>/enrollment/accept" class="btn btn-primary" >Accept</button></td>
+                          <td><button type="submit" formaction="/course/<%= cid %>/enrollment/reject" class="btn btn-primary" >Reject</button></td>
                         </tr>
                       </tbody>
                     </table>
