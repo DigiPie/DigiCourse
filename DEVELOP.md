@@ -37,10 +37,10 @@ Finally, you can execute the NodeJS app by going through the steps below.
 
 1. Check that you are in the directory _src_.
 2. Run this project on your local server by running `npm start`.
-3. Open `localhost:3000` in your web browser. You should see a login page. Please see below for demonstration accounts.
+3. Open `localhost:3000` in your web browser. You should see a login page. Please see below for example accounts.
 4. Stop the server by using `CTRL + C`.
 
-## Demonstration accounts
+## Example accounts
 | Type | Username | Password |
 |-----|:---:|----:|
 |Professor|P0000002G|CS2102CS2102|
