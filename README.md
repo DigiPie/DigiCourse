@@ -30,8 +30,8 @@ Each time a commit is made to the `master` branch, the project is automatically 
 
 ## Acknowledgements
 * DigiCourse was developed for National University of Singapore's [CS2102: Database Systems](https://nusmods.com/modules/CS2102/database-systems) (Autumn 2019, taught by [Dr. Prabawa Adi Yoga Sidi](https://www.comp.nus.edu.sg/cs/bio/adi-yoga/)).
-* This project was developed by [Evan Tay](https://github.com/DigiPie/), [Lee Tze Ting](https://github.com/halcyoneee), [Bryan Koh](https://github.com/awarenessxz) and [Jacqueline Cheong](https://github.com/Aquarinte/) from September to November 2019.
-* This project is deployed to Heroku with the help of the Heroku buildpack [subdir-heroku-buildpack](https://github.com/DigiPie/subdir-heroku-buildpack) developed by [Alexey Timanovsky](https://github.com/timanovsky).
-* This project made use of async/await codes for node-postgres by [Francesco Zerbinati](https://gist.github.com/zerbfra/70b155fa00b4e0d6fd1d4e090a039ad4).
-* This project was developed using web template designed by [uxcandy.co](https://www.uxcandy.co/).
-* This project's logo was designed by [freepik - www.freepik.com](https://www.freepik.com/free-photos-vectors/logo)</a>
+* This project was developed by [Evan Tay](https://github.com/DigiPie/), [Lee Tze Ting](https://github.com/halcyoneee), [Bryan Koh](https://github.com/awarenessxz) and [Jacqueline Cheong](https://github.com/Aquarinte/) from **September to November 2019**.
+* This project is deployed to Herokuapp with the help of the Heroku buildpack [subdir-heroku-buildpack](https://github.com/DigiPie/subdir-heroku-buildpack) developed by [Alexey Timanovsky](https://github.com/timanovsky).
+* This project used async/await codes for node-postgres developed by [Francesco Zerbinati](https://gist.github.com/zerbfra/70b155fa00b4e0d6fd1d4e090a039ad4).
+* This project's web template was designed by [uxcandy.co](https://www.uxcandy.co/).
+* This project's logo was designed by [freepik - www.freepik.com](https://www.freepik.com/free-photos-vectors/logo).
