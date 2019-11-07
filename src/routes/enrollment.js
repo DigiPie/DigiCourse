@@ -134,8 +134,6 @@ router.post('/accept', function(req, res, next) {
         AND c_year = '${req.year}'
         AND c_sem = '${req.sem}'`;
 
-        console.log(check_query);
-
 	pool.query(check_query, (err, data) => {
         if (data.rows[0].available < scount) {
             increase_count = scount - data.rows[0].available + current_capacity;
