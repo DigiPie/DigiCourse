@@ -23,7 +23,7 @@
     <!-- End of Navbar -->
 
     <!-- Main Content -->
-  	<div class="page-body">
+  	<div class="page-body" id="top_entries" name="top_entries">
 
       <!-- side bar -->
       <%- include('./partials/sidebar', { cid: cid }); %>
@@ -39,6 +39,7 @@
               <div class="topnav">
                   <div class="title">Forum entries for "<%= f_topic %>"</div>
               </div>
+              <a class="btn btn-outline-primary my-3" role="button" href="#new_entry">Start new entry</a>
               <br>
               <% if (messages.delFail) { %>
                 <div class="alert alert-danger">
@@ -82,6 +83,8 @@
                     </table>
                 </form>
                 <% } %>
+                <a id="new_entry" name="new_entry" class="btn btn-outline-primary my-3" 
+                    role="button" href="#top_entries">Return to top</a>
                 <div class="topnav">
                     <div class="title">Write new entry</div>
                 </div>

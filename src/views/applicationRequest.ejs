@@ -33,7 +33,7 @@
       <div class="page-content-wrapper">
         <!-- Content -->
         <div class="page-content-wrapper-inner">
-          <div class="content-viewport">
+          <div class="content-viewport pr-4">
 
             <!-- Application Status -->
             <div class="row">
@@ -56,11 +56,11 @@
               </form>
 
               <% if (messages.error) {%>
-              <div class="alert alert-danger col-12">
+              <div class="alert alert-danger col-12 mt-3">
                 <%= messages.error %>
               </div>
               <% } else if (messages.success) { %>
-                <div class="alert alert-success col-12">
+                <div class="alert alert-success col-12 mt-3">
                   <%= messages.success %>
                 </div>
               <% } %>
@@ -73,7 +73,7 @@
                       <th scope="col">#</th>
                       <th scope="col">CID</th>
                       <th scope="col">Course Name</th>
-                      <th scope="col">Action</th>
+                      <th scope="col">Request to</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -81,16 +81,16 @@
                     <form action="/applicationRequest" method="post">
                       <tr>
                         <input type="hidden" class="input-normal" name="c_code" value="<%= datarows[i].c_code %>"/>
-                        <th scope="col"><%= i+1 %></th>
-                        <th scope="col"><%= datarows[i].c_code %></th>
-                        <th scope="col"><%= datarows[i].c_name %></th>
-                        <th scope="col">
+                        <td scope="col"><%= i+1 %></td>
+                        <td scope="col"><%= datarows[i].c_code %></td>
+                        <td scope="col"><%= datarows[i].c_name %></td>
+                        <td scope="col">
                           <% if (datarows[i].canbe_ta) { %>
-                            <button type="submit" name="TA_req" value="0" class="btn-link">TA Request</button>
+                            <button type="submit" name="TA_req" value="0" class="btn-link">Tutor</button>
                           <% } else { %>
-                            <button type="submit" name="C_req" value="1" class="btn-link">Course Request</button>
+                            <button type="submit" name="C_req" value="1" class="btn-link">Enrol</button>
                           <% } %>
-                        </th>
+                        </td>
                       </tr>
                     </form>
                       <% } %>

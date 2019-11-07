@@ -33,8 +33,7 @@
       <div class="page-content-wrapper">
         <!-- Content -->
         <div class="page-content-wrapper-inner">
-          <div class="content-viewport">
-
+          <div class="content-viewport pr-4">
             <!-- Application Request -->
             <div class="row">
               <div class="col-12 py-5">
@@ -58,29 +57,29 @@
               </form>
 
               <% if (messages.error) {%>
-              <div class="alert alert-danger col-12">
+              <div class="alert alert-danger col-12 mt-3">
                 <%= messages.error %>
               </div>
               <% } else if (messages.success) { %>
-                <div class="alert alert-success col-12">
+                <div class="alert alert-success col-12 mt-3">
                   <%= messages.success %>
                 </div>
               <% } %>
 
               <% if (dataNum > 0) { %>
               <div class="col-12 py-5">
-                <table class="table table-sm">
-                  <thead class="table-info">
+                <table class="table  table-responsive">
+                  <thead class="thead-dark">
                     <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">CID</th>
-                      <th scope="col">Course Name</th>
+                      <th>#</th>
+                      <th>CID</th>
+                      <th>Course Name</th>
                       <% if (accountType == 'Professor') {%>
-                      <th scope="col">Request By</th>
+                      <th>Applicant</th>
                       <% } %>
-                      <th scope="col">Requesting For</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Action</th>
+                      <th>For</th>
+                      <th>Status</th>
+                      <th class='pr-3'>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -88,39 +87,40 @@
                     <form action="/applicationStatus" method="post">
                       <input type="hidden" class="input-normal" name="s_id" value="<%= datarows[i].s_id %>"/>
                       <input type="hidden" class="input-normal" name="req_dt" value="<%= datarows[i].req_datetime %>"/>
+                      <input type="hidden" class="input-normal" name="c_code" value="<%= datarows[i].c_code %>"/>
                       <tr>
-                        <th scope="col"><%= i+1 %></th>
-                        <th scope="col"><input type="text" class="input-normal" name="c_code" value="<%= datarows[i].c_code %>"/></th>
-                        <th scope="col"><%= datarows[i].c_name %></th>
+                        <td><%= i+1 %></td>
+                        <td><%= datarows[i].c_code %></td>
+                        <td><%= datarows[i].c_name %></td>
                         <% if (accountType == 'Professor') {%>
-                          <th scope="col"><%= datarows[i].studentname %></th>
+                          <td><%= datarows[i].studentname %></td>
                         <% } %>
                         <% if (datarows[i].req_type == 0) { %>
-                          <th scope="col">Teaching Assistant</th>
+                          <td>Teaching Assistant</td>
                         <% } else { %>
-                          <th scope="col">Student</th>
+                          <td>Student</td>
                         <% } %>
                         <% if (datarows[i].req_status) { %> 
-                          <th scope="col">Approved</th>
-                          <th scope="col">-</th>
+                          <td>Approved</td>
+                          <td>-</td>
                         <% } else if (datarows[i].approver) { %> 
-                          <th scope="col">Rejected</th>
-                          <th scope="col">
+                          <td>Rejected</td>
+                          <td>
                             <% if (accountType == 'Professor') {%>
-                              <button type="submit" name="edit" class="btn-link">View Enrollment</button>
+                              <button type="submit" name="edit" class="btn-link">View</button>
                             <% } else { %>
                               -
                             <% } %>
-                          </th>
+                          </td>
                         <% } else { %> 
-                          <th scope="col">Pending</th>
-                          <th scope="col">
+                          <td>Pending</td>
+                          <td>
                             <% if (accountType == 'Professor') {%>
-                              <button type="submit" name="edit" class="btn-link">View Enrollment</button>
+                              <button type="submit" name="edit" class="btn-link">View</button>
                             <% } else { %>
                               <button type="submit" name="cancel" value="cancel" class="btn-link">Cancel</button>
                             <% } %>
-                          </th>
+                          </td>
                         <% } %>
                       </tr>
                     </form>

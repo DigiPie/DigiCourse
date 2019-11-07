@@ -1,16 +1,17 @@
 <footer class="footer">
   <div class="row">
-    <div class="col-sm-6 text-center text-sm-right order-sm-1">
+    <div class="col-sm-6 text-sm-right order-sm-1 pr-4">
       <ul class="text-gray">
         <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/applicationRequest">Application Request</a></li>
-        <% if (accountType != 'Professor') { %>
-        <li><a href="/applicationStatus">Application Status</a></li>
-        <% } %>
       </ul>
     </div>
     <div class="col-sm-6 text-center text-sm-left mt-3 mt-sm-0">
-      <small class="text-muted d-block">Source code on <a href="https://github.com/DigiPie/DigiCourse" target="_blank">Github</a></small>
+      <small class="text-muted d-block">
+        Source code on 
+        <a href="https://github.com/DigiPie/DigiCourse" target="_blank" style="text-decoration: none;">
+          <i class="mdi mdi-github-circle link-icon" title="DigiPie/DigiCourse"></i> Github
+        </a>
+      </small>
     </div>
   </div>
 </footer>

@@ -10,7 +10,7 @@ const pool = new Pool({
 
 /**** Routing ****/
 router.post('/', function (req, res, next) {
-	if (req.body.new_password == '' || req.body.new_password.length <= 8) {
+	if (req.body.new_password == '' || req.body.new_password.length < 8) {
         req.flash('error', 'Please enter a password which is at least 8 characters long.');
         res.redirect('back');
         return;

@@ -43,7 +43,7 @@ router.get('/', function(req, res, next) {
     
     
 	pool.query(sql_query, (err, data) => {
-        res.render('groupscreate', {
+        res.render('groupCreate', {
             isCourse: req.isCourse,
             username: req.user.u_name,
             accountType: req.user.u_type,
@@ -69,7 +69,7 @@ router.post('/', function(req, res, next) {
         return;
     }
 
-    var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.body.c_code}', '${req.year}', '${req.sem}', '${req.body.g_num}', '${req.body.g_capacity}')`;
+    var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.user.u_username}', '${req.body.c_code}', '${req.year}', '${req.sem}', '${req.body.g_num}', '${req.body.g_capacity}')`;
 
 	pool.query(sql_query, (err, data) => {
         if (err) {

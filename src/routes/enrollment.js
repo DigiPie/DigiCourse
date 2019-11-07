@@ -32,7 +32,7 @@ router.get('/', function(req, res, next) {
         increase_count = undefined;
 
         pool.query(sql_query, (err, data) => {
-            res.render('enrollments', {
+            res.render('enrollment', {
                 isCourse: req.isCourse, 
                 username: req.user.u_name,
                 accountType: req.user.u_type,
@@ -133,8 +133,6 @@ router.post('/accept', function(req, res, next) {
         WHERE c_code = '${req.params.cid}'
         AND c_year = '${req.year}'
         AND c_sem = '${req.sem}'`;
-
-        console.log(check_query);
 
 	pool.query(check_query, (err, data) => {
         if (data.rows[0].available < scount) {

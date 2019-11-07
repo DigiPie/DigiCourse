@@ -16,6 +16,7 @@ a:hover {
   text-decoration: none;
 }
 
+
 .logo-mid {
   width: 120px;
 }
@@ -26,6 +27,11 @@ a:hover {
 
 .border-prompt {
   border: 2px solid #007bff;
+}
+
+.box-panel {
+  width: 512px;
+  max-width: 90%;
 }
 
 td.min {
@@ -39,11 +45,13 @@ td.min {
 }
 
 .topnav a {
+  width: 180px;
   float: left;
-  text-align: center;
-  padding: 14px 16px;
+  text-align: left;
+  padding: 10px 12px;
+  background-color: #f6f6f6;
   text-decoration: none;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: bold;
 }
 
@@ -64,7 +72,7 @@ td.min {
 }
 
 .topnav a.active {
-  border-bottom: solid 6px #efb200;
+  /*border-bottom: solid 6px #efb200;*/
 }
 
 .topnav a {
@@ -110,20 +118,23 @@ nav > div a.nav-item.nav-link.active {
   padding: 18px 25px;
   border-radius:0;
   border-bottom:5px solid #efb200;
+  text-align: center;
+  background-color: transparent;
 }
 
 nav > div a.nav-item.nav-link.active:after {
+  text-align: center;
   content: "";
   position: relative;
   bottom: -60px;
-  left: -10%;
+  left: -35%;
   border: 15px solid transparent;
   border-top-color: #efb200;
 }
 
 nav > div a.nav-item.nav-link:hover,
 nav > div a.nav-item.nav-link:focus {
-  background: #C5D5E4;
+  background: #efb200;
   color:#fff;
   border-radius:0;
   transition:background 0.20s linear;
@@ -140,6 +151,10 @@ a h4, a:visited h4, a:hover h4 {
   -moz-transition: color .3s ease-in-out;
   -o-transition: color .3s ease-in-out;
   transition: color .3s ease-in-out;
+}
+
+.card-body-custom {
+  min-height: 100px;
 }
 
 .tab-content {

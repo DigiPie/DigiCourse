@@ -39,7 +39,7 @@ router.get('/', function(req, res, next) {
     
 	pool.query(get_forums_for_unassign, [req.cid, req.year, req.sem], (err, forums) => {
         pool.query(get_groups_for_unassign, [req.cid, req.year, req.sem], (err, result) => {
-            res.render('forumsUnassign', {
+            res.render('forumUnassign', {
                 isCourse: req.isCourse,
                 username: req.user.u_name,
                 accountType: req.user.u_type, 

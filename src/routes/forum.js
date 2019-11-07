@@ -2,9 +2,9 @@ var express = require('express');
 var router = express.Router({mergeParams: true})
 
 const entries = require('./entries');
-const forumsAssign = require('./forumsAssign');
-const forumsUnassign = require('./forumsUnassign');
-const forumsParticipation = require('./forumsParticipation');
+const forumAssign = require('./forumAssign');
+const forumUnassign = require('./forumUnassign');
+const forumParticipation = require('./forumParticipation');
 const { Pool } = require('pg')
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
@@ -181,17 +181,17 @@ router.use('/:f_topic/:f_datetime/:p_id/entries', function(req, res, next) {
 // Child routing for forum assign.
 router.use('/assign', function(req, res, next) {
 	next()
-}, forumsAssign);
+}, forumAssign);
 
 // Child routing for forum unassign.
 router.use('/unassign', function(req, res, next) {
 	next()
-}, forumsUnassign);
+}, forumUnassign);
 
 // Child routing for forum unassign.
 router.use('/participation', function(req, res, next) {
 	next()
-}, forumsParticipation);
+}, forumParticipation);
 
 
 module.exports = router;

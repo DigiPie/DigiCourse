@@ -43,7 +43,7 @@ router.get('/', function(req, res, next) {
 
     // For each forum, retrieve a list of group numbers that haven't been assigned to the forum.
     var get_groups_for_assign = 
-    'SELECT g_num, p_id, TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
+    'SELECT g_num, f.p_id, TO_CHAR(f_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') formatted'
     + ' FROM CourseGroups cg, Forums f'
     + ' WHERE cg.c_code = f.c_code'
     + ' AND cg.c_year = f.c_year'
@@ -61,7 +61,7 @@ router.get('/', function(req, res, next) {
     
 	pool.query(get_forums_for_assign, [req.cid, req.year, req.sem], (err, forums) => {
         pool.query(get_groups_for_assign, [req.cid, req.year, req.sem], (err, result) => {
-            res.render('forumsAssign', {
+            res.render('forumAssign', {
                 isCourse: req.isCourse,
                 username: req.user.u_name,
                 accountType: req.user.u_type, 

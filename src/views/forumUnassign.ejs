@@ -35,12 +35,12 @@
         <div class="page-content-wrapper-inner">
           <div class="content-viewport">
             <div class="row">
-              <div class="col-12 py-5">
+              <div class="col-12 py-5 pr-5">
                 <% if (accountType == 'Professor') { %>
                 <div class="topnav">
                   <a href="/course/<%= cid %>/forum">Create forum</a>
-                  <a class="active" href="#">Assign forum</a>
-                  <a href="/course/<%= cid %>/forum/unassign">Unassign forum</a>
+                  <a href="/course/<%= cid %>/forum/assign">Assign forum</a>
+                  <a class="active" href="#">Unassign forum</a>
                   <a href="/course/<%= cid %>/forum/participation">Participation</a>
                 </div>
                 <br>
@@ -54,7 +54,7 @@
                     </div>
                 <% } %>
                 <% if (forums.length == 0) { %>
-                  <h4>There are currently no groups to be assigned.</h4>
+                  <h4>None of the forums have been assigned a group.</h4>
                 <% } else { %>
                 <form id="html_form" role="form" method="post">
                     <% var count = 0; %>
@@ -82,7 +82,7 @@
                             </tr>
                             <% count += 1;} %>
                             <tr>
-                                <td><button type="submit" formaction="/course/<%= cid %>/forum/assign" class="btn btn-primary" >Submit</button></td>
+                                <td><button type="submit" formaction="/course/<%= cid %>/forum/unassign" class="btn btn-primary" >Submit</button></td>
                             </tr>
                         </tbody>
                     </table>

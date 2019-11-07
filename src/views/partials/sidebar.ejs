@@ -7,7 +7,10 @@
     <div class="info-wrapper">
       <p class="user-name"><%= username %></p>
       <h6 class="display-income"><%= accountType %></h6>
-      <a href="/account" class="mt-2 text-white btn btn-primary btn-sm">Manage account</a>
+      <a href="/account" class="mt-2 text-white btn btn-primary btn-sm">
+        <i class="mdi mdi-account link-icon"></i>
+        Account settings
+      </a>
     </div>
   </div>
   <!-- End of user profile -->
@@ -16,32 +19,32 @@
   <% if (isCourse) { %>
   <ul class="navigation-menu">
     <li class="nav-title"><%= data[0].c_name %></li>
-    <li class="nav-category-divider">Course Main Menu</li>
+    <li class="nav-category-divider">General</li>
     <li>
       <a href="/course/<%= cid %>">
-        <span class="link-title">Overview</span>
+        <span class="link-title">Course</span>
         <i class="mdi mdi-clipboard-text link-icon"></i>
       </a>
     </li>
     <li>
       <a href="/course/<%= cid %>/details">
         <span class="link-title">Course Details</span>
-        <i class="mdi mdi-information-outline link-icon"></i>
+        <i class="mdi mdi-information link-icon"></i>
       </a>
     </li>
     <li class="nav-category-divider">Tools</li>
     <% if ( data[0].user_can_see ) { %>
     <li>
-      <a href="/course/<%= cid %>/groups">
-        <span class="link-title">Class / Group</span>
-        <i class="mdi mdi-google-classroom link-icon"></i>
+      <a href="/course/<%= cid %>/group">
+        <span class="link-title">Class &amp; Groups</span>
+        <i class="mdi mdi-school link-icon"></i>
       </a>
     </li>
     <% if (accountType == 'Professor') {%>
       <li>
-        <a href="/course/<%= cid %>/enrollments">
+        <a href="/course/<%= cid %>/enrollment">
           <span class="link-title">Enrollment</span>
-          <i class="mdi mdi-google-classroom link-icon"></i>
+          <i class="mdi mdi-google-spreadsheet link-icon"></i>
         </a>
       </li>
     <% } %> 

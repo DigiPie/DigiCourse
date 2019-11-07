@@ -100,7 +100,9 @@ router.post('/post', function(req, res, next) {
 
             } else {
                 req.flash('success', 'Successfully posted new entry.');
-                res.status(200).redirect('back');
+                backURL = req.header('Referer') || '/';
+                backURL = `${backURL}#new_entry`;
+                res.status(200).redirect(backURL);
             }
         });
     }

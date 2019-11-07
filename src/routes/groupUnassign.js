@@ -36,7 +36,7 @@ router.get('/', function(req, res, next) {
 
 
     pool.query(sql_query, (gerr, data) => {
-        res.render('groupsunassign', {
+        res.render('groupUnassign', {
             isCourse: req.isCourse, 
             username: req.user.u_name,
             accountType: req.user.u_type,
