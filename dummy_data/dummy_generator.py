@@ -8,21 +8,21 @@ from datetime import datetime, timedelta
 
 # global config
 insert_filename = 'insert.sql'
-num_of_prof = 30						# for generating professor account (there will be x prof account)
-num_of_students = 500					# for generating student account (there will be x student account)
-num_of_courses = 20						# for generating course (there will be x courses)
-num_of_groups = 5						# for generating CourseGroup (each course will have x groups)
-start_year = 2017						# for generating courseyearsme 
+num_of_prof = 10						# for generating professor account (there will be x prof account)
+num_of_students = 300					# for generating student account (there will be x student account)
+num_of_courses = 10						# for generating course (there will be x courses)
+num_of_groups = 4						# for generating CourseGroup (each course will have x groups)
+start_year = 2018						# for generating courseyearsme 
 current_year = 2019						# for generating courseyearsme 
 current_sem = 2							# for generating courseyearsme (either 1 or 2)
-class_capacity = 60						# set upper limit for class sizes (each course will have 20 - x capacity)
+class_capacity = 80						# set upper limit for class sizes (each course will have 20 - x capacity)
 max_prof_per_class = 2					# for generating Manages (each course will have 1-x prof)
-num_of_rejected_students = 3			# for generating enrollment (each course will have 0-x rejected students)
-num_of_pending_students = 3				# for generating enrollment (each course will have 0-x pending students)
-num_of_approved_ta = 5					# for generating enrollment (each course will have 0-x approved ta)
-num_of_rejected_ta = 3					# for generating enrollment (each course will have 0-x rejected ta)
-num_of_pending_ta = 2					# for generating enrollment (each course will have 0-x pending ta)
-num_of_forums = 5						# for generating forum (each course will have 0 - x forums)
+num_of_rejected_students = 5			# for generating enrollment (each course will have 0-x rejected students)
+num_of_pending_students = 10				# for generating enrollment (each course will have 0-x pending students)
+num_of_approved_ta = 6					# for generating enrollment (each course will have 0-x approved ta)
+num_of_rejected_ta = 4					# for generating enrollment (each course will have 0-x rejected ta)
+num_of_pending_ta = 3					# for generating enrollment (each course will have 0-x pending ta)
+num_of_forums = 3						# for generating forum (each course will have 0 - x forums)
 num_of_entries = 20						# for generating forum entires (each forum will have 0 - x entries)
 
 # global variables
@@ -79,16 +79,16 @@ def insert_user_accounts(num_of_prof, num_of_students):
 		# Insert Professors
 		for i in range(num_of_prof):
 			# generate random data
-			name = firstnames[random.randint(0, len(firstnames)-1)] + " " + lastnames[random.randint(0, len(lastnames)-1)].lower()
+			name = firstnames[random.randint(0, len(firstnames)-1)] + " " + lastnames[random.randint(0, len(lastnames)-1)]
 			uid = generate_userid(AccountType.Professor)
 			# write into file
-			f.write("INSERT INTO Accounts VALUES('" + uid + "', '" + name  + "', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');" + "\n")
+			f.write("INSERT INTO Accounts VALUES('" + uid + "', '" + name  + "', '$2b$10$PZtiJLgnJSdPU.RiraxSFulahGSVuTSShcSAqAQLbjiZivhwqzxHm');" + "\n")
 			# save into dictionary
 			prof_ids[uid] = name
 		# Insert Students
 		for i in range(num_of_students):
 			# generate random data
-			name = firstnames[random.randint(0, len(firstnames)-1)] + " " + lastnames[random.randint(0, len(lastnames)-1)].lower()
+			name = firstnames[random.randint(0, len(firstnames)-1)] + " " + lastnames[random.randint(0, len(lastnames)-1)]
 			uid = generate_userid(AccountType.Student)
 			# write into file
 			f.write("INSERT INTO Accounts VALUES('" + uid + "', '" + name  + "', '$2b$10$vS4KkX8uenTCNooir9vyUuAuX5gUhSGVql8yQdsDDD4TG8bSUjkt.');" + "\n")
