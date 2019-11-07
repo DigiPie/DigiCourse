@@ -8,8 +8,9 @@ A course management platform where student-teacher interactions can take place s
 <img src='img/stack.png?raw=true' title='Development stack' width='50%'/>
 
 This project was built using the following technologies:
-- Back-end: NodeJS, ExpressJS, PostgreSQL
-- Front-end: JQuery, Bootstrap
+- Model: PostgreSQL
+- Controller: NodeJS, ExpressJS
+- View: JQuery, Bootstrap
 - Continuous Deployment: Herokuapp
 
 ## Local deployment
