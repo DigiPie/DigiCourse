@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title>Course Application Request</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/label_template.css' />
+    <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  
+  </head>
+  <body class="header-fixed">
+
+  	<!-- nav bar -->
+    <% include partials/nav.ejs %>
+    <!-- End of Navbar -->
+
+    <!-- Main Content -->
+  	<div class="page-body">
+
+      <!-- side bar -->
+      <% include partials/sidebar.ejs %>
+      <!-- End of Sidebar -->
+
+      <!-- Right Box -->
+      <div class="page-content-wrapper">
+        <!-- Content -->
+        <div class="page-content-wrapper-inner">
+          <div class="content-viewport pr-4">
+
+            <!-- Application Status -->
+            <div class="row">
+              <div class="col-12 py-5">
+                <h4>Application / Registration</h4>
+                <br/>
+                <!--<p class="text-gray">Welcome aboard, User</p>-->
+                <div class="topnav">
+                  <a class="active" href="#">Make new Request</a>
+                  <a href="/applicationStatus">Check Status</a>
+                </div>
+              </div> <!-- end of col-12 -->
+
+              <!-- Search form -->
+              <form action="/applicationRequest" class="form-inline requestSearchBar" method="post">
+                <i class="mdi mdi-magnify" aria-hidden="true"></i>
+                <input name="searchBox" id="searchBox" class="form-control form-control-sm ml-3 mr-3 w-75" type="text" placeholder="Search" aria-label="Search">
+                <button class="btn btn-primary active" type="submit"><i class="mdi mdi-magnify" aria-hidden="true"></i></button>
+                <a href="/applicationRequest" class="btn btn-primary active ml-2" role="button" aria-pressed="true"><i class="mdi mdi-refresh" aria-hidden="true"></i></a>
+              </form>
+
+              <% if (messages.error) {%>
+              <div class="alert alert-danger col-12 mt-3">
+                <%= messages.error %>
+              </div>
+              <% } else if (messages.success) { %>
+                <div class="alert alert-success col-12 mt-3">
+                  <%= messages.success %>
+                </div>
+              <% } %>
+
+              <div class="col-12 py-5">
+                <% if (dataNum > 0) { %>
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">CID</th>
+                      <th scope="col">Course Name</th>
+                      <th scope="col">Request to</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <% for(var i=0; i < datarows.length; i++) { %>
+                    <form action="/applicationRequest" method="post">
+                      <tr>
+                        <input type="hidden" class="input-normal" name="c_code" value="<%= datarows[i].c_code %>"/>
+                        <td scope="col"><%= i+1 %></td>
+                        <td scope="col"><%= datarows[i].c_code %></td>
+                        <td scope="col"><%= datarows[i].c_name %></td>
+                        <td scope="col">
+                          <% if (datarows[i].canbe_ta) { %>
+                            <button type="submit" name="TA_req" value="0" class="btn-link">Tutor</button>
+                          <% } else { %>
+                            <button type="submit" name="C_req" value="1" class="btn-link">Enrol</button>
+                          <% } %>
+                        </td>
+                      </tr>
+                    </form>
+                      <% } %>
+                  </tbody>
+                </table>
+                <% } else { %>
+                <p>No courses available for TA/Course Applications...</p>
+                <% } %> 
+              </div>
+
+            </div> <!-- end of row -->
+          </div>
+        </div>
+        <!-- End of Content -->
+
+        <!-- Footer -->
+        <% include partials/footer.ejs %>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Right Box -->
+
+    </div>
+    <!-- End of Main Content -->
+
+    <!-- Additional Javascript -->
+    <script src="/javascripts/label_template.js"></script>
+  </body>
+</html>

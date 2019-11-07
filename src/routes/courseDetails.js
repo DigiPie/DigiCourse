@@ -26,24 +26,30 @@ async function query (q, p) {
 router.get('/', async function(req, res, next) {
     // Authentication
     if (!req.user) {
-        req.flash('error','Login is required to access dashboard');
+        req.flash('error',`Login is required to access: '${req.originalUrl}'`);
         return res.redirect('/login');
     }
 
     // Prepare SQL Statement
-    var sql_query1 = "SELECT * FROM Courses WHERE c_id = $1";
-    var sql_query2 = "SELECT * FROM CourseTeachingStaff WHERE c_id = $1";
-    
+    var sql_query1 = "SELECT * FROM CourseDetails WHERE c_code = $1";
+    var sql_query2 = `
+    SELECT * FROM (
+    SELECT c_code, c_name, c_year, c_sem, p_id as t_id, u_name as name, 'Professor' as role FROM CourseManages
+    UNION
+    SELECT c_code, c_name, c_year, c_sem, s_id as t_id, u_name as name, 'Teaching Assistant' as role FROM CourseEnrollments
+    WHERE req_type = 0) AS TeachingStaff
+    WHERE c_code = $1 and c_year = $2 and c_sem = $3`;
+
     // Query
     try {
         const data1  = await query(sql_query1, [req.cid]);
-        const data2 = await query(sql_query2, [req.cid]);
+        const data2 = await query(sql_query2, [req.cid, req.year, req.sem]);
 
         res.render('courseDetails', {
             isCourse: req.isCourse,
             username: req.user.u_name,
             accountType: req.user.u_type,
-            uid: req.user.u_id, 
+            uid: req.user.u_username, 
             cid: req.cid,
             data: req.data,
             courseData: data1.rows,

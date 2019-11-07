@@ -36,14 +36,14 @@
           <div class="content-viewport">
             <div class="row">
               <div class="col-12 py-5 pr-5">
-                <% if (accountType == 'Professor') { %>
                 <div class="topnav">
-                  <a class="active" href="#">Create forum</a>
-                  <a href="/course/<%= cid %>/forum/assign">Assign forum</a>
-                  <a href="/course/<%= cid %>/forum/unassign">Unassign forum</a>
-                  <a href="/course/<%= cid %>/forum/participation">Participation</a>
+                  <a href="/course/<%= cid %>/group">Student roster</a>
+                  <a class="active" href="#">Create group</a>
+                  <a href="/course/<%= cid %>/group/assign">Assign group</a>
+                  <a href="/course/<%= cid %>/group/update">Update group</a>
+                  <a href="/course/<%= cid %>/group/unassign">Unassign group</a>
                 </div>
-                <br>
+                </br>
                 <% if (messages.error) {%>
                   <div class="alert alert-danger">
                     <%= messages.error %>
@@ -53,50 +53,38 @@
                       <%= messages.success %>
                     </div>
                   <% } %>
-                <form id="html_form" action="/course/<%= cid %>/forum/create" role="form" method="post">
+                <form id="html_form" action="/course/<%= cid %>/group/create" role="form" method="post">
                   <div class="form-group">
-                    <label for="f_topic">Topic:</label>
-                    <input type="text" maxlength="100" class="form-control" name="f_topic" placeholder="Enter topic name">
+                    <label for="g_num">Group number</label>
+                    <input type="number" class="form-control" id="g_num" name="g_num" placeholder="Enter group number">
                   </div>
-                  <button type="submit" class="btn btn-primary">Create forum</button>
+                  <div class="form-group">
+                    <label for="g_capacity">Group capacity</label>
+                    <input type="number" class="form-control" id="g_capacity" name="g_capacity" value="4">
+                  </div>
+                  <input type="hidden" name='c_code' value="<%= cid %>">
+                  <button type="submit" class="btn btn-primary">Create group</button>
                 </form>
-                <% } %>
                 <br>
-                <div class="topnav">
-                  <div class="title">Forums for <%= cid %></div>
-                </div>
-                <br>
-                <% if (messages.delFail) {%>
-                  <div class="alert alert-danger">
-                    <%= messages.delFail %>
-                  </div>
-                <% } else if (messages.delSuccess) { %>
-                    <div class="alert alert-success">
-                      <%= messages.delSuccess %>
-                    </div>
-                  <% } %>
-                <% if (forums.length == 0) { %>
-                <h4>There are no forums in this course.</h4>
+                </br>
+                <% if (datarows.length == 0) { %>
+                <h4>There are no groups in this module.</h4>
                 <% } else { %>
                 <form id="html_form" role="form" method="post">
                   <table class="table">
                       <thead>
                         <tr>
-                          <th scope="col">Topic:</th>
-                          <th scope="col">Created On:</th>
-                          <% if (accountType == 'Professor') { %>
-                          <th scope="col">Action:</th>
-                          <% } %>
+                          <th scope="col">Group number</th>
+                          <th scope="col">Group capacity</th>
+                          <th scope="col">Number of students assigned</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <% for (var i = 0; i < forums.length; i++) { %>
+                        <% for (var i = 0; i < datarows.length; i++) { %>
                         <tr>
-                          <td><a href="/course/<%= cid %>/forum/<%= forums[i].f_topic %>/<%= forums[i].formatted %>/<%= forums[i].p_id %>/entries"><%= forums[i].f_topic %></a></td>
-                          <td><%= forums[i].formatted %></td>
-                          <% if (accountType == 'Professor') { %>
-                          <td><button type="submit" formaction="/course/<%= cid %>/forum/delete/<%= forums[i].f_topic %>/<%= forums[i].formatted %>/<%= forums[i].p_id %>" class="btn btn-primary">Delete</button></td>
-                          <% } %>
+                          <td><%= datarows[i].g_num %></td>
+                          <td><%= datarows[i].g_capacity %></td>
+                          <td><%= datarows[i].enrolled %></td>
                         </tr>
                         <% } %>
                       </tbody>

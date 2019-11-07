@@ -16,6 +16,7 @@ a:hover {
   text-decoration: none;
 }
 
+
 .logo-mid {
   width: 120px;
 }
@@ -26,6 +27,11 @@ a:hover {
 
 .border-prompt {
   border: 2px solid #007bff;
+}
+
+.box-panel {
+  width: 512px;
+  max-width: 90%;
 }
 
 td.min {
@@ -39,11 +45,13 @@ td.min {
 }
 
 .topnav a {
+  width: 180px;
   float: left;
-  text-align: center;
-  padding: 14px 16px;
+  text-align: left;
+  padding: 10px 12px;
+  background-color: #f6f6f6;
   text-decoration: none;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: bold;
 }
 
@@ -64,7 +72,7 @@ td.min {
 }
 
 .topnav a.active {
-  border-bottom: solid 6px #efb200;
+  /*border-bottom: solid 6px #efb200;*/
 }
 
 .topnav a {
@@ -95,10 +103,6 @@ td.min {
  ***********************************************/
 
 nav > .nav.nav-tabs {
-  /*border: none;
-  color:#fff;
-  background:#C98986;
-  border-radius:0;*/
 }
 
 nav > div a.nav-item.nav-link {
@@ -112,35 +116,51 @@ nav > div a.nav-item.nav-link {
 nav > div a.nav-item.nav-link.active {
   border: none;
   padding: 18px 25px;
-  /*color:#fff;
-  background:#C98986;*/
   border-radius:0;
   border-bottom:5px solid #efb200;
+  text-align: center;
+  background-color: transparent;
 }
 
 nav > div a.nav-item.nav-link.active:after {
+  text-align: center;
   content: "";
   position: relative;
   bottom: -60px;
-  left: -10%;
+  left: -35%;
   border: 15px solid transparent;
   border-top-color: #efb200;
 }
 
 nav > div a.nav-item.nav-link:hover,
 nav > div a.nav-item.nav-link:focus {
-  background: #C5D5E4;
+  background: #efb200;
   color:#fff;
   border-radius:0;
   transition:background 0.20s linear;
+}
+
+a, a:visited, a:hover {
+  text-decoration: none;
+  outline: none;
+}
+
+a h4, a:visited h4, a:hover h4 {
+  text-decoration: none;
+  -webkit-transition: color .3s ease-in-out;
+  -moz-transition: color .3s ease-in-out;
+  -o-transition: color .3s ease-in-out;
+  transition: color .3s ease-in-out;
+}
+
+.card-body-custom {
+  min-height: 100px;
 }
 
 .tab-content {
   background: #fdfdfd;
   line-height: 25px;
   border: 1px solid #ddd;
-  /*border-top:5px solid #C98986;
-  border-bottom:5px solid #e74c3c;*/
   padding:30px 25px;
   width: 100%;
   min-height: 500px;
@@ -191,5 +211,9 @@ nav > div a.nav-item.nav-link:focus {
   outline: none;
   background: none;
   cursor: default;
+}
+
+.requestSearchBar {
+  width: 100%;
 }
 

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title>Course Application Status</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/label_template.css' />
+    <link rel='stylesheet' href='/stylesheets/mdi/css/materialdesignicons.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  
+  </head>
+  <body class="header-fixed">
+
+  	<!-- nav bar -->
+    <% include partials/nav.ejs %>
+    <!-- End of Navbar -->
+
+    <!-- Main Content -->
+  	<div class="page-body">
+
+      <!-- side bar -->
+      <% include partials/sidebar.ejs %>
+      <!-- End of Sidebar -->
+
+      <!-- Right Box -->
+      <div class="page-content-wrapper">
+        <!-- Content -->
+        <div class="page-content-wrapper-inner">
+          <div class="content-viewport pr-4">
+            <!-- Application Request -->
+            <div class="row">
+              <div class="col-12 py-5">
+                <h4>Application / Registration</h4>
+                <br/>
+                <!--<p class="text-gray">Welcome aboard, User</p>-->
+                <div class="topnav">
+                  <% if (accountType != 'Professor') {%>
+                  <a href="/applicationRequest">Make new Request</a>
+                  <% } %>
+                  <a class="active" href="#">Check Status</a>
+                </div>
+              </div> <!-- end of col-12 -->
+
+              <!-- Search form -->
+              <form action="/applicationStatus" class="form-inline requestSearchBar" method="post">
+                <i class="mdi mdi-magnify" aria-hidden="true"></i>
+                <input name="searchBox" id="searchBox" class="form-control form-control-sm ml-3 mr-3 w-75" type="text" placeholder="Search" aria-label="Search">
+                <button class="btn btn-primary active" type="submit"><i class="mdi mdi-magnify" aria-hidden="true"></i></button>
+                <a href="/applicationStatus" class="btn btn-primary active ml-2" role="button" aria-pressed="true"><i class="mdi mdi-refresh" aria-hidden="true"></i></a>
+              </form>
+
+              <% if (messages.error) {%>
+              <div class="alert alert-danger col-12 mt-3">
+                <%= messages.error %>
+              </div>
+              <% } else if (messages.success) { %>
+                <div class="alert alert-success col-12 mt-3">
+                  <%= messages.success %>
+                </div>
+              <% } %>
+
+              <% if (dataNum > 0) { %>
+              <div class="col-12 py-5">
+                <table class="table  table-responsive">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th>#</th>
+                      <th>CID</th>
+                      <th>Course Name</th>
+                      <% if (accountType == 'Professor') {%>
+                      <th>Applicant</th>
+                      <% } %>
+                      <th>For</th>
+                      <th>Status</th>
+                      <th class='pr-3'>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% for(var i=0; i < datarows.length; i++) { %>
+                    <form action="/applicationStatus" method="post">
+                      <input type="hidden" class="input-normal" name="s_id" value="<%= datarows[i].s_id %>"/>
+                      <input type="hidden" class="input-normal" name="req_dt" value="<%= datarows[i].req_datetime %>"/>
+                      <input type="hidden" class="input-normal" name="c_code" value="<%= datarows[i].c_code %>"/>
+                      <tr>
+                        <td><%= i+1 %></td>
+                        <td><%= datarows[i].c_code %></td>
+                        <td><%= datarows[i].c_name %></td>
+                        <% if (accountType == 'Professor') {%>
+                          <td><%= datarows[i].studentname %></td>
+                        <% } %>
+                        <% if (datarows[i].req_type == 0) { %>
+                          <td>Teaching Assistant</td>
+                        <% } else { %>
+                          <td>Student</td>
+                        <% } %>
+                        <% if (datarows[i].req_status) { %> 
+                          <td>Approved</td>
+                          <td>-</td>
+                        <% } else if (datarows[i].approver) { %> 
+                          <td>Rejected</td>
+                          <td>
+                            <% if (accountType == 'Professor') {%>
+                              <button type="submit" name="edit" class="btn-link">View</button>
+                            <% } else { %>
+                              -
+                            <% } %>
+                          </td>
+                        <% } else { %> 
+                          <td>Pending</td>
+                          <td>
+                            <% if (accountType == 'Professor') {%>
+                              <button type="submit" name="edit" class="btn-link">View</button>
+                            <% } else { %>
+                              <button type="submit" name="cancel" value="cancel" class="btn-link">Cancel</button>
+                            <% } %>
+                          </td>
+                        <% } %>
+                      </tr>
+                    </form>
+                    <% } %>
+                  </tbody>
+                </table>
+              <% } else { %>
+                <p>No Application found!</p>
+              <% } %> 
+
+              </div> <!-- end of col-12 -->
+            </div> <!-- end of row -->
+        <!-- End of Content -->
+
+        <!-- Footer -->
+        <% include partials/footer.ejs %>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Right Box -->
+
+    </div>
+    <!-- End of Main Content -->
+
+    <!-- Additional Javascript -->
+    <script src="/javascripts/label_template.js"></script>
+  </body>
+</html>

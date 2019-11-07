@@ -2,11 +2,15 @@
   <!-- user profile -->
   <div class="user-profile">
     <div class="display-avatar animated-avatar">
-      <img class="profile-img img-lg rounded-circle" width="100" height="100" src="/images/logo.png" alt="profile image">
+      <img class="profile-img img-lg rounded-circle" width="100" src="/images/profile.png" alt="profile image">
     </div>
     <div class="info-wrapper">
       <p class="user-name"><%= username %></p>
       <h6 class="display-income"><%= accountType %></h6>
+      <a href="/account" class="mt-2 text-white btn btn-primary btn-sm">
+        <i class="mdi mdi-account link-icon"></i>
+        Account settings
+      </a>
     </div>
   </div>
   <!-- End of user profile -->
@@ -15,54 +19,49 @@
   <% if (isCourse) { %>
   <ul class="navigation-menu">
     <li class="nav-title"><%= data[0].c_name %></li>
-    <li class="nav-category-divider">Course Main Menu</li>
+    <li class="nav-category-divider">General</li>
     <li>
       <a href="/course/<%= cid %>">
-        <span class="link-title">Overview</span>
+        <span class="link-title">Course</span>
         <i class="mdi mdi-clipboard-text link-icon"></i>
       </a>
     </li>
     <li>
       <a href="/course/<%= cid %>/details">
         <span class="link-title">Course Details</span>
-        <i class="mdi mdi-information-outline link-icon"></i>
+        <i class="mdi mdi-information link-icon"></i>
       </a>
     </li>
     <li class="nav-category-divider">Tools</li>
     <% if ( data[0].user_can_see ) { %>
     <li>
-      <a href="#">
-        <span class="link-title">Announcement</span>
-        <i class="mdi mdi-bullhorn link-icon"></i>
+      <a href="/course/<%= cid %>/group">
+        <span class="link-title">Class &amp; Groups</span>
+        <i class="mdi mdi-school link-icon"></i>
       </a>
     </li>
-    <li>
-      <a href="#">
-        <span class="link-title">Content</span>
-        <i class="mdi mdi-book-open link-icon"></i>
-      </a>
-    </li>
-    <li>
-      <a href="/course/<%= cid %>/groups">
-        <span class="link-title">Class / Group</span>
-        <i class="mdi mdi-google-classroom link-icon"></i>
-      </a>
-    </li>
+    <% if (accountType == 'Professor') {%>
+      <li>
+        <a href="/course/<%= cid %>/enrollment">
+          <span class="link-title">Enrollment</span>
+          <i class="mdi mdi-google-spreadsheet link-icon"></i>
+        </a>
+      </li>
+    <% } %> 
     <li>
       <a href="/course/<%= cid %>/forum">
         <span class="link-title">Forum</span>
         <i class="mdi mdi-forum link-icon"></i>
       </a>
     </li>
-    <% if (accountType == 'Professor') {%>
+    <% } else if (accountType != 'Professor') { %>
     <li>
-        <a href="/course/<%= cid %>/enrollments">
-          <span class="link-title">Enrollments</span>
-          <i class="mdi mdi-google-classroom link-icon"></i>
-        </a>
-      </li>
-    <% } %> 
-    <% } %> 
+      <a href="/applicationRequest">
+        <span class="link-title">Join module</span>
+        <i class="mdi mdi-google-classroom link-icon"></i>
+      </a>
+    </li>
+    <% } %>
   </ul>
   <% } %>
   <!-- End of side bar menu -->

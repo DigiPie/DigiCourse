@@ -35,11 +35,15 @@
         <div class="page-content-wrapper-inner">
           <div class="content-viewport">
             <div class="row">
-              <div class="col-12 py-5">
+              <div class="col-12 py-5 pr-5">
                 <div class="topnav">
-                  <a href="/course/<%= cid %>/groups">Create group</a>
-                  <a href="/course/<%= cid %>/groups/assign"">Assign group</a>
-                  <a class="active" href="#">Student roaster</a>
+                  <a class="active" href="#">Student roster</a>
+                  <% if (accountType == 'Professor') {%>
+                  <a href="/course/<%= cid %>/group/create">Create group</a>
+                  <a href="/course/<%= cid %>/group/assign">Assign group</a>
+                  <a href="/course/<%= cid %>/group/update">Update group</a>
+                  <a href="/course/<%= cid %>/group/unassign">Unassign group</a>
+                  <% } %> 
                 </div>
                 </br>
                 <% if (datarows.length == 0) { %>
@@ -58,8 +62,8 @@
                       <% for (var i = 0; i < datarows.length; i++) { %>
                       <tr>
                         <td><%= datarows[i].s_id %></td>
-                        <td><%= datarows[i].s_name %></td>
-                        <td><%= datarows[i].g_num ? datarows[i].g_num : (datarows[i].req_type == 0 ? 'All groups' : 'No groups') %></td>
+                        <td><%= datarows[i].u_name %></td>
+                        <td><%= datarows[i].g_num ? datarows[i].g_num : 'No group' %></td>
                         <td><%= datarows[i].req_type == 1 ? 'Student' : 'Teaching Assistant' %></td>
                       </tr>
                       <% } %>

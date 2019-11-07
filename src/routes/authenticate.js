@@ -1,8 +1,6 @@
-var express = require('express');
-var sql_query = require('../sql');
-var passport = require('passport');
-var bcrypt = require('bcrypt')
-var router = express.Router();
+let express = require('express');
+let passport = require('passport');
+let router = express.Router();
 
 const { Pool } = require('pg')
 const pool = new Pool({
@@ -51,7 +49,7 @@ router.get('/login', function (req, res, next) {
 router.get('/logout', function (req, res, next) {
   // If user is already logged out, redirect to login page
   if (req.user) {
-    req.flash('info', 'Logged out of ' + req.user.u_id);
+    req.flash('info', 'Logged out of ' + req.user.u_username);
 	  req.logout();
   }
 

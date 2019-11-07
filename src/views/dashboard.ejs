@@ -44,10 +44,13 @@
             <div class="container">
               <div class="card-deck mb-3 text-center">
                 <% for(var i=0; i<datarows.length; i++) { %>
-                  <a class="card-a" href="/course/<%= datarows[i].c_id %>">
-                    <div class="card mb-4 shadow-sm">
-                      <div class="card-header"><strong><%= datarows[i].c_id %></strong></div>
-                      <div class="card-body"><%= datarows[i].c_name %></div>
+                  <a class="card-a col-xs-12 col-sm-6 col-md-4 col-lg-4" 
+                      href="/course/<%= datarows[i].c_code %>">
+                    <div class="card mb-4 m-0 shadow-sm text-left">
+                      <div class="card-header font-weight-bold">
+                        <%= datarows[i].c_code %>
+                      </div>
+                      <div class="card-body card-body-custom"><%= datarows[i].c_name %></div>
                     </div>
                   </a>
                 <% } %>

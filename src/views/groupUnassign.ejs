@@ -35,55 +35,54 @@
         <div class="page-content-wrapper-inner">
           <div class="content-viewport">
             <div class="row">
-              <div class="col-12 py-5">
-                <% if (accountType == 'Professor') { %>
+              <div class="col-12 py-5 pr-5">
                 <div class="topnav">
-                  <a href="/course/<%= cid %>/forum">Create forum</a>
-                  <a class="active" href="#">Assign forum</a>
+                  <a href="/course/<%= cid %>/group">Student roster</a>
+                  <a href="/course/<%= cid %>/group/create">Create group</a>
+                  <a href="/course/<%= cid %>/group/assign">Assign group</a>
+                  <a href="/course/<%= cid %>/group/update">Update group</a>
+                  <a class="active" href="#">Unassign group</a>
                 </div>
-                <br>
+              </br>
                 <% if (messages.error) {%>
                   <div class="alert alert-danger">
                     <%= messages.error %>
                   </div>
-                <% } else if (messages.success) { %>
+                  <% } else if (messages.success) { %>
                     <div class="alert alert-success">
                       <%= messages.success %>
                     </div>
-                <% } %>
-                <form id="html_form" role="form" method="post">
-                    <% var count = 0; %>
-                    <% for (var x = 0; x < forums.length; x++) { %>
-                    <div class="topnav">
-                        <div class="title"><%= forums[x].f_topic %></div>
-                    </div>
-                    <br>
+                  <% } %>
+                <% if (datarows.length == 0) { %>
+                <h4>No students have been assigned groups in this module.</h4>
+                  <% } else { %>
+                  <form id="html_form" role="form" method="post">
                     <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Group no.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% for (var i = 0; i < forumGroups.length; i++) { %>
-                            <tr>
-                                <% if (forumGroups[i].f_datetime == forums[x].f_datetime) { %>
-                                    <td class="min"><input type="checkbox" name="row[<%= count %>][selected]" ></td>
-                                    <input type="hidden" name='row[<%= count %>][f_datetime]' value="<%= forums[x].f_datetime %>">
-                                    <td><input type="hidden" name='row[<%= count %>][g_num]' value="<%= forumGroups[i].g_num %>"><%= forumGroups[i].g_num %></td>
-                                <% } %>
-                            </tr>
-                            <% count += 1;} %>
-                            <tr>
-                                <td><button type="submit" formaction="/course/<%= cid %>/forum/assign" class="btn btn-primary" >Submit</button></td>
-                            </tr>
-                        </tbody>
+                      <thead>
+                        <tr>
+                          <th scope="col"></th>
+                          <th scope="col">Student ID</th>
+                          <th scope="col">Student name</th>
+                          <th scope="col">Group number</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% for (var i = 0; i < datarows.length; i++) { %>
+                        <tr>
+                          <td class="min"><input type="checkbox" name="row[<%= i %>][selected]" ></td>
+                          <input type="hidden" name='row[<%= i %>][c_code]' value="<%= cid %>">
+                          <td><input type="hidden" name='row[<%= i %>][s_id]' value="<%= datarows[i].s_id %>"><%= datarows[i].s_id %></td>
+                          <td><%= datarows[i].u_name %></td>
+                          <td><input type="hidden" name='row[<%= i %>][g_num]' value="<%= datarows[i].g_num %>"><%= datarows[i].g_num %></td>
+                        </tr>
+                        <% } %>
+                        <tr>
+                          <td><button type="submit" formaction="/course/<%= cid %>/group/unassign" class="btn btn-primary" >Submit</button></td>
+                        </tr>
+                      </tbody>
                     </table>
-                    <% } %>
-                </form>
+                  </form>
                 <% } %>
-                <br>
               </div>
             </div>
             <!-- put your stuff here -->
@@ -101,6 +100,6 @@
     <!-- End of Main Content -->
 
     <!-- Additional Javascript -->
-    <script src="javascripts/label_template.js"></script>
+    <script src="/javascripts/label_template.js"></script>
   </body>
 </html>

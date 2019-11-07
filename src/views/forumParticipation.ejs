@@ -38,71 +38,78 @@
               <div class="col-12 py-5 pr-5">
                 <% if (accountType == 'Professor') { %>
                 <div class="topnav">
-                  <a class="active" href="#">Create forum</a>
+				          <a href="/course/<%= cid %>/forum">Create forum</a>
                   <a href="/course/<%= cid %>/forum/assign">Assign forum</a>
-                  <a href="/course/<%= cid %>/forum/unassign">Unassign forum</a>
-                  <a href="/course/<%= cid %>/forum/participation">Participation</a>
+				          <a href="/course/<%= cid %>/forum/unassign">Unassign forum</a>
+				          <a class="active" href="#">Participation</a>
                 </div>
                 <br>
-                <% if (messages.error) {%>
-                  <div class="alert alert-danger">
-                    <%= messages.error %>
-                  </div>
-                <% } else if (messages.success) { %>
-                    <div class="alert alert-success">
-                      <%= messages.success %>
-                    </div>
-                  <% } %>
-                <form id="html_form" action="/course/<%= cid %>/forum/create" role="form" method="post">
-                  <div class="form-group">
-                    <label for="f_topic">Topic:</label>
-                    <input type="text" maxlength="100" class="form-control" name="f_topic" placeholder="Enter topic name">
-                  </div>
-                  <button type="submit" class="btn btn-primary">Create forum</button>
-                </form>
                 <% } %>
-                <br>
                 <div class="topnav">
-                  <div class="title">Forums for <%= cid %></div>
+                  <div class="title">Overall top forum participation (Students)</div>
                 </div>
                 <br>
-                <% if (messages.delFail) {%>
-                  <div class="alert alert-danger">
-                    <%= messages.delFail %>
-                  </div>
-                <% } else if (messages.delSuccess) { %>
-                    <div class="alert alert-success">
-                      <%= messages.delSuccess %>
-                    </div>
-                  <% } %>
-                <% if (forums.length == 0) { %>
-                <h4>There are no forums in this course.</h4>
+                <% if (students.length == 0) { %>
+                <h4>There is currently no forum participation from students in this course.</h4>
                 <% } else { %>
                 <form id="html_form" role="form" method="post">
                   <table class="table">
                       <thead>
                         <tr>
-                          <th scope="col">Topic:</th>
-                          <th scope="col">Created On:</th>
-                          <% if (accountType == 'Professor') { %>
-                          <th scope="col">Action:</th>
-                          <% } %>
+                          <th scope="col">User ID:</th>
+                          <th scope="col">Name:</th>
+                          <th scope="col">Total no. of entries posted:</th>
+                          <th scope="col">Most participated forum(s):</th>
+                          <th scope="col">No. of entries posted:</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <% for (var i = 0; i < forums.length; i++) { %>
+                        <% for (var i = 0; i < students.length; i++) { %>
                         <tr>
-                          <td><a href="/course/<%= cid %>/forum/<%= forums[i].f_topic %>/<%= forums[i].formatted %>/<%= forums[i].p_id %>/entries"><%= forums[i].f_topic %></a></td>
-                          <td><%= forums[i].formatted %></td>
-                          <% if (accountType == 'Professor') { %>
-                          <td><button type="submit" formaction="/course/<%= cid %>/forum/delete/<%= forums[i].f_topic %>/<%= forums[i].formatted %>/<%= forums[i].p_id %>" class="btn btn-primary">Delete</button></td>
-                          <% } %>
+                          <td><%= students[i].u_username %></td>
+                          <td><%= students[i].u_name %></td>
+                          <td><%= students[i].total_entries %></td>
+                          <td><%= students[i].most_participated_forums %></td>
+                          <td><%= students[i].num_of_entries %></td>
                         </tr>
                         <% } %>
                       </tbody>
                     </table>
                 </form>
                 <% } %>
+                <br>
+                <div class="topnav">
+                    <div class="title">Overall top forum participation (Teaching assistants)</div>
+                  </div>
+                  <br>
+                  <% if (teaching.length == 0) { %>
+                  <h4>There is currently no forum participation from teaching assistants in this course.</h4>
+                  <% } else { %>
+                  <form id="html_form" role="form" method="post">
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">User ID:</th>
+                            <th scope="col">Name:</th>
+                            <th scope="col">Total no. of entries posted:</th>
+                            <th scope="col">Most participated forum(s):</th>
+                            <th scope="col">No. of entries posted:</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% for (var i = 0; i < teaching.length; i++) { %>
+                          <tr>
+                            <td><%= teaching[i].u_username %></td>
+                            <td><%= teaching[i].u_name %></td>
+                            <td><%= teaching[i].total_entries %></td>
+                            <td><%= teaching[i].most_participated_forums %></td>
+                            <td><%= teaching[i].num_of_entries %></td>
+                          </tr>
+                          <% } %>
+                        </tbody>
+                      </table>
+                  </form>
+                  <% } %>
               </div>
             </div>
             <!-- put your stuff here -->

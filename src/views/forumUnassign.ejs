@@ -35,13 +35,15 @@
         <div class="page-content-wrapper-inner">
           <div class="content-viewport">
             <div class="row">
-              <div class="col-12 py-5">
+              <div class="col-12 py-5 pr-5">
+                <% if (accountType == 'Professor') { %>
                 <div class="topnav">
-                  <a class="active" href="#">Create group</a>
-                  <a href="/course/<%= cid %>/groups/assign">Assign group</a>
-                  <a href="/course/<%= cid %>/groups/student">Student roaster</a>
+                  <a href="/course/<%= cid %>/forum">Create forum</a>
+                  <a href="/course/<%= cid %>/forum/assign">Assign forum</a>
+                  <a class="active" href="#">Unassign forum</a>
+                  <a href="/course/<%= cid %>/forum/participation">Participation</a>
                 </div>
-                </br>
+                <br>
                 <% if (messages.error) {%>
                   <div class="alert alert-danger">
                     <%= messages.error %>
@@ -50,45 +52,45 @@
                     <div class="alert alert-success">
                       <%= messages.success %>
                     </div>
-                  <% } %>
-                <form id="html_form" action="/course/<%= cid %>/groups/create" role="form" method="post">
-                  <div class="form-group">
-                    <label for="g_num">Group number</label>
-                    <input type="number" class="form-control" id="g_num" name="g_num" placeholder="Enter group number">
-                  </div>
-                  <div class="form-group">
-                    <label for="g_capacity">Group capacity</label>
-                    <input type="number" class="form-control" id="g_capacity" name="g_capacity" value="4">
-                  </div>
-                  <input type="hidden" name='c_id' value="<%= cid %>">
-                  <button type="submit" class="btn btn-primary">Create group</button>
-                </form>
-                <br>
-                </br>
-                <% if (datarows.length == 0) { %>
-                <h4>There are no groups in this module.</h4>
+                <% } %>
+                <% if (forums.length == 0) { %>
+                  <h4>None of the forums have been assigned a group.</h4>
                 <% } else { %>
                 <form id="html_form" role="form" method="post">
-                  <table class="table">
-                      <thead>
-                        <tr>
-                          <th scope="col">Group number</th>
-                          <th scope="col">Group capacity</th>
-                          <th scope="col">Number of enrolled</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <% for (var i = 0; i < datarows.length; i++) { %>
-                        <tr>
-                          <td><%= datarows[i].g_num %></td>
-                          <td><%= datarows[i].g_capacity %></td>
-                          <td><%= datarows[i].enrolled %></td>
-                        </tr>
-                        <% } %>
-                      </tbody>
+                    <% var count = 0; %>
+                    <% for (var x = 0; x < forums.length; x++) { %>
+                    <div class="topnav">
+                        <div class="title"><%= forums[x].f_topic %></div>
+                    </div>
+                    <br>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Group no.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (var i = 0; i < forumGroups.length; i++) { %>
+                            <tr>
+                                <% if (forumGroups[i].formatted == forums[x].formatted && forumGroups[i].p_id == forums[x].p_id) { %>
+                                    <td class="min"><input type="checkbox" name="row[<%= count %>][selected]" ></td>
+                                    <input type="hidden" name='row[<%= count %>][p_id]' value="<%= forums[x].p_id %>">
+                                    <input type="hidden" name='row[<%= count %>][f_datetime]' value="<%= forums[x].formatted %>">
+                                    <td><input type="hidden" name='row[<%= count %>][g_num]' value="<%= forumGroups[i].g_num %>"><%= forumGroups[i].g_num %></td>
+                                <% } %>
+                            </tr>
+                            <% count += 1;} %>
+                            <tr>
+                                <td><button type="submit" formaction="/course/<%= cid %>/forum/unassign" class="btn btn-primary" >Submit</button></td>
+                            </tr>
+                        </tbody>
                     </table>
+                    <% } %>
                 </form>
                 <% } %>
+                <% } %>
+                <br>
               </div>
             </div>
             <!-- put your stuff here -->
@@ -106,6 +108,6 @@
     <!-- End of Main Content -->
 
     <!-- Additional Javascript -->
-    <script src="/javascripts/label_template.js"></script>
+    <script src="javascripts/label_template.js"></script>
   </body>
 </html>

@@ -14,61 +14,75 @@ var increase_count;
 router.get('/', function(req, res, next) {
     // Authentication
 	if (!req.user) {
-		req.flash('error','Login is required to access dashboard');
+		req.flash('error',`Login is required to access: '${req.originalUrl}'`);
 		return res.redirect('/login');
     }
     
-    const capacity_query = `SELECT c_capacity FROM Courses WHERE c_id = '${req.params.cid}'`;
+    const capacity_query = `SELECT c_capacity FROM CourseYearSem WHERE c_code = '${req.params.cid}' AND c_year = '${req.year}' AND c_sem = '${req.sem}'`;
 
-    var sql_query = `SELECT s_id, c_id, req_type, p_id, req_status, TO_CHAR(req_datetime, 'Dy Mon DD YYYY HH24:MI:SS') req_datetime 
-    FROM Enrollments WHERE c_id =\'${req.params.cid}\' AND NOT req_status`;
+    var sql_query = `SELECT s_id, c_code, req_type, p_id, req_status, TO_CHAR(req_datetime, 'Dy Mon DD YYYY HH24:MI:SS') req_datetime 
+    FROM Enrollments 
+    WHERE c_code ='${req.params.cid}'
+    AND c_year = '${req.year}'
+    AND c_sem = '${req.sem}'
+    AND NOT req_status`;
 
     pool.query(capacity_query, (err, cdata) => {
         current_capacity = cdata.rows[0].c_capacity;
-        var new_capacity = increase_count == undefined ? current_capacity + 10 : increase_count; 
         increase_count = undefined;
 
         pool.query(sql_query, (err, data) => {
-            res.render('enrollments', {
+            res.render('enrollment', {
                 isCourse: req.isCourse, 
                 username: req.user.u_name,
                 accountType: req.user.u_type,
-                uid: req.user.u_id, 
+                uid: req.user.u_username, 
                 cid: req.cid,
                 data: req.data,
                 datarows: data.rows,
                 capacity: current_capacity,
-                new_capacity: new_capacity 
             });
         });  
     });
     
 });
 
-const account_uid = 'P0000001A';
-
 router.post('/increase', function(req, res, next) {
-    if (req.body.c_capacity.length == 0) {
-        req.flash('error', `Please enter a capacity`);
+    if (req.body.c_capacity == '' || isNaN(req.body.c_capacity) || req.body.c_capacity <= 0) {
+        req.flash('error', `Please enter a valid capacity.`);
         res.status(400).redirect('back');
         return;
     }
 
-    const column_set = new pgp.helpers.ColumnSet(['?c_id', 'c_capacity'], {table: 'courses'});
-    const update_sql = pgp.helpers.update({c_id: req.params.cid, c_capacity: req.body.c_capacity}, column_set) + ` WHERE c_id = '${req.params.cid}'`;
+    const check_capacity_sql = `SELECT COUNT(*) count FROM CourseEnrollments
+    WHERE c_code = '${req.params.cid}'
+    AND c_year = '${req.year}' 
+    AND c_sem = '${req.sem}'
+    AND req_type = 1`
 
-	pool.query(update_sql, (err, data) => {
-        if (err) {
-            res.status(err.status || 500);
-            res.render('error', {
-                message: "Something went wrong during the update, try again later.",
-                error: err
-            });
-        } else {
-            req.flash('success', `Successfully increased the capacity to ${req.body.c_capacity}.`);
-            res.status(200).redirect('back');
+    const column_set = new pgp.helpers.ColumnSet(['?c_code', 'c_capacity'], {table: 'courseyearsem'});
+    const update_sql = pgp.helpers.update({c_code: req.params.cid, c_capacity: req.body.c_capacity}, column_set) 
+    + ` WHERE c_code = '${req.params.cid}' AND c_year = '${req.year}' AND c_sem = '${req.sem}'`;
+
+    pool.query(check_capacity_sql, (err, cdata) => {
+        if (parseInt(req.body.c_capacity) < parseInt(cdata.rows[0].count)) {
+            req.flash('error', `Please enter a valid capacity. Capacity must be at least equal to number of students already enrolled in the course: ${cdata.rows[0].count}.`);
+            res.status(400).redirect('back');
+            return;
         }
-	});
+        pool.query(update_sql, (err, data) => {
+            if (err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: 'Something went wrong during the update, try again later.',
+                    error: err
+                });
+            } else {
+                req.flash('success', `Successfully changed the course capacity to ${req.body.c_capacity}.`);
+                res.status(200).redirect('back');
+            }
+        });
+    });
 });
 
 // POST
@@ -88,7 +102,7 @@ router.post('/accept', function(req, res, next) {
     for(var i = 0; i < selected_rows.length; i++) {
         delete selected_rows[i].accepted;
         selected_rows[i].req_status = true;
-        selected_rows[i].p_id = account_uid;
+        selected_rows[i].p_id = req.user.u_username;
         sids.push(selected_rows[i].s_id);
 
         if (selected_rows[i].req_type == 0) {
@@ -105,15 +119,20 @@ router.post('/accept', function(req, res, next) {
     t_sid = t_sid.join(', ');
     s_sid = s_sid.join(', ');
 
-    const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_id', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
-    const where_sql = ' WHERE v.s_id = t.s_id AND v.c_id = t.c_id AND TO_CHAR(t.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = v.req_datetime';
+    const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_code', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
+    const where_sql = ` WHERE v.s_id = t.s_id AND v.c_code = t.c_code AND TO_CHAR(t.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = v.req_datetime AND t.c_year = '${req.year}'
+    AND t.c_sem = '${req.sem}'`;
     var check_query = `SELECT c_capacity - (
             SELECT COUNT(*) scount
             FROM CourseEnrollments
-            WHERE c_id = '${req.params.cid}'
+            WHERE c_code = '${req.params.cid}'
+            AND c_year = '${req.year}'
+            AND c_sem = '${req.sem}'
             AND req_type = 1) available
-        FROM Courses
-        WHERE c_id = '${req.params.cid}'`;
+        FROM CourseYearSem
+        WHERE c_code = '${req.params.cid}'
+        AND c_year = '${req.year}'
+        AND c_sem = '${req.sem}'`;
 
 	pool.query(check_query, (err, data) => {
         if (data.rows[0].available < scount) {
@@ -122,10 +141,9 @@ router.post('/accept', function(req, res, next) {
                 const update_sql = pgp.helpers.update(ta_rows, column_set) + where_sql;
                 pool.query(update_sql, (err, data) => {
                     if (err) {
-                        res.status(err.status || 500);
                         res.render('error', {
-                            message: "Something went wrong during the update, try again later.",
-                            error: err
+                            err_msg: "Something went wrong during the update, try again later.",
+                            err_status: err.status || 500
                         });
                     } else {
                         req.flash('success', `Successfully enrolled ${t_sid} as Teaching Assistant.\n `);
@@ -149,10 +167,9 @@ router.post('/accept', function(req, res, next) {
     
             pool.query(update_sql, (err, data) => {
                 if (err) {
-                    res.status(err.status || 500);
                     res.render('error', {
-                        message: "Something went wrong during the update, try again later.",
-                        error: err
+                        err_msg: "Something went wrong during the update, try again later.",
+                        err_status: err.status || 500
                     });
                 } else {
                     req.flash('success', `Successfully enrolled ${sids}.`);
@@ -177,22 +194,21 @@ router.post('/reject', function(req, res, next) {
     for(var i=0; i<selected_rows.length; i++) {
         delete selected_rows[i].accepted;
         selected_rows[i].req_status = false;
-        selected_rows[i].p_id = account_uid;
+        selected_rows[i].p_id = req.user.u_username;
         sids.push(selected_rows[i].s_id);
     }
 
     sids = sids.join(', ');
 
-    const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_id', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
+    const column_set = new pgp.helpers.ColumnSet(['?s_id','?c_code', '?req_type', '?req_datetime', 'req_status', 'p_id'], {table: 'enrollments'});
     const update_sql = pgp.helpers.update(selected_rows, column_set) 
-    + ' WHERE v.s_id = t.s_id AND v.c_id = t.c_id AND TO_CHAR(t.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = v.req_datetime';
+    + ' WHERE v.s_id = t.s_id AND v.c_code = t.c_code AND TO_CHAR(t.req_datetime, \'Dy Mon DD YYYY HH24:MI:SS\') = v.req_datetime';
     	
 	pool.query(update_sql, (err, data) => {
         if (err) {
-            res.status(err.status || 500);
             res.render('error', {
-                message: "Something went wrong during the update, try again later.",
-                error: err
+                err_msg: "Something went wrong during the update, try again later.",
+                err_status: err.status || 500
             });
         } else {
             req.flash('success', `Successfully rejected ${sids}.`);
