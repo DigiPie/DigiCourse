@@ -260,6 +260,7 @@ CREATE TABLE CourseEnrollments (
     s_id        varchar(9) REFERENCES Students (s_id),
     u_name      varchar(100) NOT NULL,
     req_type    integer NOT NULL,
+    PRIMARY KEY (c_code, c_year, c_sem, s_id),
     FOREIGN KEY (c_code, c_year, c_sem) REFERENCES CourseYearSem (c_code, c_year, c_sem) ON DELETE CASCADE
 );
 
@@ -297,12 +298,6 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER insert_course_manages
 BEFORE INSERT OR UPDATE ON Manages
 FOR EACH ROW EXECUTE PROCEDURE f_insert_course_manages();
-
-CREATE TABLE student_info (
-    matric  varchar(9) PRIMARY KEY,
-    name    varchar(255) NOT NULL,
-    faculty varchar(3) NOT NULL
-);
 
 CREATE TABLE Forums (
     p_id            varchar(9) REFERENCES Professors (p_id),
