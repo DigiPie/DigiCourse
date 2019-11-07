@@ -5,6 +5,8 @@ A course management platform where student-teacher interactions can take place s
 * This project was developed by [Bryan Koh](https://github.com/awarenessxz), [Evan Tay](https://github.com/DigiPie/), [Jacqueline Cheong](https://github.com/Aquarinte/) and [Lee Tze Ting](https://github.com/halcyoneee) from September to November 2019.
 
 ## Tech stack
+<img src='img/stack.png?raw=true' title='Development stack' width='50%'/>
+
 This project was built using the following technologies:
 - Back-end: NodeJS, ExpressJS, PostgreSQL
 - Front-end: JQuery, Bootstrap
