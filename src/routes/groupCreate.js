@@ -69,7 +69,7 @@ router.post('/', function(req, res, next) {
         return;
     }
 
-    var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.body.c_code}', '${req.year}', '${req.sem}', '${req.body.g_num}', '${req.body.g_capacity}')`;
+    var sql_query = `INSERT INTO CourseGroups VAlUES ('${req.user.u_username}', '${req.body.c_code}', '${req.year}', '${req.sem}', '${req.body.g_num}', '${req.body.g_capacity}')`;
 
 	pool.query(sql_query, (err, data) => {
         if (err) {

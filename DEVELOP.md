@@ -43,6 +43,6 @@ Finally, you can execute the NodeJS app by going through the steps below.
 ## Example accounts
 | Type | Username | Password |
 |-----|:---:|----:|
-|Professor|P0000002G|CS2102CS2102|
-|Student|A0000167X|CS2102CS2102|
-|Teaching Assistant|A0000037T|CS2102CS2102|
+|Professor|P0000007K|CS2102CS2102|
+|Student|A0000274S|CS2102CS2102|
+|Teaching Assistant|A0000161B|CS2102CS2102|

@@ -221,7 +221,7 @@ def insert_courses(num_of_courses, prof_ids):
 			group_size = int((capacity / num_of_groups) + 1)		# capacity / num of group
 			# write to file
 			for g_num in range(num_of_groups):
-				f.write("INSERT INTO CourseGroups VALUES ('" + course[0] + "', " + str(course[1]) + ", " + str(course[2]) + ", " + str(g_num+1) + ", " + str(group_size) + ");" + "\n")
+				f.write("INSERT INTO CourseGroups VALUES ('" + course[4][0] + "', '" + str(course[0]) + "', " + str(course[1]) + ", " + str(course[2]) + ", " + str(g_num+1) + ", " + str(group_size) + ");" + "\n")
 
 	return allCourses
 
