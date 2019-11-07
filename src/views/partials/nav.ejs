@@ -21,27 +21,28 @@
         </div>
       </form>
       <!-- Menu -->
-      <ul class="nav ml-auto" title="Course Management">
+      <ul class="nav ml-auto">
         <!-- registration / application -->
         <li class="nav-item dropdown">
-          <a class="nav-link" href="#" id="applyDropdown" data-toggle="dropdown" aria-expanded="false">
-            <i class="mdi mdi-apps mdi-1x"></i>
+          <a class="nav-link" title="Apply" href="#" id="applyDropdown" data-toggle="dropdown" aria-expanded="false">
+            <i class="mdi mdi-google-classroom mdi-1x"></i> 
+            <span class="text-white">Apply</span>
           </a>
           <div class="dropdown-menu navbar-dropdown dropdown-menu-right" aria-labelledby="applyDropdown">
             <div class="dropdown-header">
-              <h6 class="dropdown-title">Course Management</h6>
+              <h6 class="dropdown-title">Course Application</h6>
             </div>
             <div class="dropdown-body ml-1">
               <% if (accountType != 'Professor') {%>
               <div class="dropdown-list">
                 <div class="content-wrapper">
-                  <a href="/applicationRequest">Course/TA Request</a>
+                  <a href="/applicationRequest">Apply</a>
                 </div>
               </div>
               <% } %>
               <div class="dropdown-list">
                 <div class="content-wrapper">
-                  <a href="/applicationStatus">Application Status</a>
+                  <a href="/applicationStatus">Status</a>
                 </div>
               </div>
             </div>
@@ -49,7 +50,10 @@
         </li>
           <!-- logout -->
         <li class="nav-item">
-          <a class="nav-link" href="/logout" id="menuLogout" title="Log out"><i class="mdi mdi-logout mdi-1x"></i></a>
+          <a class="nav-link" href="/logout" id="menuLogout" title="Sign out">
+            <i class="mdi mdi-logout mdi-1x"></i>
+            <span class="text-white">Sign out</span>
+          </a>
         </li>
       </ul>
     </div>
