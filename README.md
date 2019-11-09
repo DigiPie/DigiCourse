@@ -39,3 +39,28 @@ Each time a commit is made to the `master` branch, the project is automatically 
 * This project's backend used async/await node-postgres connection and query code written by [Francesco Zerbinati](https://gist.github.com/zerbfra/70b155fa00b4e0d6fd1d4e090a039ad4).
 * This project's web template was designed by [uxcandy.co](https://www.uxcandy.co/).
 * This project's logo was designed by [freepik - www.freepik.com](https://www.freepik.com/free-photos-vectors/logo).
+
+## Screenshots
+Dashboard page
+<br />
+<img src='img/dashboard.png?raw=true' title='Dashboard page' width='75%'/>
+<br />
+<br />
+Course page
+<br />
+<img src='img/course.png?raw=true' title='Course page' width='75%'/>
+<br />
+<br />
+Enrolment page
+<br />
+<img src='img/enrolment.png?raw=true' title='Enrolment page' width='75%'/>
+<br />
+<br />
+Account page
+<br />
+<img src='img/account.png?raw=true' title='Enrolment page' width='75%'/>
+<br />
+<br />
+Search page
+<br />
+<img src='img/search.png?raw=true' title='Enrolment page' width='75%'/>
