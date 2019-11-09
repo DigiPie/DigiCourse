@@ -149,7 +149,8 @@ router.post('/', function(req, res, next) {
 			});
 		});
 	} else {
-		return res.redirect('/course/' + cid);
+		req.flash('error', 'Please input something to search for.');
+		res.status(400).redirect('back');
 	}
 
 });
