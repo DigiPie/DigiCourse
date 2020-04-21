@@ -78,6 +78,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
+	
 	// Handle redirection
 	if (req.body.searchBox) {
 		// Prepare SQL Statement
@@ -129,7 +130,7 @@ router.post('/', function(req, res, next) {
 				dataNum: data.rowCount
 			});
 		});
-	} else {
+	} else if (req.body.C_req || req.body.TA_req) {
 		// Retrieve Information
 		var cid = req.body.c_code;
 		var type = -1;
@@ -156,14 +157,17 @@ router.post('/', function(req, res, next) {
 
 			pool.query(sql_query, [req.user.u_username, cid, year, sem, type], (err, data) => {
 				if (err) {
-					req.flash('error', 'Error. Please try again');
+					req.flash('error', 'Error. Please try again.');
 					res.status(err.status || 500).redirect('back');
 				} else {
-					req.flash('success', 'Successfully submitted Request');
+					req.flash('success', 'Successfully submitted Request.');
 					res.status(200).redirect('/applicationRequest');
 				}
 			});
 		});
+	} else {
+		req.flash('error', 'Please input something to search for.');
+		res.status(400).redirect('back');
 	}
 });
 

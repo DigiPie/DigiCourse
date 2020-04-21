@@ -1,7 +1,20 @@
 {
-  "name": "src",
-  "version": "0.0.0",
-  "private": true,
+  "name": "DigiCourse",
+  "description": "A course management platform where student-teacher interactions can take place seamlessly online.",
+  "version": "0.1.2",
+  "contributors": [
+    {
+      "name": "Evan Tay",
+      "github": "https://github.com/DigiPie",
+      "url": "https://evantay.com"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DigiPie/DigiCourse"
+  },
+  "private": false,
   "scripts": {
     "start": "node ./bin/www"
   },
